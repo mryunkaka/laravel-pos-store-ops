@@ -30,6 +30,16 @@
                     </div>
                 @endif
 
+                <!-- Alert: Error Message -->
+                @if (session()->has('error'))
+                    <div class="alert text-white bg-danger" role="alert">
+                        <div class="iq-alert-text">{{ session('error') }}</div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <x-heroicon-o-x-mark class="w-6 h-6" />
+                        </button>
+                    </div>
+                @endif
+
                 <!-- Header: Page Title and Clear Search -->
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                     <div>
@@ -112,7 +122,11 @@
                                             <td>{{ $order->payment_type }}</td>
                                             <td>{{ number_format($order->total, 2) }}</td>
                                             <td>
-                                                <span class="badge badge-warning">{{ ucfirst($order->order_status) }}</span>
+                                                @if($order->order_status == 'pending')
+                                                    <span class="badge badge-warning">Pending</span>
+                                                @elseif($order->order_status == 'cancelled')
+                                                    <span class="badge badge-danger">Cancelled</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center list-action">

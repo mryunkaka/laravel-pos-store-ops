@@ -99,18 +99,18 @@ Acceptance criteria Phase 2:
 - Dashboard tidak lagi menghitung pending order sebagai sales final.
 - Audit log minimal menyimpan user, action, module, referensi ID, old value/new value jika relevan, IP/user agent jika mudah tersedia.
 
-- [ ] Validasi stok saat add product ke cart.
-- [ ] Validasi stok saat update qty cart.
-- [ ] Validasi stok ulang saat order dibuat.
-- [ ] Validasi stok ulang saat order di-complete.
-- [ ] Cegah stok minus kecuali user punya permission khusus.
-- [ ] Tambahkan status order yang lebih jelas: `pending`, `complete`, `cancelled`, `void`.
-- [ ] Tambahkan fitur cancel pending order dengan alasan.
-- [ ] Tambahkan fitur void complete order dengan alasan dan permission supervisor.
-- [ ] Pastikan void complete order mengembalikan stok.
-- [ ] Perbaiki dashboard agar sales utama hanya menghitung order `complete`.
-- [ ] Perbaiki top selling product agar hanya menghitung order `complete`.
-- [ ] Tambahkan audit log dasar untuk login, create order, complete order, cancel/void order, update due, dan update product.
+- [x] Validasi stok saat add product ke cart.
+- [x] Validasi stok saat update qty cart.
+- [x] Validasi stok ulang saat order dibuat.
+- [x] Validasi stok ulang saat order di-complete.
+- [x] Cegah stok minus kecuali user punya permission khusus.
+- [x] Tambahkan status order yang lebih jelas: `pending`, `complete`, `cancelled`, `void`.
+- [x] Tambahkan fitur cancel pending order dengan alasan.
+- [x] Tambahkan fitur void complete order dengan alasan dan permission supervisor.
+- [x] Pastikan void complete order mengembalikan stok.
+- [x] Perbaiki dashboard agar sales utama hanya menghitung order `complete`.
+- [x] Perbaiki top selling product agar hanya menghitung order `complete`.
+- [x] Tambahkan audit log dasar untuk login, create order, complete order, cancel/void order, update due, dan update product.
 
 ## Phase 3 - Inventory Core
 

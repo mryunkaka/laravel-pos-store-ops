@@ -47,6 +47,58 @@
 
 Tujuan perubahan ini adalah mencegah AI/developer berikutnya salah tafsir, melakukan rewrite, merombak struktur awal, mengganti framework, atau mencentang TODO yang belum selesai.
 
+## 2026-06-17
+
+### Implementasi Phase 2 - Data Aman Untuk POS
+
+- Validasi stok diimplementasikan di 4 titik: add cart, update cart, store order, dan complete order.
+- Permission `allow-negative-stock` untuk user tertentu yang boleh bypass validasi stok.
+- Status order baru: `cancelled` dan `void` (sebelumnya hanya `pending` dan `complete`).
+- Fitur cancel pending order dengan alasan wajib (modal input).
+- Fitur void complete order dengan alasan, permission `void.order`, dan pengembalian stok otomatis.
+- Dashboard diperbaiki: total_paid, total_due, today_sales, top products, dan monthly chart sekarang hanya menghitung order `complete`.
+- Audit log dasar dibuat: tabel `audit_logs`, model `AuditLog`, service `AuditService::log()`.
+- Audit tercatat untuk: login, logout, create order, complete order, cancel order, void order, update due, update product.
+- Model `Order` ditambahkan helper: `isFinalized()`, `canBeCancelled()`, `canBeVoided()`, relasi `voidedBy` dan `cancelledBy`.
+- OrderController ditambahkan validasi due agar tidak negatif.
+- Pending orders list sekarang menampilkan juga order cancelled. Complete orders list menampilkan juga order void.
+- View details-order ditambahkan modal cancel/void dan informasi status cancelled/void.
+- Error alert ditambahkan di halaman POS, pending orders, complete orders, dan order details.
+- Permission baru ditambahkan via `Phase2PermissionSeeder`: `void.order`, `allow-negative-stock`, `audit.menu`.
+- Role Manager mendapat permission `void.order`.
+
+Migration yang dijalankan:
+- `2026_06_17_100000_create_audit_logs_table`
+- `2026_06_17_100001_add_cancel_void_fields_to_orders_table`
+
+Seeder yang dijalankan:
+- `Phase2PermissionSeeder`
+
+File utama yang ditambah:
+- `app/Models/AuditLog.php`
+- `app/Services/AuditService.php`
+- `database/migrations/2026_06_17_100000_create_audit_logs_table.php`
+- `database/migrations/2026_06_17_100001_add_cancel_void_fields_to_orders_table.php`
+- `database/seeders/Phase2PermissionSeeder.php`
+
+File utama yang diubah:
+- `app/Http/Controllers/Dashboard/OrderController.php`
+- `app/Http/Controllers/Dashboard/PosController.php`
+- `app/Http/Controllers/Dashboard/DashboardController.php`
+- `app/Http/Controllers/Dashboard/ProductController.php`
+- `app/Http/Controllers/Auth/AuthenticatedSessionController.php`
+- `app/Models/Order.php`
+- `routes/web.php`
+- `database/seeders/RolePermissionSeeder.php`
+- `resources/views/orders/details-order.blade.php`
+- `resources/views/orders/pending-orders.blade.php`
+- `resources/views/orders/complete-orders.blade.php`
+- `resources/views/pos/index.blade.php`
+
+Catatan risiko:
+- Audit log viewer belum tersedia di UI, disiapkan untuk Phase 7.
+- Skenario kompleks (void lalu complete ulang) belum diuji.
+
 ## Format Update Berikutnya
 
 Setiap perubahan berikutnya sebaiknya dicatat dengan format:

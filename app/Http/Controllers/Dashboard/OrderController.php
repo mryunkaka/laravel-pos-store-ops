@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Services\AuditService;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Redirect;
@@ -30,7 +31,7 @@ class OrderController extends Controller
         }
 
         $orders = QueryBuilder::for(Order::class)
-            ->where('order_status', 'pending')
+            ->whereIn('order_status', ['pending', 'cancelled'])
             ->allowedSorts([
                 'order_date',
                 'total',
@@ -60,7 +61,7 @@ class OrderController extends Controller
         }
 
         $orders = QueryBuilder::for(Order::class)
-            ->where('order_status', 'complete')
+            ->whereIn('order_status', ['complete', 'void'])
             ->allowedSorts([
                 'order_date',
                 'total',
@@ -88,6 +89,28 @@ class OrderController extends Controller
         // Validation handled by StoreOrderRequest
 
         return DB::transaction(function () use ($request) {
+            // Stock validation before creating order
+            $insufficientStock = [];
+            $contents = Cart::content();
+            $allowNegativeStock = $request->user()->can('allow-negative-stock');
+
+            if (!$allowNegativeStock) {
+                foreach ($contents as $item) {
+                    $product = Product::find($item->id);
+                    if ($product && $product->stock < $item->qty) {
+                        $insufficientStock[] = "{$product->name} (stok: {$product->stock}, diminta: {$item->qty})";
+                    }
+                }
+
+                if (!empty($insufficientStock)) {
+                    $message = 'Stok tidak mencukupi: ' . implode(', ', $insufficientStock);
+                    if ($request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => $message], 422);
+                    }
+                    return Redirect::back()->with('error', $message);
+                }
+            }
+
             $invoice_no = IdGenerator::generate([
                 'table' => 'orders',
                 'field' => 'invoice_no',
@@ -114,7 +137,6 @@ class OrderController extends Controller
             ]);
 
             // Create Order Details
-            $contents = Cart::content();
             foreach ($contents as $content) {
                 OrderDetails::create([
                     'order_id' => $order->id,
@@ -124,6 +146,9 @@ class OrderController extends Controller
                     'total' => $content->total,
                 ]);
             }
+
+            // Audit log
+            AuditService::log('order', 'create', $order, null, $order->toArray(), "Order {$invoice_no} created");
 
             // Clear Cart
             Cart::destroy();
@@ -161,24 +186,128 @@ class OrderController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Complete an order - reduces stock.
      */
     public function updateStatus(Request $request)
     {
+        $request->validate([
+            'id' => 'required|numeric|exists:orders,id',
+        ]);
+
         $order_id = $request->id;
+        $allowNegativeStock = $request->user()->can('allow-negative-stock');
 
-        DB::transaction(function () use ($order_id) {
-            $products = OrderDetails::where('order_id', $order_id)->get();
+        DB::transaction(function () use ($order_id, $allowNegativeStock) {
+            $order = Order::findOrFail($order_id);
 
-            foreach ($products as $detail) {
+            // Prevent completing non-pending orders
+            if ($order->order_status !== 'pending') {
+                abort(422, 'Only pending orders can be completed.');
+            }
+
+            // Stock validation before completing
+            $details = OrderDetails::where('order_id', $order_id)->get();
+            $insufficientStock = [];
+
+            if (!$allowNegativeStock) {
+                foreach ($details as $detail) {
+                    $product = Product::find($detail->product_id);
+                    if ($product && $product->stock < $detail->quantity) {
+                        $insufficientStock[] = "{$product->name} (stok: {$product->stock}, diminta: {$detail->quantity})";
+                    }
+                }
+
+                if (!empty($insufficientStock)) {
+                    abort(422, 'Stok tidak mencukupi: ' . implode(', ', $insufficientStock));
+                }
+            }
+
+            $oldStatus = $order->order_status;
+
+            foreach ($details as $detail) {
                 Product::where('id', $detail->product_id)
                     ->decrement('stock', $detail->quantity);
             }
 
-            Order::findOrFail($order_id)->update(['order_status' => 'complete']);
+            $order->update(['order_status' => 'complete']);
+
+            // Audit log
+            AuditService::log('order', 'complete', $order, ['order_status' => $oldStatus], ['order_status' => 'complete'], "Order {$order->invoice_no} completed, stock reduced");
         });
 
         return Redirect::route('order.pendingOrders')->with('success', 'Order has been completed!');
+    }
+
+    /**
+     * Cancel a pending order with reason.
+     */
+    public function cancelOrder(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|numeric|exists:orders,id',
+            'cancel_reason' => 'required|string|max:500',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if (!$order->canBeCancelled()) {
+            return Redirect::back()->with('error', 'Only pending orders can be cancelled.');
+        }
+
+        $oldStatus = $order->order_status;
+
+        $order->update([
+            'order_status' => 'cancelled',
+            'cancel_reason' => $request->cancel_reason,
+            'cancelled_by' => auth()->id(),
+            'cancelled_at' => Carbon::now(),
+        ]);
+
+        // Audit log
+        AuditService::log('order', 'cancel', $order, ['order_status' => $oldStatus], ['order_status' => 'cancelled', 'cancel_reason' => $request->cancel_reason], "Order {$order->invoice_no} cancelled");
+
+        return Redirect::route('order.pendingOrders')->with('success', 'Order has been cancelled.');
+    }
+
+    /**
+     * Void a completed order with reason and restore stock.
+     * Requires 'void.order' permission.
+     */
+    public function voidOrder(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|numeric|exists:orders,id',
+            'void_reason' => 'required|string|max:500',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if (!$order->canBeVoided()) {
+            return Redirect::back()->with('error', 'Only completed orders can be voided.');
+        }
+
+        DB::transaction(function () use ($order, $request) {
+            $oldStatus = $order->order_status;
+
+            // Restore stock
+            $details = OrderDetails::where('order_id', $order->id)->get();
+            foreach ($details as $detail) {
+                Product::where('id', $detail->product_id)
+                    ->increment('stock', $detail->quantity);
+            }
+
+            $order->update([
+                'order_status' => 'void',
+                'void_reason' => $request->void_reason,
+                'voided_by' => auth()->id(),
+                'voided_at' => Carbon::now(),
+            ]);
+
+            // Audit log
+            AuditService::log('order', 'void', $order, ['order_status' => $oldStatus], ['order_status' => 'void', 'void_reason' => $request->void_reason], "Order {$order->invoice_no} voided, stock restored");
+        });
+
+        return Redirect::route('order.completeOrders')->with('success', 'Order has been voided and stock restored.');
     }
 
     public function invoiceDownload(int $order_id)
@@ -256,10 +385,20 @@ class OrderController extends Controller
         $paid_due = $mainDue - $request->due_amount;
         $paid_pay = $mainPay + $request->due_amount;
 
+        // Prevent negative due
+        if ($paid_due < 0) {
+            return Redirect::back()->with('error', 'Jumlah bayar melebihi sisa piutang!');
+        }
+
+        $oldValues = ['pay_amount' => $mainPay, 'due_amount' => $mainDue];
+
         $order->update([
             'due_amount' => $paid_due,
             'pay_amount' => $paid_pay,
         ]);
+
+        // Audit log
+        AuditService::log('order', 'update_due', $order, $oldValues, ['pay_amount' => $paid_pay, 'due_amount' => $paid_due], "Due payment for {$order->invoice_no}");
 
         return Redirect::route('order.pendingDue')->with('success', 'Due Amount Updated Successfully!');
     }

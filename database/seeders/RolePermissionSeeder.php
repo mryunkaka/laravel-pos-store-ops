@@ -27,11 +27,14 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'roles.menu', 'group_name' => 'roles']);
         Permission::create(['name' => 'user.menu', 'group_name' => 'user']);
         Permission::create(['name' => 'database.menu', 'group_name' => 'database']);
+        Permission::create(['name' => 'void.order', 'group_name' => 'orders']);
+        Permission::create(['name' => 'allow-negative-stock', 'group_name' => 'stock']);
+        Permission::create(['name' => 'audit.menu', 'group_name' => 'audit']);
 
         // Create Roles and Assign Permissions
         Role::create(['name' => 'SuperAdmin'])->givePermissionTo(Permission::all());
         Role::create(['name' => 'Admin'])->givePermissionTo(['customer.menu', 'user.menu', 'supplier.menu', 'attendance.menu']);
         Role::create(['name' => 'Account'])->givePermissionTo(['customer.menu', 'user.menu', 'supplier.menu']);
-        Role::create(['name' => 'Manager'])->givePermissionTo(['stock.menu', 'orders.menu', 'product.menu', 'salary.menu', 'employee.menu', 'attendance.menu']);
+        Role::create(['name' => 'Manager'])->givePermissionTo(['stock.menu', 'orders.menu', 'product.menu', 'salary.menu', 'employee.menu', 'attendance.menu', 'void.order']);
     }
 }

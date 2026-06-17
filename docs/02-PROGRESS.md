@@ -23,6 +23,56 @@
 - [x] Product flow sudah dicek di `ProductController`.
 - [x] Dashboard summary sudah dicek di `DashboardController`.
 
+## Phase 2 - Selesai (2026-06-17)
+
+### Validasi Stok
+- [x] Validasi stok saat add product ke cart (`PosController@addCart`).
+- [x] Validasi stok saat update qty cart (`PosController@updateCart`).
+- [x] Validasi stok ulang saat order dibuat (`OrderController@storeOrder`).
+- [x] Validasi stok ulang saat order di-complete (`OrderController@updateStatus`).
+- [x] Permission `allow-negative-stock` untuk bypass validasi stok.
+
+### Cancel & Void
+- [x] Migration: kolom `cancel_reason`, `void_reason`, `voided_by`, `voided_at`, `cancelled_by`, `cancelled_at` di tabel `orders`.
+- [x] Status order baru: `cancelled`, `void` (selain `pending`, `complete`).
+- [x] Cancel pending order dengan alasan wajib (modal input).
+- [x] Void complete order dengan alasan + permission `void.order` + stok dikembalikan.
+- [x] Void hanya mengembalikan stok 1x.
+
+### Dashboard Fix
+- [x] `total_paid` dan `total_due` hanya hitung order `complete`.
+- [x] `today_sales` hanya hitung order `complete`.
+- [x] Top selling product hanya hitung order `complete`.
+- [x] Monthly chart hanya hitung order `complete`.
+
+### Audit Log
+- [x] Tabel `audit_logs` dengan kolom: user_id, module, action, reference_type, reference_id, old_values, new_values, ip_address, user_agent, description.
+- [x] Model `AuditLog` dan `AuditService::log()`.
+- [x] Audit tercatat untuk: login, logout, create order, complete order, cancel order, void order, update due, update product.
+
+### Permission Baru
+- `void.order` - diberikan ke SuperAdmin dan Manager.
+- `allow-negative-stock` - diberikan ke SuperAdmin.
+- `audit.menu` - disiapkan untuk audit log viewer (Phase 7).
+
+### File Utama yang Diubah/Ditambah
+- `database/migrations/2026_06_17_100000_create_audit_logs_table.php`
+- `database/migrations/2026_06_17_100001_add_cancel_void_fields_to_orders_table.php`
+- `database/seeders/Phase2PermissionSeeder.php`
+- `app/Models/AuditLog.php`
+- `app/Models/Order.php` (tambah kolom, helper method)
+- `app/Services/AuditService.php`
+- `app/Http/Controllers/Dashboard/OrderController.php` (validasi stok, cancel, void)
+- `app/Http/Controllers/Dashboard/PosController.php` (validasi stok)
+- `app/Http/Controllers/Dashboard/DashboardController.php` (fix query)
+- `app/Http/Controllers/Dashboard/ProductController.php` (audit log)
+- `app/Http/Controllers/Auth/AuthenticatedSessionController.php` (audit log)
+- `routes/web.php` (route cancel, void)
+- `resources/views/orders/details-order.blade.php` (modal cancel/void, status display)
+- `resources/views/orders/pending-orders.blade.php` (badge, error alert)
+- `resources/views/orders/complete-orders.blade.php` (badge, error alert)
+- `resources/views/pos/index.blade.php` (error alert)
+
 ## Kesimpulan Teknis Saat Ini
 
 - POS membuat order dengan status `pending`.
@@ -34,16 +84,13 @@
 
 ## Risiko Saat Ini
 
-- Stok bisa minus karena belum ada validasi stok saat add/update cart dan complete order.
-- Dashboard `today_sales` menghitung semua order berdasarkan `created_at`, bukan hanya complete order.
-- Top selling product menghitung semua `order_details`, termasuk order pending.
-- Tidak ada audit trail untuk perubahan stok, harga, pembayaran, dan status order.
-- Tidak ada mekanisme void/cancel resmi dengan alasan dan approval.
 - `composer.phar` masih file lokal untracked, dipakai supaya tidak perlu Composer global.
+- Audit log viewer belum tersedia (direncanakan di Phase 7).
+- Stok yang sudah pernah di-void dan di-complete ulang belum diuji skenario kompleks.
 
 ## Next Step
 
-Kerjakan `03-TODO.md` mulai dari Phase 1. Jangan lanjut Phase 2 sebelum semua checklist Phase 1 selesai dan ditandai.
+Kerjakan `03-TODO.md` Phase 3 - Inventory Core. Jangan lanjut Phase 4 sebelum semua checklist Phase 3 selesai.
 
 ## Instruksi Untuk Sesi Lanjutan
 

@@ -30,7 +30,7 @@ use App\Http\Controllers\Dashboard\UserController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 
@@ -127,6 +127,10 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/pending/due', [OrderController::class, 'pendingDue'])->name('order.pendingDue');
     Route::get('/order/due/{id}', [OrderController::class, 'orderDueAjax'])->name('order.orderDueAjax');
     Route::post('/update/due', [OrderController::class, 'updateDue'])->name('order.updateDue');
+
+    // Cancel & Void
+    Route::post('/orders/cancel', [OrderController::class, 'cancelOrder'])->name('order.cancel');
+    Route::post('/orders/void', [OrderController::class, 'voidOrder'])->middleware(['permission:void.order'])->name('order.void');
 
     // Stock Management
 

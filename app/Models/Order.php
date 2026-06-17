@@ -13,6 +13,12 @@ class Order extends Model
         'customer_id',
         'order_date',
         'order_status',
+        'cancel_reason',
+        'void_reason',
+        'voided_by',
+        'voided_at',
+        'cancelled_by',
+        'cancelled_at',
         'total_products',
         'sub_total',
         'vat',
@@ -30,7 +36,43 @@ class Order extends Model
         'total' => 'float',
         'pay_amount' => 'float',
         'due_amount' => 'float',
+        'voided_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
+
+    /**
+     * Check if order is in a final state (cannot be modified).
+     */
+    public function isFinalized(): bool
+    {
+        return in_array($this->order_status, ['complete', 'cancelled', 'void']);
+    }
+
+    /**
+     * Check if order can be cancelled.
+     */
+    public function canBeCancelled(): bool
+    {
+        return $this->order_status === 'pending';
+    }
+
+    /**
+     * Check if order can be voided.
+     */
+    public function canBeVoided(): bool
+    {
+        return $this->order_status === 'complete';
+    }
+
+    public function voidedBy()
+    {
+        return $this->belongsTo(User::class, 'voided_by');
+    }
+
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
+    }
 
     public function customer()
     {

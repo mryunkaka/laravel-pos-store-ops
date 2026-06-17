@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use Exception;
 use App\Models\Product;
 use App\Models\Category;
+use App\Services\AuditService;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedSort;
 use Illuminate\Http\Request;
@@ -154,6 +155,9 @@ class ProductController extends Controller
 
         Product::where('id', $product->id)->update($validatedData);
 
+        // Audit log
+        AuditService::log('product', 'update', $product, null, $validatedData, "Product {$product->name} updated");
+
         return Redirect::route('products.index')->with('success', 'Product has been updated!');
     }
 
@@ -225,7 +229,7 @@ class ProductController extends Controller
         return Redirect::route('products.index')->with('success', 'Data has been successfully imported!');
     }
 
-    public function exportExcel($products)
+    public function exportExcel(array $products)
     {
         ini_set('max_execution_time', 0);
         ini_set('memory_limit', '4000M');

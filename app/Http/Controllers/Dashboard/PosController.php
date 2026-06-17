@@ -50,6 +50,27 @@ class PosController extends Controller
             'price' => 'required|numeric',
         ]);
 
+        // Stock validation
+        $product = Product::findOrFail($validatedData['id']);
+        $currentQtyInCart = 0;
+        foreach (Cart::content() as $item) {
+            if ($item->id == $validatedData['id']) {
+                $currentQtyInCart = $item->qty;
+                break;
+            }
+        }
+
+        $newQty = $currentQtyInCart + 1;
+        if (!$request->user()->can('allow-negative-stock') && $product->stock < $newQty) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Stok tidak mencukupi! Stok tersedia: {$product->stock}",
+                ], 422);
+            }
+            return Redirect::back()->with('error', "Stok tidak mencukupi! Stok tersedia: {$product->stock}");
+        }
+
         Cart::add([
             'id' => $validatedData['id'],
             'name' => $validatedData['name'],
@@ -78,8 +99,25 @@ class PosController extends Controller
     public function updateCart(Request $request, string $rowId)
     {
         $validatedData = $request->validate([
-            'qty' => 'required|numeric',
+            'qty' => 'required|numeric|min:1',
         ]);
+
+        // Stock validation
+        $cartItem = Cart::get($rowId);
+        if ($cartItem) {
+            $product = Product::find($cartItem->id);
+            if ($product && !$request->user()->can('allow-negative-stock')) {
+                if ($product->stock < $validatedData['qty']) {
+                    if ($request->wantsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Stok tidak mencukupi! Stok tersedia: {$product->stock}",
+                        ], 422);
+                    }
+                    return Redirect::back()->with('error', "Stok tidak mencukupi! Stok tersedia: {$product->stock}");
+                }
+            }
+        }
 
         Cart::update($rowId, $validatedData['qty']);
 

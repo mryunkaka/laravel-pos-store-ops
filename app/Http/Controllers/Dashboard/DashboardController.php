@@ -12,17 +12,21 @@ class DashboardController extends Controller
     public function index()
     {
         // 1. Key Metrics
-        $total_paid = Order::sum('pay_amount');
-        $total_due = Order::sum('due_amount');
+        $total_paid = Order::where('order_status', 'complete')->sum('pay_amount');
+        $total_due = Order::where('order_status', 'complete')->sum('due_amount');
         $complete_orders = Order::where('order_status', 'complete')->count();
         $pending_orders = Order::where('order_status', 'pending')->count();
 
-        // 2. Today's Snapshot
-        $today_sales = Order::whereDate('created_at', \Carbon\Carbon::today())->sum('total');
+        // 2. Today's Snapshot (only complete orders)
+        $today_sales = Order::where('order_status', 'complete')
+            ->whereDate('created_at', \Carbon\Carbon::today())
+            ->sum('total');
 
-        // 3. Top 5 Best Selling Products (by Quantity Sold)
+        // 3. Top 5 Best Selling Products (only from complete orders)
         $top_products = \Illuminate\Support\Facades\DB::table('order_details')
+            ->join('orders', 'order_details.order_id', '=', 'orders.id')
             ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->where('orders.order_status', 'complete')
             ->select(
                 'products.name as product_name',
                 'products.image as product_image',
@@ -34,11 +38,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // 4. Monthly Sales Data for Chart (Current Year)
+        // 4. Monthly Sales Data for Chart (only complete orders, Current Year)
         $monthly_sales = Order::select(
             \Illuminate\Support\Facades\DB::raw('SUM(total) as total_amount'),
             \Illuminate\Support\Facades\DB::raw('MONTH(created_at) as month')
         )
+            ->where('order_status', 'complete')
             ->whereYear('created_at', date('Y'))
             ->groupBy('month')
             ->orderBy('month')
