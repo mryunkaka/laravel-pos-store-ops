@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Edit Employee</h4>
+                            <h4 class="card-title">Edit Karyawan</h4>
                         </div>
                     </div>
 
@@ -35,7 +35,7 @@
                                                 </div>
                                                 </div>
                                                 <div class="img-extension mt-3">
-                                                    <span class="text-muted small">Only .jpg, .png, .jpeg allowed</span>
+                                                    <span class="text-muted small">Hanya .jpg, .png, .jpeg yang diperbolehkan</span>
                                                 </div>
                                                 </div>
                                                 </div>
@@ -44,9 +44,9 @@
                             <!-- Section: Personal Information -->
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
-                                    <label for="name">Employee Name <span class="text-danger">*</span></label>
+                                    <label for="name">Nama Karyawan <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name"
-                                        value="{{ old('name', $employee->name) }}" placeholder="Enter full name" required>
+                                        value="{{ old('name', $employee->name) }}" placeholder="Masukkan nama lengkap" required>
                                     @error('name')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -55,9 +55,9 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="email">Employee Email <span class="text-danger">*</span></label>
+                                    <label for="email">Email Karyawan <span class="text-danger">*</span></label>
                                     <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
-                                        value="{{ old('email', $employee->email) }}" placeholder="Enter email address" required>
+                                        value="{{ old('email', $employee->email) }}" placeholder="Masukkan alamat email" required>
                                     @error('email')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -66,9 +66,9 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="phone">Employee Phone <span class="text-danger">*</span></label>
+                                    <label for="phone">Telepon Karyawan <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone"
-                                        value="{{ old('phone', $employee->phone) }}" placeholder="Enter phone number" required>
+                                        value="{{ old('phone', $employee->phone) }}" placeholder="Masukkan nomor telepon" required>
                                     @error('phone')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -77,9 +77,9 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="city">Employee City <span class="text-danger">*</span></label>
+                                    <label for="city">Kota Karyawan <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city"
-                                        value="{{ old('city', $employee->city) }}" placeholder="Enter city" required>
+                                        value="{{ old('city', $employee->city) }}" placeholder="Masukkan kota" required>
                                     @error('city')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -88,9 +88,9 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="salary">Employee Salary ($) <span class="text-danger">*</span></label>
+                                    <label for="salary">Gaji Karyawan ($) <span class="text-danger">*</span></label>
                                     <input type="number" step="0.01" class="form-control @error('salary') is-invalid @enderror" id="salary" name="salary"
-                                        value="{{ old('salary', $employee->salary) }}" placeholder="Enter salary amount" required>
+                                        value="{{ old('salary', $employee->salary) }}" placeholder="Masukkan jumlah gaji" required>
                                     @error('salary')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -99,10 +99,10 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="experience">Experience</label>
+                                    <label for="experience">Pengalaman</label>
                                     <select class="form-control @error('experience') is-invalid @enderror" name="experience" id="experience">
-                                        <option value="" disabled>Select Experience Year...</option>
-                                        @foreach (['1 Year', '2 Year', '3 Year', '4 Year', '5 Year', '5+ Year'] as $option)
+                                        <option value="" disabled>Pilih Tahun Pengalaman...</option>
+                                        @foreach (['1 Tahun', '2 Tahun', '3 Tahun', '4 Tahun', '5 Tahun', '5+ Tahun'] as $option)
                                             <option value="{{ $option }}" {{ old('experience', $employee->experience) == $option ? 'selected' : '' }}>
                                                 {{ $option }}
                                             </option>
@@ -116,9 +116,9 @@
                                         </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="vacation">Vacation Days</label>
+                                    <label for="vacation">Hari Libur</label>
                                     <input type="text" class="form-control @error('vacation') is-invalid @enderror" id="vacation" name="vacation"
-                                        value="{{ old('vacation', $employee->vacation) }}" placeholder="Enter vacation days">
+                                        value="{{ old('vacation', $employee->vacation) }}" placeholder="Masukkan hari libur">
                                     @error('vacation')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -127,9 +127,9 @@
                                     </div>
 
                                 <div class="form-group col-md-12">
-                                    <label for="address">Address <span class="text-danger">*</span></label>
+                                    <label for="address">Alamat <span class="text-danger">*</span></label>
                                     <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3"
-                                        placeholder="Enter full address" required>{{ old('address', $employee->address) }}</textarea>
+                                        placeholder="Masukkan alamat lengkap" required>{{ old('address', $employee->address) }}</textarea>
                                     @error('address')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -140,8 +140,8 @@
 
                             <!-- Section: Form Actions -->
                             <div class="mt-2">
-                                <button type="submit" class="btn btn-primary mr-2">Update Employee</button>
-                                <a class="btn btn-secondary" href="{{ route('employees.index') }}">Cancel</a>
+                                <button type="submit" class="btn btn-primary mr-2">Perbarui Karyawan</button>
+                                <a class="btn btn-secondary" href="{{ route('employees.index') }}">Batal</a>
                             </div>
                             </form>
                             </div>

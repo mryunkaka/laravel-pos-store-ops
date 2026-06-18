@@ -13,7 +13,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Pay Salary</h4>
+                            <h4 class="card-title">Bayar Gaji</h4>
                         </div>
                     </div>
 
@@ -25,44 +25,44 @@
                             <div class="row align-items-center">
                                 {{-- Section: Employee Information --}}
                                 <div class="form-group col-md-6">
-                                    <label>Employee Name</label>
+                                    <label>Nama Karyawan</label>
                                     <input type="text" class="form-control bg-white" value="{{ $advanceSalary->employee->name }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Month</label>
+                                    <label>Bulan</label>
                                     <input type="text" class="form-control bg-white" value="{{ $advanceSalary->date }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Salary</label>
+                                    <label>Gaji</label>
                                     <input type="text" class="form-control bg-white" value="{{ $advanceSalary->employee->salary }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Advance Salary</label>
+                                    <label>Gaji di Muka</label>
                                     <input type="text" class="form-control bg-white" value="{{ $advanceSalary->advance_salary }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Due Salary</label>
+                                    <label>Gaji Terhutang</label>
                                     <input type="text" class="form-control bg-white"
                                         value="{{ $advanceSalary->employee->salary - $advanceSalary->advance_salary }}" readonly>
                                 </div>
 
                                 {{-- Section: Salary Month Selection --}}
                                 <div class="form-group col-md-4">
-                                    <label for="month">Salary Month <span class="text-danger">*</span></label>
+                                    <label for="month">Bulan Gaji <span class="text-danger">*</span></label>
                                     <select class="form-control @error('month') is-invalid @enderror" name="month" required>
-                                        <option value="" disabled selected>Select Month</option>
-                                        <option value="01">January</option>
-                                        <option value="02">February</option>
-                                        <option value="03">March</option>
+                                        <option value="" disabled selected>Pilih Bulan</option>
+                                        <option value="01">Januari</option>
+                                        <option value="02">Februari</option>
+                                        <option value="03">Maret</option>
                                         <option value="04">April</option>
-                                        <option value="05">May</option>
-                                        <option value="06">June</option>
-                                        <option value="07">July</option>
-                                        <option value="08">August</option>
+                                        <option value="05">Mei</option>
+                                        <option value="06">Juni</option>
+                                        <option value="07">Juli</option>
+                                        <option value="08">Agustus</option>
                                         <option value="09">September</option>
-                                        <option value="10">October</option>
+                                        <option value="10">Oktober</option>
                                         <option value="11">November</option>
-                                        <option value="12">December</option>
+                                        <option value="12">Desember</option>
                                     </select>
                                     @error('month')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -70,7 +70,7 @@
                                 </div>
 
                                 <div class="form-group col-md-4">
-                                    <label for="year">Salary Year <span class="text-danger">*</span></label>
+                                    <label for="year">Tahun Gaji <span class="text-danger">*</span></label>
                                     <select class="form-control @error('year') is-invalid @enderror" name="year" required>
                                         <option value="{{ date('Y') }}">{{ date('Y') }}</option>
                                         <option value="{{ date('Y') - 1 }}">{{ date('Y') - 1 }}</option>
@@ -82,7 +82,7 @@
 
                                 {{-- Section: Payment Date --}}
                                 <div class="form-group col-md-4">
-                                    <label for="datepicker">Payment Date <span class="text-danger">*</span></label>
+                                    <label for="datepicker">Tanggal Pembayaran <span class="text-danger">*</span></label>
                                     <input id="datepicker" class="form-control @error('date') is-invalid @enderror" name="date"
                                         value="{{ old('date', date('Y-m-d')) }}" />
                                     @error('date')
@@ -96,10 +96,10 @@
                             {{-- Section: Form Actions --}}
                             <div class="mt-2">
                                 <button type="submit" class="btn btn-primary mr-2">
-                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Pay Salary
+                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Bayar Gaji
                                 </button>
                                 <a class="btn btn-secondary" href="{{ route('pay-salary.index') }}">
-                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Cancel
+                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Batal
                                 </a>
                             </div>
                         </form>

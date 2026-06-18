@@ -11,7 +11,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Role in Permission</h4>
+                            <h4 class="card-title">Role dalam Permission</h4>
                         </div>
                     </div>
 
@@ -22,10 +22,10 @@
                             <div class=" row align-items-center">
 
                                 <div class="form-group col-md-6">
-                                    <label for="role_id">Role Name <span class="text-danger">*</span></label>
+                                    <label for="role_id">Nama Role <span class="text-danger">*</span></label>
                                     <select class="form-control @error('role') is-invalid @enderror" id="role_id"
                                         name="role_id" required>
-                                        <option selected="" disabled>-- Select Role --</option>
+                                        <option selected="" disabled="">-- Pilih Role --</option>
                                         @foreach ($roles as $role)
                                             <option value="{{ $role->id }}">{{ $role->name }}</option>
                                         @endforeach
@@ -40,7 +40,7 @@
 
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
-                                    <label for="name">Permission Name <span class="text-danger">*</span></label>
+                                    <label for="name">Nama Permission <span class="text-danger">*</span></label>
                                     @error('name')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -54,7 +54,7 @@
                                 <div class="form-group col-md-3">
                                     <div class="custom-control custom-checkbox custom-control-inline">
                                         <input type="checkbox" class="custom-control-input" id="check-all">
-                                        <label class="custom-control-label" for="check-all">Check All</label>
+                                        <label class="custom-control-label" for="check-all">Centang Semua</label>
                                     </div>
                                 </div>
                             </div>
@@ -104,10 +104,10 @@
                             <!-- end: Input Data -->
                             <div class="mt-2">
                                 <button type="submit" class="btn btn-primary mr-2">
-                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Save
+                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Simpan
                                 </button>
                                 <a class="btn bg-danger" href="{{ route('rolePermission.index') }}">
-                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Cancel
+                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Batal
                                 </a>
                             </div>
                         </form>

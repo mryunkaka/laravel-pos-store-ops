@@ -17,16 +17,16 @@
             {{-- Section: Header and Add Button --}}
             <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                 <div>
-                    <h4 class="mb-3">Supplier List</h4>
-                    <p class="mb-0">A supplier dashboard lets you easily gather and visualize supplier data from optimizing <br>
-                        the supplier experience, ensuring supplier retention. </p>
+                    <h4 class="mb-3">Daftar Pemasok</h4>
+                    <p class="mb-0">Dashboard pemasok memungkinkan Anda dengan mudah mengumpulkan dan memvisualisasikan data pemasok <br>
+                        untuk mengoptimalkan pengalaman pemasok dan menjaga retensi pemasok.</p>
                 </div>
                 <div>
                     <a href="{{ route('suppliers.create') }}" class="btn btn-primary add-list">
-                        <x-heroicon-o-plus class="w-5 h-5 mr-3" />Add Supplier
+                        <x-heroicon-o-plus class="w-5 h-5 mr-3" />Tambah Pemasok
                     </a>
                     <a href="{{ route('suppliers.index') }}" class="btn btn-danger add-list">
-                        <x-heroicon-o-x-mark class="w-5 h-5 mr-3" />Clear Search
+                        <x-heroicon-o-x-mark class="w-5 h-5 mr-3" />Bersihkan Pencarian
                     </a>
                 </div>
             </div>
@@ -37,7 +37,7 @@
             <form action="{{ route('suppliers.index') }}" method="get">
                 <div class="d-flex flex-wrap align-items-center justify-content-between">
                     <div class="form-group row">
-                        <label for="row" class="col-sm-3 align-self-center">Row:</label>
+                        <label for="row" class="col-sm-3 align-self-center">Baris:</label>
                         <div class="col-sm-9">
                             <select class="form-control" name="row" onchange="this.form.submit()">
                                 <option value="10" @if(request('row') == '10')selected="selected"@endif>10</option>
@@ -49,10 +49,10 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="control-label col-sm-3 align-self-center" for="search">Search:</label>
+                        <label class="control-label col-sm-3 align-self-center" for="search">Cari:</label>
                         <div class="col-sm-8">
                             <div class="input-group">
-                                <input type="text" id="search" class="form-control" name="search" placeholder="Search supplier" value="{{ request('search') }}">
+                                <input type="text" id="search" class="form-control" name="search" placeholder="Cari pemasok" value="{{ request('search') }}">
                                 <div class="input-group-append">
                                     <button type="submit" class="input-group-text bg-primary">
                                         <x-heroicon-o-magnifying-glass class="w-5 h-5" />
@@ -72,11 +72,11 @@
                     <thead class="bg-white text-uppercase">
                         <tr class="ligth ligth-data">
                             <th>No.</th>
-                            <th><x-sort-link name="name" label="Name" /></th>
+                            <th><x-sort-link name="name" label="Nama" /></th>
                             <th><x-sort-link name="email" label="Email" /></th>
-                            <th><x-sort-link name="phone" label="Phone" /></th>
-                            <th><x-sort-link name="city" label="City" /></th>
-                            <th>Action</th>
+                            <th><x-sort-link name="phone" label="Telepon" /></th>
+                            <th><x-sort-link name="city" label="Kota" /></th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="ligth-body">
@@ -89,16 +89,16 @@
                             <td>{{ $supplier->city }}</td>
                             <td>
                                 <div class="d-flex align-items-center justify-content-center list-action">
-                                    <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="View" href="{{ route('suppliers.show', $supplier->id) }}">
+                                    <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Lihat" href="{{ route('suppliers.show', $supplier->id) }}">
                                         <x-heroicon-o-eye class="w-5 h-5 mr-0" />
                                     </a>
-                                    <a class="btn btn-success mr-2" data-toggle="tooltip" data-placement="top" title="Edit" href="{{ route('suppliers.edit', $supplier->id) }}">
+                                    <a class="btn btn-success mr-2" data-toggle="tooltip" data-placement="top" title="Ubah" href="{{ route('suppliers.edit', $supplier->id) }}">
                                         <x-heroicon-o-pencil class="w-5 h-5 mr-0" />
                                     </a>
                                     <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST" style="display:inline;">
                                         @method('delete')
                                         @csrf
-                                        <button type="submit" class="btn btn-warning border-0" onclick="return confirm('Are you sure you want to delete this record?')" data-toggle="tooltip" data-placement="top" title="Delete">
+                                        <button type="submit" class="btn btn-warning border-0" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" data-toggle="tooltip" data-placement="top" title="Hapus">
                                             <x-heroicon-o-trash class="w-5 h-5 mr-0" />
                                         </button>
                                     </form>

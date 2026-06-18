@@ -33,12 +33,12 @@
                 <!-- Header: Page Title and Clear Search -->
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                     <div>
-                        <h4 class="mb-3">Pending Due List</h4>
-                        <p class="mb-0">List of orders with outstanding due amounts.</p>
+                        <h4 class="mb-3">Daftar Piutang Tertunda</h4>
+                        <p class="mb-0">Daftar order dengan sisa piutang yang belum lunas.</p>
                     </div>
                     <div>
                         <a href="{{ route('order.pendingDue') }}" class="btn btn-danger add-list d-flex align-items-center">
-                            <x-heroicon-o-trash class="w-5 h-5 mr-1" /> Clear Search
+                            <x-heroicon-o-trash class="w-5 h-5 mr-1" /> Bersihkan Pencarian
                         </a>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
                             <div class="d-flex flex-wrap align-items-center justify-content-between">
                                 <div class="form-group mb-0 mr-2 mt-n3 row-selector-container">
                                     <div class="d-flex align-items-center">
-                                        <label for="row" class="mb-0 mr-2" style="min-width: 50px;">Row:</label>
+                                        <label for="row" class="mb-0 mr-2" style="min-width: 50px;">Baris:</label>
                                         <select class="form-control" name="row">
                                             <option value="10" @if (request('row') == '10') selected="selected" @endif>10
                                             </option>
@@ -69,10 +69,10 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="control-label col-sm-3 align-self-center" for="search">Search:</label>
+                                    <label class="control-label col-sm-3 align-self-center" for="search">Cari:</label>
                                     <div class="col-sm-8">
                                         <div class="input-group">
-                                            <input type="text" id="search" class="form-control" name="search" placeholder="Search order"
+                                            <input type="text" id="search" class="form-control" name="search" placeholder="Cari order"
                                                 value="{{ request('search') }}">
                                             <div class="input-group-append">
                                                 <button type="submit" class="input-group-text bg-primary">
@@ -91,13 +91,13 @@
                                 <thead class="bg-white text-uppercase">
                                     <tr class="ligth ligth-data">
                                         <th>No.</th>
-                                        <th>Invoice No</th>
-                                        <th><x-sort-link name="customer.name" label="Name" /></th>
-                                        <th><x-sort-link name="order_date" label="Order Date" /></th>
-                                        <th>Payment</th>
-                                        <th><x-sort-link name="pay_amount" label="Pay" /></th>
-                                        <th><x-sort-link name="due_amount" label="Due" /></th>
-                                        <th>Action</th>
+                                        <th>No. Faktur</th>
+                                        <th><x-sort-link name="customer.name" label="Nama" /></th>
+                                        <th><x-sort-link name="order_date" label="Tanggal Order" /></th>
+                                        <th>Pembayaran</th>
+                                        <th><x-sort-link name="pay_amount" label="Dibayar" /></th>
+                                        <th><x-sort-link name="due_amount" label="Piutang" /></th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="ligth-body">
@@ -115,7 +115,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center list-action">
                                                     <!-- Details Button -->
-                                                    <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Details"
+                                                    <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Detail"
                                                         href="{{ route('order.orderDetails', $order->id) }}">
                                                         <x-heroicon-o-eye class="w-5 h-5 mr-0" />
                                                     </a>
@@ -129,7 +129,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center">No pending due orders found.</td>
+                                            <td colspan="8" class="text-center">Tidak ada piutang tertunda ditemukan.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -150,7 +150,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Pay Due Amount</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Bayar Sisa Piutang</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -161,13 +161,13 @@
                     <div class="modal-body">
                         <input type="hidden" name="order_id" id="order_id">
                         <div class="form-group">
-                            <label for="due_amount">Pay Amount</label>
+                            <label for="due_amount">Jumlah Bayar</label>
                             <input type="number" class="form-control" name="due_amount" id="due_amount" required step="0.01">
                             </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Pay</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Bayar</button>
                             </div>
                             </form>
                             </div>

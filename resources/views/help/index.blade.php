@@ -41,18 +41,18 @@
             <!-- Header Section -->
             <div class="flex flex-wrap items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Help & Documentation</h2>
-                    <p class="text-gray-600">Comprehensive guide to POSDash - Your Point of Sale Management System</p>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Bantuan & Dokumentasi</h2>
+                    <p class="text-gray-600">Panduan lengkap untuk POSDash - Sistem Manajemen Kasir Anda</p>
                 </div>
             </div>
 
             <!-- Introduction Card -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
-                <h3 class="text-xl font-semibold text-gray-800 mb-3">About POSDash</h3>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Tentang POSDash</h3>
                 <p class="text-gray-700 leading-relaxed">
-                    POSDash is a robust, enterprise-grade Point of Sale (POS) management system designed for efficiency and ease of use.
-                    This application provides comprehensive tools for managing sales, inventory, employees, customers, and financial operations
-                    all in one integrated platform.
+                    POSDash adalah sistem manajemen Point of Sale (POS) yang handal dan berkelas enterprise, dirancang untuk efisiensi dan kemudahan penggunaan.
+                    Aplikasi ini menyediakan alat lengkap untuk mengelola penjualan, inventaris, karyawan, pelanggan, dan operasi keuangan
+                    semuanya dalam satu platform terintegrasi.
                 </p>
             </div>
 
@@ -69,27 +69,27 @@
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Fast and user-friendly transaction processing interface</span>
+                            <span>Antarmuka pemrosesan transaksi yang cepat dan ramah pengguna</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Smart product search by name or code</span>
+                            <span>Pencarian produk pintar berdasarkan nama atau kode</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Real-time cart management with dynamic calculations</span>
+                            <span>Pengelolaan keranjang real-time dengan perhitungan dinamis</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Automatic subtotal and tax calculations</span>
+                            <span>Perhitungan subtotal dan pajak otomatis</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Customer selection and quick customer creation</span>
+                            <span>Pemilihan pelanggan dan pembuatan pelanggan cepat</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Professional invoice and receipt generation</span>
+                            <span>Penerbitan faktur dan kuitansi profesional</span>
                         </li>
                     </ul>
                 </div>
@@ -100,32 +100,32 @@
                         <div class="bg-cyan-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-archive-box class="w-6 h-6 text-cyan-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Product & Inventory</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Produk & Inventaris</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Complete product catalog management</span>
+                            <span>Pengelolaan katalog produk lengkap</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Hierarchical category organization</span>
+                            <span>Pengorganisasian kategori secara hierarkis</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Automated stock tracking and deduction</span>
+                            <span>Pelacakan dan pengurangan stok otomatis</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Barcode support for product identification</span>
+                            <span>Dukungan barcode untuk identifikasi produk</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Product import/export functionality</span>
+                            <span>Fungsi impor/ekspor produk</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Expiry date tracking for products</span>
+                            <span>Pelacakan tanggal kedaluwarsa produk</span>
                         </li>
                     </ul>
                 </div>
@@ -136,32 +136,32 @@
                         <div class="bg-green-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-shopping-bag class="w-6 h-6 text-green-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Order Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Pengelolaan Pesanan</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Track pending and completed orders</span>
+                            <span>Melacak pesanan pending dan yang sudah selesai</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Manage pending due payments</span>
+                            <span>Kelola pembayaran tunggakan pending</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Detailed order information and history</span>
+                            <span>Informasi dan riwayat pesanan mendetail</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Update order status (pending to complete)</span>
+                            <span>Perbarui status pesanan (pending menjadi selesai)</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Download invoices and print receipts</span>
+                            <span>Unduh faktur dan cetak kuitansi</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Automatic invoice number generation</span>
+                            <span>Pembuatan nomor faktur otomatis</span>
                         </li>
                     </ul>
                 </div>
@@ -172,24 +172,24 @@
                         <div class="bg-yellow-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-user-group class="w-6 h-6 text-yellow-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Customer Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Manajemen Pelanggan</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Comprehensive customer database</span>
+                            <span>Database pelanggan komprehensif</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Customer profiles with contact information</span>
+                            <span>Profil pelanggan dengan informasi kontak</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Quick customer search and selection</span>
+                            <span>Pencarian dan pemilihan pelanggan cepat</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Customer order history tracking</span>
+                            <span>Pelacakan riwayat pesanan pelanggan</span>
                         </li>
                     </ul>
                 </div>
@@ -200,20 +200,20 @@
                         <div class="bg-red-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-user-group class="w-6 h-6 text-red-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Supplier Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Manajemen Pemasok</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Maintain supplier information database</span>
+                            <span>Menjaga database informasi pemasok</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Track supplier contact details</span>
+                            <span>Melacak detail kontak pemasok</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Manage supplier relationships</span>
+                            <span>Mengelola hubungan dengan pemasok</span>
                         </li>
                     </ul>
                 </div>
@@ -224,24 +224,24 @@
                         <div class="bg-blue-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-user-group class="w-6 h-6 text-blue-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Employee Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Manajemen Karyawan</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Complete employee records and profiles</span>
+                            <span>Catatan dan profil karyawan lengkap</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Employee photo management</span>
+                            <span>Pengelolaan foto karyawan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Employee contact and salary information</span>
+                            <span>Informasi kontak dan gaji karyawan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Employee data search and filtering</span>
+                            <span>Pencarian dan penyaringan data karyawan</span>
                         </li>
                     </ul>
                 </div>
@@ -252,28 +252,28 @@
                         <div class="bg-cyan-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-banknotes class="w-6 h-6 text-cyan-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">HR & Payroll</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">SDM & Penggajian</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Employee attendance tracking</span>
+                            <span>Pelacakan kehadiran karyawan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Advance salary management</span>
+                            <span>Pengelolaan uang muka gaji</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Monthly salary payment processing</span>
+                            <span>Pemrosesan pembayaran gaji bulanan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Bulk salary payment option</span>
+                            <span>Opsi pembayaran gaji massal</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Complete salary payment history</span>
+                            <span>Riwayat pembayaran gaji lengkap</span>
                         </li>
                     </ul>
                 </div>
@@ -284,32 +284,32 @@
                         <div class="bg-green-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-chart-bar class="w-6 h-6 text-green-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Financial Reporting</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Laporan Keuangan</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Interactive dashboard with key metrics</span>
+                            <span>Dasbor interaktif dengan metrik utama</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Monthly sales trends visualization</span>
+                            <span>Visualisasi tren penjualan bulanan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Top-selling products analysis</span>
+                            <span>Analisis produk terlaris</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Total paid and due amounts tracking</span>
+                            <span>Pelacakan total jumlah yang dibayar dan tunggakan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Recent transactions overview</span>
+                            <span>Ikhtisar transaksi terbaru</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Professional invoice and receipt printing</span>
+                            <span>Pencetakan faktur dan kuitansi profesional</span>
                         </li>
                     </ul>
                 </div>
@@ -320,28 +320,28 @@
                         <div class="bg-yellow-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-key class="w-6 h-6 text-yellow-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">User & Access Control</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Pengguna & Kontrol Akses</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>User account management</span>
+                            <span>Pengelolaan akun pengguna</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Role-based access control (RBAC)</span>
+                            <span>Kontrol akses berbasis peran (RBAC)</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Granular permission management</span>
+                            <span>Pengelolaan izin yang terperinci</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Role and permission assignment</span>
+                            <span>Penugasan peran dan izin</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Secure authentication system</span>
+                            <span>Sistem otentikasi yang aman</span>
                         </li>
                     </ul>
                 </div>
@@ -352,20 +352,20 @@
                         <div class="bg-red-100 rounded-lg p-3 mr-4">
                             <x-heroicon-o-circle-stack class="w-6 h-6 text-red-600" />
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Database Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Pengelolaan Database</h3>
                     </div>
                     <ul class="space-y-2">
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>On-demand database backup creation</span>
+                            <span>Pembuatan cadangan database sesuai permintaan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Backup file download</span>
+                            <span>Unduh file cadangan</span>
                         </li>
                         <li class="flex items-start text-gray-700">
                             <x-heroicon-o-check-circle class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span>Backup file management and deletion</span>
+                            <span>Pengelolaan dan penghapusan file cadangan</span>
                         </li>
                     </ul>
                 </div>
@@ -373,7 +373,7 @@
 
             <!-- Technical Information -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-200">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Technical Stack</h3>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Stack Teknis</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-bold text-gray-700 mb-3">Backend:</h4>
@@ -399,27 +399,27 @@
 
             <!-- Quick Tips -->
             <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Quick Tips</h3>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Tips Cepat</h3>
                 <ul class="space-y-3">
                     <li class="flex items-start text-gray-700">
                         <x-heroicon-o-light-bulb class="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <span>Use the search functionality to quickly find products, customers, or employees</span>
+                        <span>Gunakan fungsi pencarian untuk dengan cepat menemukan produk, pelanggan, atau karyawan</span>
                     </li>
                     <li class="flex items-start text-gray-700">
                         <x-heroicon-o-light-bulb class="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <span>Stock is automatically deducted when orders are marked as complete</span>
+                        <span>Stok akan otomatis dikurangi saat pesanan ditandai sebagai selesai</span>
                     </li>
                     <li class="flex items-start text-gray-700">
                         <x-heroicon-o-light-bulb class="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <span>You can track pending due payments and update them as customers pay</span>
+                        <span>Anda dapat melacak pembayaran tunggakan pending dan memperbaruinya saat pelanggan membayar</span>
                     </li>
                     <li class="flex items-start text-gray-700">
                         <x-heroicon-o-light-bulb class="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <span>The dashboard provides real-time insights into your sales performance</span>
+                        <span>Dasbor memberikan wawasan real-time tentang kinerja penjualan Anda</span>
                     </li>
                     <li class="flex items-start text-gray-700">
                         <x-heroicon-o-light-bulb class="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
-                        <span>Regular database backups are recommended to protect your data</span>
+                        <span>Cadangan database secara berkala direkomendasikan untuk melindungi data Anda</span>
                     </li>
                 </ul>
             </div>

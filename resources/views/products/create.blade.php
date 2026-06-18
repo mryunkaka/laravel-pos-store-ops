@@ -13,7 +13,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Add Product</h4>
+                            <h4 class="card-title">Tambah Produk</h4>
                         </div>
                     </div>
 
@@ -51,7 +51,7 @@
                             <!-- begin: Input Data -->
                             <div class="row align-items-center">
                                 <div class="form-group col-md-12">
-                                    <label for="name">Product Name <span class="text-danger">*</span></label>
+                                    <label for="name">Nama Produk <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name"
                                         value="{{ old('name') }}" required>
                                     @error('name')
@@ -62,10 +62,10 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="code">Product Code</label>
+                                    <label for="code">Kode Produk</label>
                                     <input type="text" class="form-control @error('code') is-invalid @enderror" id="code" name="code"
-                                        value="{{ old('code') }}" placeholder="Leave empty for auto-generation" maxlength="50">
-                                    <small class="form-text text-muted">Optional: Leave empty to auto-generate or scan barcode below</small>
+                                        value="{{ old('code') }}" placeholder="Kosongkan untuk generate otomatis" maxlength="50">
+                                    <small class="form-text text-muted">Opsional: Kosongkan untuk generate otomatis atau scan barcode di bawah</small>
                                     @error('code')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -76,14 +76,14 @@
                                 <div class="form-group col-md-6">
                                     <label for="barcode_scanner">Barcode Scanner</label>
                                     <input type="text" class="form-control" id="barcode_scanner" 
-                                        placeholder="Scan barcode here (mobile-friendly)" autocomplete="off">
-                                    <small class="form-text text-muted">Scan barcode to auto-fill Product Code</small>
+                                        placeholder="Scan barcode di sini (mobile-friendly)" autocomplete="off">
+                                    <small class="form-text text-muted">Scan barcode untuk mengisi Kode Produk otomatis</small>
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="category_id">Category <span class="text-danger">*</span></label>
+                                    <label for="category_id">Kategori <span class="text-danger">*</span></label>
                                     <select class="form-control" name="category_id" required>
-                                        <option selected="" disabled>-- Select Category --</option>
+                                        <option selected="" disabled>-- Pilih Kategori --</option>
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                                 {{ $category->name }}</option>
@@ -97,7 +97,7 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="stock">Stock</label>
+                                    <label for="stock">Stok</label>
                                     <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock"
                                         value="{{ old('stock') }}">
                                     @error('stock')
@@ -108,7 +108,7 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="buying_price">Buying Price <span class="text-danger">*</span></label>
+                                    <label for="buying_price">Harga Beli <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control @error('buying_price') is-invalid @enderror" id="buying_price"
                                         name="buying_price" value="{{ old('buying_price') }}" required>
                                     @error('buying_price')
@@ -119,7 +119,7 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="selling_price">Selling Price <span class="text-danger">*</span></label>
+                                    <label for="selling_price">Harga Jual <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control @error('selling_price') is-invalid @enderror" id="selling_price"
                                         name="selling_price" value="{{ old('selling_price') }}" required>
                                     @error('selling_price')
@@ -130,7 +130,7 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="buying_date">Buying Date</label>
+                                    <label for="buying_date">Tanggal Beli</label>
                                     <input id="buying_date" class="form-control @error('buying_date') is-invalid @enderror" name="buying_date"
                                         value="{{ old('buying_date') }}" />
                                     @error('buying_date')
@@ -141,7 +141,7 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label for="expire_date">Expire Date</label>
+                                    <label for="expire_date">Tanggal Kadaluarsa</label>
                                     <input id="expire_date" class="form-control @error('expire_date') is-invalid @enderror" name="expire_date"
                                         value="{{ old('expire_date') }}" />
                                     @error('expire_date')

@@ -18,17 +18,17 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Order Details Information
+                            <h4 class="card-title">Informasi Detail Order
                                 @if($order->order_status == 'cancelled')
-                                    <span class="badge badge-danger ml-2">Cancelled</span>
+                                    <span class="badge badge-danger ml-2">Dibatalkan</span>
                                 @elseif($order->order_status == 'void')
-                                    <span class="badge badge-dark ml-2">Voided</span>
+                                    <span class="badge badge-dark ml-2">Di-void</span>
                                 @endif
                             </h4>
                         </div>
                         <div>
                             <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
-                                <x-heroicon-o-arrow-left class="w-4 h-4 mr-1 inline" /> Back
+                                <x-heroicon-o-arrow-left class="w-4 h-4 mr-1 inline" /> Kembali
                             </a>
                         </div>
                         </div>
@@ -47,37 +47,37 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Customer Name</label>
+                                    <label>Nama Pelanggan</label>
                                     <input type="text" class="form-control bg-white" value="{{ $order->customer->name }}" readonly>
                                     </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Customer Phone</label>
+                                            <label>Telepon Pelanggan</label>
                                     <input type="text" class="form-control bg-white" value="{{ $order->customer->phone }}" readonly>
                                     </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Order Date</label>
+                                            <label>Tanggal Order</label>
                                     <input type="text" class="form-control bg-white" value="{{ $order->order_date->format('Y-m-d') }}" readonly>
                                     </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Order Invoice</label>
+                                            <label>Faktur Order</label>
                                             <input class="form-control bg-white" value="{{ $order->invoice_no }}" readonly />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Payment Type</label>
+                                            <label>Tipe Pembayaran</label>
                                             <input class="form-control bg-white" value="{{ $order->payment_type }}" readonly />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Paid Amount</label>
+                                            <label>Jumlah Dibayar</label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text">$</span>
@@ -88,7 +88,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Due Amount</label>
+                                                <label>Sisa Piutang</label>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">$</span>
@@ -109,12 +109,12 @@
                                         <input type="hidden" name="id" value="{{ $order->id }}">
 
                                         <button type="button" class="btn btn-outline-danger mr-2" data-toggle="modal" data-target="#cancelModal">
-                                            <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Cancel Order
+                                            <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Batalkan Order
                                         </button>
 
                                         <button type="submit" class="btn btn-success"
-                                            onclick="return confirm('Are you sure you want to complete this order? This reduces stock.')">
-                                            <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Complete Order
+                                            onclick="return confirm('Apakah Anda yakin ingin menyelesaikan order ini? Stok akan dikurangi.')">
+                                            <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Selesaikan Order
                                         </button>
                                     </form>
                                 </div>
@@ -128,20 +128,20 @@
                                         <input type="hidden" name="order_id" value="{{ $order->id }}">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="cancelModalLabel">Cancel Order {{ $order->invoice_no }}</h5>
+                                                <h5 class="modal-title" id="cancelModalLabel">Batalkan Order {{ $order->invoice_no }}</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
                                             <div class="modal-body">
                                                 <div class="form-group">
-                                                    <label>Reason for cancellation <span class="text-danger">*</span></label>
-                                                    <textarea name="cancel_reason" class="form-control" rows="3" required placeholder="Enter reason for cancelling this order..."></textarea>
+                                                    <label>Alasan pembatalan <span class="text-danger">*</span></label>
+                                                    <textarea name="cancel_reason" class="form-control" rows="3" required placeholder="Masukkan alasan pembatalan order ini..."></textarea>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                                <button type="submit" class="btn btn-danger">Konfirmasi Pembatalan</button>
                                             </div>
                                         </div>
                                     </form>
@@ -151,7 +151,7 @@
                             <div class="row mt-3">
                                 <div class="col-lg-12">
                                     <div class="alert alert-success text-center" role="alert">
-                                        <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> This order is completed.
+                                        <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Order ini sudah selesai.
                                     </div>
                                 </div>
                             </div>
@@ -179,16 +179,16 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="alert alert-warning">
-                                                        <strong>Warning:</strong> Voiding this order will restore all product stock. This action cannot be undone.
+                                                        <strong>Peringatan:</strong> Void order ini akan mengembalikan semua stok produk. Aksi ini tidak bisa dibatalkan.
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>Reason for void <span class="text-danger">*</span></label>
-                                                        <textarea name="void_reason" class="form-control" rows="3" required placeholder="Enter reason for voiding this order..."></textarea>
+                                                        <label>Alasan void <span class="text-danger">*</span></label>
+                                                        <textarea name="void_reason" class="form-control" rows="3" required placeholder="Masukkan alasan void order ini..."></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-dark">Confirm Void</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                                    <button type="submit" class="btn btn-dark">Konfirmasi Void</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -199,9 +199,9 @@
                             <div class="row mt-3">
                                 <div class="col-lg-12">
                                     <div class="alert alert-danger" role="alert">
-                                        <x-heroicon-o-x-circle class="w-5 h-5 mr-1 inline" /> <strong>Order Cancelled</strong><br>
-                                        Reason: {{ $order->cancel_reason }}<br>
-                                        <small>Cancelled by: {{ $order->cancelledBy->name ?? 'N/A' }} at {{ $order->cancelled_at?->format('Y-m-d H:i') ?? 'N/A' }}</small>
+                                        <x-heroicon-o-x-circle class="w-5 h-5 mr-1 inline" /> <strong>Order Dibatalkan</strong><br>
+                                        Alasan: {{ $order->cancel_reason }}<br>
+                                        <small>Dibatalkan oleh: {{ $order->cancelledBy->name ?? 'N/A' }} pada {{ $order->cancelled_at?->format('Y-m-d H:i') ?? 'N/A' }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -209,9 +209,9 @@
                             <div class="row mt-3">
                                 <div class="col-lg-12">
                                     <div class="alert alert-dark" role="alert">
-                                        <x-heroicon-o-x-circle class="w-5 h-5 mr-1 inline" /> <strong>Order Voided</strong><br>
-                                        Reason: {{ $order->void_reason }}<br>
-                                        <small>Voided by: {{ $order->voidedBy->name ?? 'N/A' }} at {{ $order->voided_at?->format('Y-m-d H:i') ?? 'N/A' }}</small>
+                                        <x-heroicon-o-x-circle class="w-5 h-5 mr-1 inline" /> <strong>Order Di-void</strong><br>
+                                        Alasan: {{ $order->void_reason }}<br>
+                                        <small>Di-void oleh: {{ $order->voidedBy->name ?? 'N/A' }} pada {{ $order->voided_at?->format('Y-m-d H:i') ?? 'N/A' }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Order Items</h4>
+                        <h4 class="card-title">Item Order</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive rounded">
@@ -232,11 +232,11 @@
                                 <thead class="bg-light text-uppercase">
                                     <tr class="ligth ligth-data">
                                         <th>No.</th>
-                                        <th>Photo</th>
-                                        <th>Product Name</th>
-                                        <th>Product Code</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
+                                        <th>Foto</th>
+                                        <th>Nama Produk</th>
+                                        <th>Kode Produk</th>
+                                        <th>Jumlah</th>
+                                        <th>Harga</th>
                                         <th>Total</th>
                                     </tr>
                                 </thead>
@@ -263,7 +263,7 @@
                                         <td class="font-weight-bold">{{ number_format($order->sub_total, 2) }}</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="6" class="text-right font-weight-bold">VAT</td>
+                                        <td colspan="6" class="text-right font-weight-bold">PPN</td>
                                         <td class="font-weight-bold">{{ number_format($order->vat, 2) }}</td>
                                     </tr>
                                     <tr>

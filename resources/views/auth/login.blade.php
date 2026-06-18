@@ -9,8 +9,8 @@
                         <!-- Section: Login Form -->
                         <div class="col-lg-7 align-self-center">
                             <div class="p-3">
-                                <h2 class="mb-2">Log In</h2>
-                                <p>Login to stay connected.</p>
+                                <h2 class="mb-2">Masuk</h2>
+                                <p>Masuk untuk tetap terhubung.</p>
 
                                 <!-- Alert: Session Status -->
                                 @if (session('status'))
@@ -54,14 +54,14 @@
                                         <!-- Links: Register & Forgot Password -->
                                         <div class="col-lg-6">
                                             <p>
-                                                Not a Member yet? <a href="{{ route('register') }}" class="text-primary">Register</a>
+                                                Belum punya akun? <a href="{{ route('register') }}" class="text-primary">Daftar</a>
                                             </p>
                                         </div>
                                         <div class="col-lg-6">
-                                            <a href="{{ route('password.request') }}" class="text-primary float-right">Forgot Password?</a>
+                                            <a href="{{ route('password.request') }}" class="text-primary float-right">Lupa Password?</a>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Login</button>
+                                    <button type="submit" class="btn btn-primary">Masuk</button>
                                 </form>
                             </div>
                         </div>

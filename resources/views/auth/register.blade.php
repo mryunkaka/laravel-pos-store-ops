@@ -10,8 +10,8 @@
                             <!-- Section: Registration Form -->
                             <div class="col-lg-7 align-self-center">
                                 <div class="p-3">
-                                    <h2 class="mb-2">Register</h2>
-                                    <p>Create your account.</p>
+                                    <h2 class="mb-2">Daftar</h2>
+                                    <p>Buat akun Anda.</p>
 
                                     <form method="POST" action="{{ route('register') }}">
                                         @csrf
@@ -22,7 +22,7 @@
                                                     <input class="floating-input form-control @error('name') is-invalid @enderror"
                                                         type="text" placeholder=" " name="name" autocomplete="off"
                                                         value="{{ old('name') }}" required>
-                                                    <label>Full Name</label>
+                                                    <label>Nama Lengkap</label>
                                                 </div>
                                                 @error('name')
                                                     <div class="mb-4" style="margin-top: -20px">
@@ -88,7 +88,7 @@
                                                     <input class="floating-input form-control" type="password"
                                                         placeholder=" " name="password_confirmation" autocomplete="off"
                                                         required id="reg_confirm_password">
-                                                    <label>Confirm Password</label>
+                                                    <label>Konfirmasi Password</label>
                                                     <div class="position-absolute"
                                                         style="right: 15px; top: 15px; cursor: pointer; color: #6c757d;"
                                                         onclick="togglePassword('reg_confirm_password')">
@@ -99,9 +99,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="submit" class="btn btn-primary">Register</button>
+                                        <button type="submit" class="btn btn-primary">Daftar</button>
                                         <p class="mt-3">
-                                            Already have an Account? <a href="{{ route('login') }}" class="text-primary">Log In</a>
+                                            Sudah punya akun? <a href="{{ route('login') }}" class="text-primary">Masuk</a>
                                         </p>
                                     </form>
                                 </div>

@@ -31,7 +31,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">History Pay Salary</h4>
+                            <h4 class="card-title">Riwayat Pembayaran Gaji</h4>
                         </div>
                     </div>
 
@@ -39,31 +39,31 @@
                         {{-- Section: Information --}}
                         <div class="row align-items-center">
                             <div class="form-group col-md-6">
-                                <label>Employee Name</label>
+                                <label>Nama Karyawan</label>
                                 <input class="form-control bg-white" value="{{ $paySalary->employee->name }}" readonly>
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Date</label>
+                                <label>Tanggal</label>
                                 <input class="form-control bg-white" value="{{ $paySalary->date }}" readonly>
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Salary</label>
+                                <label>Gaji</label>
                                 <input class="form-control bg-white" value="{{ $paySalary->paid_amount }}" readonly>
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Advance Salary</label>
+                                <label>Gaji di Muka</label>
                                 <input class="form-control bg-white"
-                                    value="{{ $paySalary->advance_salary ? $paySalary->advance_salary : 'No Advance' }}" readonly>
+                                    value="{{ $paySalary->advance_salary ? $paySalary->advance_salary : 'Tidak Ada Gaji di Muka' }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Due Salary</label>
+                                    <label>Gaji Terhutang</label>
                                     <input class="form-control bg-white" value="{{ $paySalary->due_salary }}" readonly>
                                 </div>
                                 </div>
 
                                 {{-- Section: Actions --}}
                                 <div class="mt-2">
-                                    <a class="btn btn-secondary" href="{{ route('pay-salary.payHistory') }}">Back</a>
+                                    <a class="btn btn-secondary" href="{{ route('pay-salary.payHistory') }}">Kembali</a>
                                 </div>
                                 </div>
                                 </div>

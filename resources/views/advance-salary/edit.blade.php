@@ -43,7 +43,7 @@
                             <div class="row align-items-center">
                                 <!-- Employee Selection -->
                                 <div class="form-group col-md-12">
-                                    <label for="employee_id">Employee Name <span class="text-danger">*</span></label>
+                                    <label for="employee_id">Nama Karyawan <span class="text-danger">*</span></label>
                                     <select class="form-control mb-3" id="employee_id" name="employee_id" required>
                                         <option selected="" disabled>-- Select Employee --</option>
                                         @foreach ($employees as $employee)
@@ -88,8 +88,8 @@
 
                                     <!-- Form Actions -->
                                     <div class="mt-2">
-                                        <button type="submit" class="btn btn-primary mr-2">Update</button>
-                                        <a class="btn bg-danger" href="{{ route('advance-salary.index') }}">Cancel</a>
+                                        <button type="submit" class="btn btn-primary mr-2">Perbarui</button>
+                                                                <a href="{{ route('advance-salary.index') }}" class="btn btn-secondary">Batal</a>
                                     </div>
                                     </form>
                                     </div>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt #{{ $order->invoice_no }}</title>
+    <title>Struk #{{ $order->invoice_no }}</title>
 
     <!-- Thermal Receipt Styles -->
     <style>
@@ -100,8 +100,8 @@
 
     <!-- User Actions (Hidden on Print) -->
     <div class="action-buttons">
-        <button class="btn" onclick="window.print()">Print Again</button>
-        <button class="btn btn-outline" onclick="window.close()">Close</button>
+        <button class="btn" onclick="window.print()">Cetak Ulang</button>
+        <button class="btn btn-outline" onclick="window.close()">Tutup</button>
     </div>
 
     <!-- Receipt Content -->
@@ -111,26 +111,26 @@
         <div class="header text-center mb-3">
             <h2 class="font-bold text-uppercase">POS SHOP</h2>
             <p>123 Commerce Avenue, Jakarta</p>
-            <p>Tel: +62 812 3456 7890</p>
+            <p>Telp: +62 812 3456 7890</p>
         </div>
 
         <div class="dashed-line"></div>
 
         <!-- Metadata -->
         <div class="d-flex justify-between mb-1">
-            <span>Date:</span>
+            <span>Tanggal:</span>
             <span>{{ $order->created_at->format('d/m/Y H:i') }}</span>
         </div>
         <div class="d-flex justify-between mb-1">
-            <span>Invoice:</span>
+            <span>Faktur:</span>
             <span>#{{ $order->invoice_no }}</span>
         </div>
         <div class="d-flex justify-between mb-1">
-            <span>Cashier:</span>
-            <span>{{ substr(auth()->user()->name ?? 'Staff', 0, 10) }}</span>
+            <span>Kasir:</span>
+            <span>{{ substr(auth()->user()->name ?? 'Staf', 0, 10) }}</span>
         </div>
          <div class="d-flex justify-between">
-            <span>Customer:</span>
+            <span>Pelanggan:</span>
             <span class="font-bold">{{ substr($order->customer->name, 0, 15) }}</span>
         </div>
 
@@ -141,9 +141,9 @@
             <thead>
                 <tr>
                     <th class="text-left" style="width: 45%">ITEM</th>
-                    <th class="text-center" style="width: 15%">QTY</th>
-                    <th class="text-right" style="width: 20%">PRICE</th>
-                    <th class="text-right" style="width: 20%">AMT</th>
+                    <th class="text-center" style="width: 15%">JML</th>
+                    <th class="text-right" style="width: 20%">HARGA</th>
+                    <th class="text-right" style="width: 20%">TOTAL</th>
                 </tr>
             </thead>
             <tbody>
@@ -170,7 +170,7 @@
                 <span>{{ number_format($order->sub_total, 0, ',', '.') }}</span>
             </div>
             <div class="d-flex justify-between mb-1">
-                <span>Tax</span>
+                <span>Pajak</span>
                 <span>{{ number_format($order->vat, 0, ',', '.') }}</span>
             </div>
 
@@ -180,19 +180,19 @@
             </div>
 
             <div class="d-flex justify-between mt-2 mb-1">
-                <span>Pay ({{ $order->payment_type ?? 'Cash' }})</span>
+                <span>Bayar ({{ $order->payment_type ?? 'Tunai' }})</span>
                 <span>{{ number_format($order->pay_amount, 0, ',', '.') }}</span>
             </div>
              <div class="d-flex justify-between">
-                <span>Change</span>
+                <span>Kembalian</span>
                 <span>{{ number_format($order->due_amount < 0 ? abs($order->due_amount) : 0, 0, ',', '.') }}</span>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer text-center">
-            <p class="mb-1">*** THANK YOU ***</p>
-            <p>Please keep this receipt for warranty.</p>
+            <p class="mb-1">*** TERIMA KASIH ***</p>
+            <p>Simpan struk ini untuk garansi.</p>
             <br>
             <p style="letter-spacing: 2px;">{{ $order->invoice_no }}</p>
         </div>

@@ -52,7 +52,7 @@
                                 <th><x-sort-link name="date" label="Date" /></th>
                                 <th><x-sort-link name="advance_salary" label="Advance Salary" /></th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="ligth-body">
@@ -84,7 +84,7 @@
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center list-action">
-                                            <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Edit"
+                                            <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Ubah"
                                                 href="{{ route('advance-salary.edit', $advance->id) }}">
                                                 <x-heroicon-o-pencil class="w-5 h-5" />
                                             </a>
@@ -93,7 +93,7 @@
                                                 @csrf
                                                 <button type="submit" class="btn btn-warning border-none"
                                                     onclick="return confirm('Are you sure you want to delete this record?')" data-toggle="tooltip"
-                                                    data-placement="top" title="Delete">
+                                                    data-placement="top" title="Hapus">
                                                     <x-heroicon-o-trash class="w-5 h-5" />
                                                 </button>
                                             </form>

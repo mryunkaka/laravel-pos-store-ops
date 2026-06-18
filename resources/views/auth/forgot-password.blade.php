@@ -10,7 +10,7 @@
                         <div class="col-lg-7 align-self-center">
                             <div class="p-3">
                                 <h2 class="mb-2">Reset Password</h2>
-                                <p>Enter your email address and we'll send you an email with instructions to reset your password.</p>
+                                <p>Masukkan alamat email Anda dan kami akan mengirimkan email dengan instruksi untuk mereset password Anda.</p>
 
                                 <!-- Alert: Session Status -->
                                 @if (session('status'))
@@ -36,9 +36,9 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Reset Password</button>
+                                    <button type="submit" class="btn btn-primary">Kirim Link Reset Password</button>
                                     <p class="mt-3">
-                                        Wait, I remember my password... <a href="{{ route('login') }}" class="text-primary">Log In</a>
+                                        Tunggu, saya ingat password saya... <a href="{{ route('login') }}" class="text-primary">Masuk</a>
                                     </p>
                                 </form>
                             </div>

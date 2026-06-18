@@ -11,16 +11,16 @@
                     <!-- Toolbar: Actions -->
                     <div class="d-flex justify-content-between align-items-center p-4 bg-light border-bottom rounded-top-lg">
                         <div>
-                            <h5 class="mb-0 font-weight-bold text-dark">Invoice Preview</h5>
+                            <h5 class="mb-0 font-weight-bold text-dark">Pratinjau Faktur</h5>
                             <p class="mb-0 text-muted small">Order #{{ $order->invoice_no }}</p>
                         </div>
                         <div>
                             <a href="{{ route('pos.index') }}" class="btn btn-outline-secondary btn-sm mr-2">
-                                <x-heroicon-o-arrow-left class="w-4 h-4 mr-1 inline"/> Back to POS
+                                <x-heroicon-o-arrow-left class="w-4 h-4 mr-1 inline"/> Kembali ke POS
                             </a>
                             <!-- Opens dedicated Thermal Receipt Popup -->
                             <button onclick="openPrintWindow()" class="btn btn-dark btn-sm shadow-sm">
-                                <x-heroicon-o-printer class="w-4 h-4 mr-1 inline"/> Print Receipt
+                                <x-heroicon-o-printer class="w-4 h-4 mr-1 inline"/> Cetak Struk
                             </button>
                         </div>
                     </div>
@@ -35,10 +35,10 @@
                                 <p class="text-muted">Jakarta, Indonesia</p>
                             </div>
                             <div class="col-6 text-right">
-                                <h6 class="text-uppercase text-muted font-weight-bold letter-spacing-2 mb-2">Invoice</h6>
+                                <h6 class="text-uppercase text-muted font-weight-bold letter-spacing-2 mb-2">Faktur</h6>
                                 <h4 class="font-weight-bold text-dark mb-0">{{ $order->invoice_no }}</h4>
                                 <p class="text-muted small mb-0">{{ $order->created_at->format('d M Y, H:i') }}</p>
-                                <span class="badge badge-success mt-1 px-3 py-1">PAID</span>
+                                <span class="badge badge-success mt-1 px-3 py-1">LUNAS</span>
                             </div>
                         </div>
 
@@ -47,13 +47,13 @@
                         <!-- Client & Cashier Info -->
                         <div class="row mb-5">
                             <div class="col-6">
-                                <p class="text-uppercase text-muted small font-weight-bold mb-2">Billed To</p>
+                                <p class="text-uppercase text-muted small font-weight-bold mb-2">Ditagihkan Kepada</p>
                                 <h6 class="font-weight-bold text-dark mb-1">{{ $order->customer->name }}</h6>
                                 <p class="text-muted small mb-0">{{ $order->customer->phone ?? '' }}</p>
                             </div>
                             <div class="col-6 text-right">
-                                <p class="text-uppercase text-muted small font-weight-bold mb-2">Cashier</p>
-                                <h6 class="font-weight-bold text-dark mb-0">{{ auth()->user()->name ?? 'Staff' }}</h6>
+                                <p class="text-uppercase text-muted small font-weight-bold mb-2">Kasir</p>
+                                <h6 class="font-weight-bold text-dark mb-0">{{ auth()->user()->name ?? 'Staf' }}</h6>
                             </div>
                         </div>
 
@@ -63,8 +63,8 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="border-0 font-weight-bold text-muted small text-uppercase pl-4">Item</th>
-                                        <th class="border-0 font-weight-bold text-muted small text-uppercase text-center">Qty</th>
-                                        <th class="border-0 font-weight-bold text-muted small text-uppercase text-right">Price</th>
+                                        <th class="border-0 font-weight-bold text-muted small text-uppercase text-center">Jml</th>
+                                        <th class="border-0 font-weight-bold text-muted small text-uppercase text-right">Harga</th>
                                         <th class="border-0 font-weight-bold text-muted small text-uppercase text-right pr-4">Total</th>
                                     </tr>
                                 </thead>
@@ -92,7 +92,7 @@
                                         <td class="text-right font-weight-bold">{{ number_format($order->sub_total, 2) }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Tax (VAT)</td>
+                                        <td class="text-muted">Pajak (PPN)</td>
                                         <td class="text-right font-weight-bold">{{ number_format($order->vat, 2) }}</td>
                                     </tr>
                                     <tr class="border-top">
@@ -100,11 +100,11 @@
                                         <td class="text-primary font-weight-bold text-right pt-3 h5">{{ number_format($order->total, 2) }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Paid</td>
+                                        <td class="text-muted">Dibayar</td>
                                         <td class="text-success text-right font-weight-bold">{{ number_format($order->pay_amount, 2) }}</td>
                                     </tr>
                                      <tr>
-                                        <td class="text-muted">Change</td>
+                                        <td class="text-muted">Kembalian</td>
                                         <td class="text-dark text-right font-weight-bold">{{ number_format($order->due_amount < 0 ? abs($order->due_amount) : 0, 2) }}</td>
                                     </tr>
                                 </table>

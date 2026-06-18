@@ -21,14 +21,13 @@
             <div class="col-lg-12 mb-4">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <h3 class="font-weight-bold">Dashboard Overview</h3>
-                        <p class="mb-0 text-muted">Welcome back, {{ auth()->user()->name }}! Here's what's happening in your
-                            store today.</p>
+                        <h3 class="font-weight-bold">Ringkasan Dashboard</h3>
+                        <p class="mb-0 text-muted">Selamat datang kembali, {{ auth()->user()->name }}! Berikut ringkasan toko Anda hari ini.</p>
                     </div>
                     <div>
                         <a href="{{ route('pos.index') }}" class="btn btn-primary">
                             <x-heroicon-o-computer-desktop class="w-5 h-5 mr-2" />
-                            Go to POS
+                            Buka POS
                         </a>
                     </div>
                 </div>
@@ -43,7 +42,7 @@
                                 <x-heroicon-o-banknotes class="w-6 h-6 text-info" />
                             </div>
                             <div>
-                                <p class="mb-2">Total Paid</p>
+                                <p class="mb-2">Total Dibayar</p>
                                 <h4>${{ number_format($total_paid, 2) }}</h4>
                             </div>
                         </div>
@@ -62,7 +61,7 @@
                                 <x-heroicon-o-credit-card class="w-6 h-6 text-danger" />
                             </div>
                             <div>
-                                <p class="mb-2">Total Due</p>
+                                <p class="mb-2">Total Piutang</p>
                                 <h4>${{ number_format($total_due, 2) }}</h4>
                             </div>
                         </div>
@@ -81,7 +80,7 @@
                                 <x-heroicon-o-check-circle class="w-6 h-6 text-success" />
                             </div>
                             <div>
-                                <p class="mb-2">Complete Orders</p>
+                                <p class="mb-2">Order Selesai</p>
                                 <h4>{{ $complete_orders }}</h4>
                             </div>
                         </div>
@@ -100,7 +99,7 @@
                                 <x-heroicon-o-clock class="w-6 h-6 text-warning" />
                             </div>
                             <div>
-                                <p class="mb-2">Pending Orders</p>
+                                <p class="mb-2">Order Tertunda</p>
                                 <h4>{{ $pending_orders }}</h4>
                             </div>
                         </div>
@@ -116,7 +115,7 @@
                 <div class="card card-block card-stretch card-height">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Monthly Sales Overview ({{ date('Y') }})</h4>
+                            <h4 class="card-title">Ringkasan Penjualan Bulanan ({{ date('Y') }})</h4>
                         </div>
                     </div>
                     <div class="card-body">
@@ -130,11 +129,11 @@
                 <div class="card card-block card-stretch card-height">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Recent Orders</h4>
+                            <h4 class="card-title">Order Terbaru</h4>
                         </div>
                         <div class="card-header-toolbar d-flex align-items-center">
                             <a href="{{ route('order.pendingOrders') }}"
-                                class="btn btn-outline-primary position-relative text-nowrap">View All</a>
+                                class="btn btn-outline-primary position-relative text-nowrap">Lihat Semua</a>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -142,18 +141,18 @@
                             <table class="table mb-0">
                                 <thead class="bg-white text-uppercase">
                                     <tr class="ligth ligth-data">
-                                        <th>Date</th>
-                                        <th>Customer</th>
-                                        <th>Amount</th>
+                                        <th>Tanggal</th>
+                                        <th>Pelanggan</th>
+                                        <th>Jumlah</th>
                                         <th>Status</th>
-                                        <th>Action</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="ligth-body">
                                     @forelse($recent_orders as $order)
                                         <tr>
                                             <td>{{ $order->created_at->format('d M Y') }}</td>
-                                            <td>{{ $order->customer->name ?? 'Walk-in Customer' }}</td>
+                                            <td>{{ $order->customer->name ?? 'Pelanggan Umum' }}</td>
                                             <td>${{ number_format($order->total, 2) }}</td>
                                             <td>
                                                 <span
@@ -169,7 +168,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center">No recent orders found.</td>
+                                            <td colspan="5" class="text-center">Belum ada order terbaru.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -183,7 +182,7 @@
                 <div class="card card-block card-stretch card-height">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Top Selling Products</h4>
+                            <h4 class="card-title">Produk Terlaris</h4>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -191,9 +190,9 @@
                             <table class="table mb-0">
                                 <thead class="bg-white text-uppercase">
                                     <tr class="ligth ligth-data">
-                                        <th>Product</th>
-                                        <th>Code</th>
-                                        <th>Sold</th>
+                                        <th>Produk</th>
+                                        <th>Kode</th>
+                                        <th>Terjual</th>
                                     </tr>
                                 </thead>
                                 <tbody class="ligth-body">
@@ -205,7 +204,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="3" class="text-center">No sales data yet.</td>
+                                            <td colspan="3" class="text-center">Belum ada data penjualan.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -225,7 +224,7 @@
             if (typeof ApexCharts !== 'undefined') {
                 var options = {
                     series: [{
-                        name: 'Sales',
+                        name: 'Penjualan',
                         data: {!! $chart_data !!}
                     }],
                     chart: {
@@ -242,8 +241,8 @@
                         curve: 'smooth'
                     },
                     xaxis: {
-                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
-                            'Dec'
+                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov',
+                            'Des'
                         ],
                     },
                     tooltip: {

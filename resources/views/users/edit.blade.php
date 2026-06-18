@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Edit User</h4>
+                            <h4 class="card-title">Edit Pengguna</h4>
                         </div>
                     </div>
 
@@ -30,7 +30,7 @@
                                 <div class="input-group mb-4 col-lg-6">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input @error('photo') is-invalid @enderror" id="image" name="photo" accept="image/*" onchange="previewImage();">
-                                        <label class="custom-file-label" for="photo">Choose file</label>
+                                        <label class="custom-file-label" for="photo">Pilih file</label>
                                     </div>
                                     @error('photo')
                                     <div class="invalid-feedback">
@@ -43,7 +43,7 @@
                             <!-- begin: Input Data -->
                             <div class=" row align-items-center">
                                 <div class="form-group col-md-12">
-                                    <label for="name">Name <span class="text-danger">*</span></label>
+                                    <label for="name">Nama <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $userData->name) }}" required>
                                     @error('name')
                                     <div class="invalid-feedback">
@@ -80,7 +80,7 @@
                                     @enderror
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="password_confirmation">Confirm Password</label>
+                                    <label for="password_confirmation">Konfirmasi Password</label>
                                     <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation">
                                     @error('password_confirmation')
                                     <div class="invalid-feedback">
@@ -92,7 +92,7 @@
                                 <div class="form-group col-md-6">
                                     <label for="role">Role</label>
                                     <select class="form-control @error('role') is-invalid @enderror" name="role">
-                                        <option selected="" disabled>-- Select Role --</option>
+                                        <option selected="" disabled>-- Pilih Role --</option>
                                         @foreach ($roles as $role)
                                             <option value="{{ $role->id }}" {{ $userData->hasRole($role->name) ? 'selected' : '' }}>{{ $role->name }}</option>
                                         @endforeach
@@ -107,10 +107,10 @@
                             <!-- end: Input Data -->
                             <div class="mt-2">
                                 <button type="submit" class="btn btn-primary mr-2">
-                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Update
+                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Perbarui
                                 </button>
                                 <a class="btn bg-danger" href="{{ route('users.index') }}">
-                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Cancel
+                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Batal
                                 </a>
                             </div>
                         </form>

@@ -15,7 +15,7 @@
                     <a class="search-link" href="#">
                         <x-heroicon-o-magnifying-glass class="w-5 h-5" />
                     </a>
-                    <input type="text" class="text search-input" placeholder="Search here...">
+                    <input type="text" class="text search-input" placeholder="Cari di sini...">
                 </form>
             </div>
             <div class="d-flex align-items-center">
@@ -36,7 +36,7 @@
                                 <form action="#" class="searchbox p-2">
                                     <div class="form-group mb-0 position-relative">
                                         <input type="text" class="text search-input font-size-12"
-                                            placeholder="type here to search...">
+                                            placeholder="ketik untuk mencari...">
                                         <a href="#" class="search-link">
                                             <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                                         </a>
@@ -60,12 +60,12 @@
                                         </div>
                                         <div class="p-3">
                                             <h5 class="mb-1">{{  auth()->user()->name }}</h5>
-                                            <p class="mb-0">Since {{ date('d M, Y', strtotime(auth()->user()->created_at)) }}</p>
+                                            <p class="mb-0">Sejak {{ date('d M Y', strtotime(auth()->user()->created_at)) }}</p>
                                             <div class="d-flex align-items-center justify-content-center mt-3">
-                                                <a href="{{ route('profile') }}" class="btn border mr-2">Profile</a>
+                                                <a href="{{ route('profile') }}" class="btn border mr-2">Profil</a>
                                                 <form action="{{ route('logout') }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="btn border">Sign Out</button>
+                                                    <button type="submit" class="btn border">Keluar</button>
                                                 </form>
                                             </div>
                                         </div>

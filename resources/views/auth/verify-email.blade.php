@@ -9,26 +9,26 @@
                         <!-- Section: Email Verification Form -->
                         <div class="col-lg-7 align-self-center">
                             <div class="p-3">
-                                <h2 class="mb-2">Verify Your Email</h2>
-                                <p>Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.</p>
+                                <h2 class="mb-2">Verifikasi Email Anda</h2>
+                                <p>Terima kasih sudah mendaftar! Sebelum memulai, bisakah Anda memverifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan ke email Anda? Jika Anda tidak menerima email tersebut, kami akan dengan senang hati mengirimkan yang baru.</p>
 
                                 <!-- Alert: Session Status -->
                                 @if (session('status') == 'verification-link-sent')
                                     <div class="alert alert-success" role="alert">
-                                        A new verification link has been sent to the email address you provided during registration.
+                                        Link verifikasi baru telah dikirim ke alamat email yang Anda berikan saat pendaftaran.
                                     </div>
                                 @endif
 
                                 <form method="POST" action="{{ route('verification.send') }}">
                                     @csrf
                                     <div class="mb-3">
-                                        <button type="submit" class="btn btn-primary">Resend Verification Email</button>
+                                        <button type="submit" class="btn btn-primary">Kirim Ulang Email Verifikasi</button>
                                     </div>
                                 </form>
 
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-link text-primary p-0">Log Out</button>
+                                    <button type="submit" class="btn btn-link text-primary p-0">Keluar</button>
                                 </form>
                             </div>
                         </div>

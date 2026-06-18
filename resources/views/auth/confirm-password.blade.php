@@ -9,8 +9,8 @@
                         <!-- Section: Password Confirmation Form -->
                         <div class="col-lg-7 align-self-center">
                             <div class="p-3">
-                                <h2 class="mb-2">Confirm Password</h2>
-                                <p>This is a secure area of the application. Please confirm your password before continuing.</p>
+                                <h2 class="mb-2">Konfirmasi Password</h2>
+                                <p>Ini adalah area aman dari aplikasi. Harap konfirmasi password Anda sebelum melanjutkan.</p>
 
                                 <form method="POST" action="{{ route('password.confirm') }}">
                                     @csrf
@@ -34,7 +34,7 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Confirm</button>
+                                    <button type="submit" class="btn btn-primary">Konfirmasi</button>
                                 </form>
                             </div>
                         </div>

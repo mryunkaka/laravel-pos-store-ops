@@ -8,7 +8,7 @@
                 <div class="ml-3">
                     <h4 class="mb-1">{{  auth()->user()->name }}</h4>
                     <p class="mb-2">UI/UX Designer</p>
-                    <a href="{{ route('profile.edit') }}" class="btn btn-primary font-size-14">Edit Profile</a>
+                    <a href="{{ route('profile.edit') }}" class="btn btn-primary font-size-14">Edit Profil</a>
                 </div>
             </div>
             <ul class="list-inline p-0 m-0">
@@ -21,7 +21,7 @@
                 <li class="mb-2">
                     <div class="d-flex align-items-center">
                         <x-heroicon-o-map-pin class="w-4 h-4 mr-3" />
-                        <p class="mb-0">{{ $user->address ? $user->address : 'Unknown' }}</p>
+                        <p class="mb-0">{{ $user->address ? $user->address : 'Tidak Diketahui' }}</p>
                     </div>
                 </li>
             </ul>

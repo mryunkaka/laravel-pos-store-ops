@@ -9,7 +9,7 @@
 
 <div class="card-header d-flex justify-content-between">
     <div class="iq-header-title">
-        <h4 class="card-title">Profile</h4>
+        <h4 class="card-title">Profil</h4>
     </div>
 </div>
 <div class="card-body">
@@ -20,7 +20,7 @@
     </div>
     <div class=" row align-items-center">
         <div class="form-group col-md-12">
-            <label for="fname">Full Name</label>
+            <label for="fname">Nama Lengkap</label>
             <input type="text" class="form-control bg-white" id="fname" value="{{  auth()->user()->name }}" readonly>
         </div>
         <div class="form-group col-md-6">
@@ -32,12 +32,12 @@
             <input type="text" class="form-control bg-white" id="email" value="{{  auth()->user()->email }}" readonly>
         </div>
         <div class="form-group col-md-6">
-            <label for="job_description">Job Description</label>
+            <label for="job_description">Deskripsi Pekerjaan</label>
             <input type="text" class="form-control bg-white" id="job_description" value="{{  auth()->user()->job_description ?? '' }}" readonly>
         </div>
         <div class="form-group col-md-6">
-            <label for="location">Location</label>
-            <input type="text" class="form-control bg-white" id="location" value="{{  auth()->user()->location ?? 'Unknown' }}" readonly>
+            <label for="location">Lokasi</label>
+            <input type="text" class="form-control bg-white" id="location" value="{{  auth()->user()->location ?? 'Tidak Diketahui' }}" readonly>
         </div>
     </div>
 </div>

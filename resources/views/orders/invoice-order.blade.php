@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zxx">
+<html lang="id">
 
 <head>
-    <title>POS Invoice #{{ $order->invoice_no }}</title>
+    <title>POS Faktur #{{ $order->invoice_no }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
 
@@ -44,7 +44,7 @@
                             <div class="row">
                                 <div class="col-sm-6 mb-50">
                                     <div class="invoice-number">
-                                        <h4 class="inv-title-1">Invoice date:</h4>
+                                        <h4 class="inv-title-1">Tanggal invoice:</h4>
                                         <p class="invo-addr-1">
                                             {{ $order->order_date->format('d M Y') }}
                                         </p>
@@ -58,17 +58,17 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-6 mb-50">
-                                    <h4 class="inv-title-1">Customer</h4>
+                                    <h4 class="inv-title-1">Pelanggan</h4>
                                     <p class="inv-from-1">{{ $order->customer->name }}</p>
                                     <p class="inv-from-1">{{ $order->customer->email }}</p>
                                     <p class="inv-from-1">{{ $order->customer->phone }}</p>
                                     <p class="inv-from-2">{{ $order->customer->address }}</p>
                                 </div>
                                 <div class="col-sm-6 text-end mb-50">
-                                    <h4 class="inv-title-1">Details</h4>
-                                    <p class="inv-from-1">Payment Type: {{ $order->payment_type }}</p>
-                                    <p class="inv-from-1">Total Pay: {{ number_format($order->pay_amount, 2) }}</p>
-                                    <p class="inv-from-1">Due: {{ number_format($order->due_amount, 2) }}</p>
+                                    <h4 class="inv-title-1">Detail</h4>
+                                    <p class="inv-from-1">Tipe Pembayaran: {{ $order->payment_type }}</p>
+                                    <p class="inv-from-1">Total Dibayar: {{ number_format($order->pay_amount, 2) }}</p>
+                                    <p class="inv-from-1">Sisa Piutang: {{ number_format($order->due_amount, 2) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -78,9 +78,9 @@
                                 <table class="default-table invoice-table">
                                     <thead>
                                         <tr>
-                                            <th>Description</th>
-                                            <th>Price</th>
-                                            <th>Quantity</th>
+                                            <th>Deskripsi</th>
+                                            <th>Harga</th>
+                                            <th>Jumlah</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
@@ -108,10 +108,10 @@
                     <!-- Action Buttons -->
                     <div class="invoice-btn-section clearfix d-print-none">
                         <a href="javascript:window.print()" class="btn btn-lg btn-print">
-                            Print Invoice
+                            Cetak Faktur
                         </a>
                         <a id="invoice_download_btn" class="btn btn-lg btn-download">
-                            Download Invoice
+                            Unduh Faktur
                         </a>
                     </div>
 

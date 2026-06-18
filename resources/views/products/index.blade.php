@@ -38,9 +38,9 @@
 
             <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                 <div>
-                    <h4 class="mb-3">Product List</h4>
-                    <p class="mb-0">A product dashboard lets you easily gather and visualize product data from optimizing <br>
-                        the product experience, ensuring product retention. </p>
+                    <h4 class="mb-3">Daftar Produk</h4>
+                    <p class="mb-0">Dashboard produk memungkinkan Anda dengan mudah mengumpulkan dan memvisualisasikan data produk <br>
+                        untuk mengoptimalkan pengalaman produk dan menjaga retensi produk.</p>
                 </div>
                 <!-- begin: Action Buttons -->
                 <div class="d-flex align-items-center">
@@ -51,7 +51,7 @@
                         <x-heroicon-o-arrow-down-tray class="w-5 h-5 mr-1" /> Export
                     </a>
                     <a href="{{ route('products.create') }}" class="btn btn-primary add-list d-flex align-items-center">
-                        <x-heroicon-o-plus class="w-5 h-5 mr-1" /> Add Product
+                        <x-heroicon-o-plus class="w-5 h-5 mr-1" /> Tambah Produk
                     </a>
                 </div>
                 <!-- end: Action Buttons -->
@@ -63,7 +63,7 @@
                 <div class="d-flex flex-wrap align-items-center justify-content-between">
                     <div class="form-group mb-0 mr-2 mt-n3 row-selector-container">
                         <div class="d-flex align-items-center">
-                            <label for="row" class="mb-0 mr-2" style="min-width: 50px;">Row:</label>
+                            <label for="row" class="mb-0 mr-2" style="min-width: 50px;">Baris:</label>
                             <select class="form-control" name="row">
                                 <option value="10" @if(request('row') == '10')selected="selected"@endif>10</option>
                                 <option value="25" @if(request('row') == '25')selected="selected"@endif>25</option>
@@ -74,9 +74,9 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="control-label col-sm-3 align-self-center" for="search">Search:</label>
+                        <label class="control-label col-sm-3 align-self-center" for="search">Cari:</label>
                         <div class="input-group col-sm-8">
-                            <input type="text" id="search" class="form-control" name="search" placeholder="Search product" value="{{ request('search') }}">
+                            <input type="text" id="search" class="form-control" name="search" placeholder="Cari produk" value="{{ request('search') }}">
                             <div class="input-group-append">
                                 <button type="submit" class="input-group-text bg-primary">
                                     <x-heroicon-o-magnifying-glass class="w-5 h-5" />
@@ -97,13 +97,13 @@
                     <thead class="bg-white text-uppercase">
                         <tr class="ligth ligth-data">
                             <th>No.</th>
-                            <th>Photo</th>
-                            <th><x-sort-link name="name" label="Name" /></th>
-                            <th><x-sort-link name="category.name" label="Category" /></th>
-                            <th><x-sort-link name="selling_price" label="Price" /></th>
+                            <th>Foto</th>
+                            <th><x-sort-link name="name" label="Nama" /></th>
+                            <th><x-sort-link name="category.name" label="Kategori" /></th>
+                            <th><x-sort-link name="selling_price" label="Harga" /></th>
                             <th><x-sort-link name="stock" label="Stock" /></th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="ligth-body">
@@ -126,18 +126,18 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center list-action">
-                                    <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="View"
+                                    <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Lihat"
                                         href="{{ route('products.show', $product->id) }}">
                                         <x-heroicon-o-eye class="w-5 h-5 mr-0" />
                                     </a>
-                                    <a class="btn btn-warning mr-2" data-toggle="tooltip" data-placement="top" title="Edit"
+                                    <a class="btn btn-warning mr-2" data-toggle="tooltip" data-placement="top" title="Ubah"
                                         href="{{ route('products.edit', $product->id) }}">
                                         <x-heroicon-o-pencil class="w-5 h-5 mr-0" />
                                     </a>
                                     <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
                                         @method('delete')
                                         @csrf
-                                        <button type="submit" class="btn btn-danger border-0" onclick="return confirm('Are you sure you want to delete this record?')" data-toggle="tooltip" data-placement="top" title="Delete">
+                                        <button type="submit" class="btn btn-danger border-0" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" data-toggle="tooltip" data-placement="top" title="Hapus">
                                             <x-heroicon-o-trash class="w-5 h-5 mr-0" />
                                         </button>
                                     </form>
@@ -147,7 +147,7 @@
                         @empty
                         <tr>
                             <td colspan="8" class="text-center">
-                                <span class="text-muted">No products found.</span>
+                                <span class="text-muted">Tidak ada produk ditemukan.</span>
                             </td>
                         </tr>
                         @endforelse

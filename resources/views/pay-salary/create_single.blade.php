@@ -34,7 +34,7 @@
                             <div class="row align-items-center">
                                 {{-- Employee Selection --}}
                                 <div class="form-group col-md-12">
-                                    <label for="employee_id">Employee <span class="text-danger">*</span></label>
+                                    <label for="employee_id">Karyawan <span class="text-danger">*</span></label>
                                     <select class="form-control @error('employee_id') is-invalid @enderror" name="employee_id" required>
                                         <option value="" disabled selected>Select Employee</option>
                                         @foreach($employees as $employee)

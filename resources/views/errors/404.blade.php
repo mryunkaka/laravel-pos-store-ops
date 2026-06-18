@@ -16,10 +16,10 @@
                 <div class="col-sm-12 text-center align-self-center">
                     <div class="iq-error position-relative">
                         <h2 class="mb-0 mt-4">404</h2>
-                        <p>Oops! This Page is Not Found.</p>
+                        <p>Oops! Halaman Ini Tidak Ditemukan.</p>
                         <a class="btn btn-primary d-inline-flex align-items-center mt-3" href="{{ route('dashboard') }}">
                             <x-heroicon-o-home class="w-5 h-5 mr-2" />
-                            Back to Home
+                            Kembali ke Beranda
                         </a>
                     </div>
                 </div>

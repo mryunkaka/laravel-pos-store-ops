@@ -9,8 +9,8 @@
                         <!-- Section: Reset Password Form -->
                         <div class="col-lg-7 align-self-center">
                             <div class="p-3">
-                                <h2 class="mb-2">New Password</h2>
-                                <p>Create your new password.</p>
+                                <h2 class="mb-2">Password Baru</h2>
+                                <p>Buat password baru Anda.</p>
 
                                 <form action="{{ route('password.store') }}" method="POST">
                                     @csrf
@@ -37,7 +37,7 @@
                                             <div class="floating-label form-group position-relative">
                                                 <input class="floating-input form-control @error('password') is-invalid @enderror"
                                                     type="password" placeholder=" " name="password" required id="password">
-                                                <label>New Password</label>
+                                                <label>Password Baru</label>
                                                 <div class="position-absolute" style="right: 15px; top: 15px; cursor: pointer; color: #6c757d;"
                                                     onclick="togglePassword('password')">
                                                     <x-heroicon-o-eye class="w-6 h-6" id="eye-password" />
@@ -56,7 +56,7 @@
                                             <div class="floating-label form-group position-relative">
                                                 <input class="floating-input form-control" type="password" placeholder=" "
                                                     name="password_confirmation" required id="password_confirmation">
-                                                <label>Confirm Password</label>
+                                                <label>Konfirmasi Password</label>
                                                 <div class="position-absolute" style="right: 15px; top: 15px; cursor: pointer; color: #6c757d;"
                                                     onclick="togglePassword('password_confirmation')">
                                                     <x-heroicon-o-eye class="w-6 h-6" id="eye-password_confirmation" />

@@ -11,7 +11,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Edit Role in Permission</h4>
+                            <h4 class="card-title">Edit Role dalam Permission</h4>
                         </div>
                     </div>
 
@@ -22,7 +22,7 @@
                             <!-- begin: Input Data -->
                             <div class=" row align-items-center mb-2">
                                 <div class="form-group col-md-6">
-                                    <label for="role_id">Role Name</label>
+                                    <label for="role_id">Nama Role</label>
                                     <h4>{{ $role->name }}</h4>
                                     {{-- <input type="text" class="form-control" value="{{ $role->name }}" readonly> --}}
                                 </div>
@@ -30,7 +30,7 @@
 
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
-                                    <label for="name">Permission Name <span class="text-danger">*</span></label>
+                                    <label for="name">Nama Permission <span class="text-danger">*</span></label>
                                 </div>
                             </div>
 
@@ -39,7 +39,7 @@
                                 <div class="form-group col-md-3">
                                     <div class="custom-control custom-checkbox custom-control-inline">
                                         <input type="checkbox" class="custom-control-input" id="check-all">
-                                        <label class="custom-control-label" for="check-all">Check All</label>
+                                        <label class="custom-control-label" for="check-all">Centang Semua</label>
                                     </div>
                                 </div>
                             </div>
@@ -97,10 +97,10 @@
                             <!-- end: Input Data -->
                             <div class="mt-2">
                                 <button type="submit" class="btn btn-primary mr-2">
-                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Save
+                                    <x-heroicon-o-check-circle class="w-5 h-5 mr-1 inline" /> Simpan
                                 </button>
                                 <a class="btn bg-danger" href="{{ route('rolePermission.index') }}">
-                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Cancel
+                                    <x-heroicon-o-x-mark class="w-5 h-5 mr-1 inline" /> Batal
                                 </a>
                             </div>
                         </form>

@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Import Product</h4>
+                            <h4 class="card-title">Import Produk</h4>
                         </div>
                     </div>
 
@@ -38,7 +38,7 @@
                                         <x-heroicon-o-arrow-up-tray class="w-5 h-5 mr-1 inline" />
                                         Import
                                     </button>
-                                    <a class="btn btn-danger" href="{{ route('products.index') }}">Cancel</a>
+                                    <a class="btn btn-danger" href="{{ route('products.index') }}">Batal</a>
                                 </div>
                                 </form>
                                 </div>

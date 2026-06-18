@@ -13,7 +13,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Edit Employee Attendance</h4>
+                            <h4 class="card-title">Edit Absensi Karyawan</h4>
                         </div>
                     </div>
 
@@ -23,7 +23,7 @@
                             <div class="row align-items-center">
                                 <!-- Section: Date Selection -->
                                 <div class="form-group col-md-6">
-                                    <label for="datepicker">Date <span class="text-danger">*</span></label>
+                                    <label for="datepicker">Tanggal <span class="text-danger">*</span></label>
                                     <input id="datepicker" class="form-control @error('date') is-invalid @enderror" name="date"
                                         value="{{ old('date', $date) }}" autocomplete="off" />
                                     @error('date')
@@ -35,10 +35,10 @@
                                 <div class="col-lg-12">
                                     <div class="d-flex justify-content-end mb-2">
                                         <button type="button" class="btn btn-sm btn-outline-success mr-2" id="btn-all-present">
-                                            <x-heroicon-o-check class="w-4 h-4 mr-1 inline" />Mark All Present
+                                            <x-heroicon-o-check class="w-4 h-4 mr-1 inline" />Tandai Semua Hadir
                                         </button>
                                         <button type="button" class="btn btn-sm btn-outline-danger" id="btn-all-leave">
-                                            <x-heroicon-o-x-mark class="w-4 h-4 mr-1 inline" />Mark All Leave
+                                            <x-heroicon-o-x-mark class="w-4 h-4 mr-1 inline" />Tandai Semua Libur
                                         </button>
                                     </div>
                                     <div class="table-responsive rounded mb-3" style="max-height: 500px; overflow-y: auto;">
@@ -46,8 +46,8 @@
                                             <thead class="bg-white text-uppercase sticky-top" style="z-index: 10;">
                                                 <tr class="ligth ligth-data">
                                                     <th>No.</th>
-                                                    <th>Employee</th>
-                                                    <th class="text-center">Attendance Status</th>
+                                                    <th>Karyawan</th>
+                                                    <th class="text-center">Status Absensi</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="ligth-body">
@@ -65,7 +65,7 @@
                                                                             <input type="radio" id="present{{ $loop->iteration }}" name="status{{ $loop->iteration }}"
                                                                                 class="custom-control-input set-present" value="present"
                                                                                 {{ $attendence->status == 'present' ? 'checked' : '' }}>
-                                                                            <label class="custom-control-label text-success" for="present{{ $loop->iteration }}">Present</label>
+                                                                            <label class="custom-control-label text-success" for="present{{ $loop->iteration }}">Hadir</label>
                                                                         </div>
                                                                     </div>
                                                                     <!-- Status: Leave -->
@@ -73,7 +73,7 @@
                                                                         <div class="custom-control custom-radio custom-control-inline">
                                                                             <input type="radio" id="leave{{ $loop->iteration }}" name="status{{ $loop->iteration }}"
                                                                                 class="custom-control-input set-leave" value="leave" {{ $attendence->status == 'leave' ? 'checked' : '' }}>
-                                                                            <label class="custom-control-label text-warning" for="leave{{ $loop->iteration }}">Leave</label>
+                                                                            <label class="custom-control-label text-warning" for="leave{{ $loop->iteration }}">Libur</label>
                                                                             </div>
                                                                             </div>
                                                                     <!-- Status: Absent -->
@@ -81,7 +81,7 @@
                                                                         <div class="custom-control custom-radio custom-control-inline">
                                                                             <input type="radio" id="absent{{ $loop->iteration }}" name="status{{ $loop->iteration }}"
                                                                                 class="custom-control-input set-absent" value="absent" {{ $attendence->status == 'absent' ? 'checked' : '' }}>
-                                                                            <label class="custom-control-label text-danger" for="absent{{ $loop->iteration }}">Absent</label>
+                                                                            <label class="custom-control-label text-danger" for="absent{{ $loop->iteration }}">Tidak Hadir</label>
                                                                             </div>
                                                                             </div>
                                                                             </div>
@@ -97,8 +97,8 @@
 
                             <!-- Section: Form Actions -->
                             <div class="mt-2">
-                                <button type="submit" class="btn btn-primary">Update</button>
-                                <a href="{{ route('attendance.index') }}" class="btn btn-danger">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Perbarui</button>
+                                <a href="{{ route('attendance.index') }}" class="btn btn-danger">Batal</a>
                             </div>
                             </form>
                             </div>

@@ -14,7 +14,7 @@
                 <li class="{{ Request::is('dashboard') ? 'active' : '' }}">
                     <a href="{{ route('dashboard') }}" class="svg-icon">
                         <x-heroicon-o-home class="w-6 h-6" />
-                        <span class="ml-4">Dashboards</span>
+                        <span class="ml-4">Dashboard</span>
                     </a>
                 </li>
 
@@ -33,24 +33,24 @@
                     <li>
                         <a href="#orders" class="collapsed" data-toggle="collapse" aria-expanded="false">
                             <x-heroicon-o-shopping-bag class="w-6 h-6" />
-                            <span class="ml-3">Orders</span>
+                            <span class="ml-3">Order</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
                             <ul id="orders" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
 
                             <li class="{{ Request::is('orders/pending*') ? 'active' : '' }}">
                                 <a href="{{ route('order.pendingOrders') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Pending Orders</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Order Tertunda</span>
                                     </a>
                                     </li>
                                     <li class="{{ Request::is('orders/complete*') ? 'active' : '' }}">
                                         <a href="{{ route('order.completeOrders') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Complete Orders</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Order Selesai</span>
                                     </a>
                                     </li>
                                     <li class="{{ Request::is('pending/due*') ? 'active' : '' }}">
                                         <a href="{{ route('order.pendingDue') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Pending Due</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Piutang Tertunda</span>
                                     </a>
                                     </li>
 
@@ -62,23 +62,23 @@
                     <li>
                         <a href="#products" class="collapsed" data-toggle="collapse" aria-expanded="false">
                             <x-heroicon-o-archive-box class="w-6 h-6" />
-                            <span class="ml-3">Products</span>
+                            <span class="ml-3">Produk</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
                             <ul id="products" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                                 <li class="{{ Request::is(['products']) ? 'active' : '' }}">
                                     <a href="{{ route('products.index') }}">
-                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Products</span>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Produk</span>
                                         </a>
                                         </li>
                                         <li class="{{ Request::is(['products/create']) ? 'active' : '' }}">
                                             <a href="{{ route('products.create') }}">
-                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Add Product</span>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Tambah Produk</span>
                                         </a>
                                         </li>
                                         <li class="{{ Request::is(['categories*']) ? 'active' : '' }}">
                                             <a href="{{ route('categories.index') }}">
-                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Categories</span>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Kategori</span>
                                         </a>
                                         </li>
                                         </ul>
@@ -91,7 +91,7 @@
                     <li class="{{ Request::is('employees*') ? 'active' : '' }}">
                         <a href="{{ route('employees.index') }}" class="svg-icon">
                             <x-heroicon-o-user-group class="w-6 h-6" />
-                            <span class="ml-3">Employees</span>
+                            <span class="ml-3">Karyawan</span>
                             </a>
                             </li>
                 @endif
@@ -100,7 +100,7 @@
                     <li class="{{ Request::is('customers*') ? 'active' : '' }}">
                         <a href="{{ route('customers.index') }}" class="svg-icon">
                             <x-heroicon-o-user-group class="w-6 h-6" />
-                            <span class="ml-3">Customers</span>
+                            <span class="ml-3">Pelanggan</span>
                             </a>
                             </li>
                 @endif
@@ -109,7 +109,7 @@
                     <li class="{{ Request::is('suppliers*') ? 'active' : '' }}">
                         <a href="{{ route('suppliers.index') }}" class="svg-icon">
                             <x-heroicon-o-user-group class="w-6 h-6" />
-                            <span class="ml-3">Suppliers</span>
+                            <span class="ml-3">Pemasok</span>
                             </a>
                             </li>
                 @endif
@@ -118,29 +118,29 @@
                     <li>
                         <a href="#advance-salary" class="collapsed" data-toggle="collapse" aria-expanded="false">
                         <x-heroicon-o-banknotes class="w-6 h-6" />
-                        <span class="ml-3">Salary</span>
+                        <span class="ml-3">Gaji</span>
                         <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                         </a>
                         <ul id="advance-salary" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
 
                             <li class="{{ Request::is(['advance-salary', 'advance-salary/*/edit']) ? 'active' : '' }}">
                                 <a href="{{ route('advance-salary.index') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>All Advance Salary</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Semua Gaji di Muka</span>
                                     </a>
                                     </li>
                                     <li class="{{ Request::is('advance-salary/create*') ? 'active' : '' }}">
                                         <a href="{{ route('advance-salary.create') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Create Advance Salary</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Buat Gaji di Muka</span>
                                     </a>
                                     </li>
                                     <li class="{{ Request::is('pay-salary') ? 'active' : '' }}">
                                         <a href="{{ route('pay-salary.index') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Pay Salary</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Bayar Gaji</span>
                                     </a>
                                     </li>
                                     <li class="{{ Request::is('pay-salary/history*') ? 'active' : '' }}">
                                         <a href="{{ route('pay-salary.payHistory') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>History Pay Salary</span>
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Riwayat Bayar Gaji</span>
                                     </a>
                                     </li>
                                     </ul>
@@ -151,19 +151,19 @@
                     <li>
                         <a href="#attendance" class="collapsed" data-toggle="collapse" aria-expanded="false">
                             <x-heroicon-o-calendar-days class="w-6 h-6" />
-                            <span class="ml-3">Attendance</span>
+                            <span class="ml-3">Absensi</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
                             <ul id="attendance" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
 
                                 <li class="{{ Request::is(['attendance']) ? 'active' : '' }}">
                                     <a href="{{ route('attendance.index') }}">
-                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>All Attendance</span>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Semua Absensi</span>
                                         </a>
                                         </li>
                                         <li class="{{ Request::is('attendance/create') ? 'active' : '' }}">
                                             <a href="{{ route('attendance.create') }}">
-                                                <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Create Attendance</span>
+                                                <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Buat Absensi</span>
                                         </a>
                                         </li>
                                         </ul>
@@ -183,12 +183,12 @@
                             <ul id="permission" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                                 <li class="{{ Request::is(['permission', 'permission/create', 'permission/edit/*']) ? 'active' : '' }}">
                                     <a href="{{ route('permission.index') }}">
-                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Permissions</span>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Permission</span>
                                         </a>
                                         </li>
                                         <li class="{{ Request::is(['role', 'role/create', 'role/edit/*']) ? 'active' : '' }}">
                                             <a href="{{ route('role.index') }}">
-                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Roles</span>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Role</span>
                                         </a>
                                         </li>
                                         <li class="{{ Request::is(['role/permission*']) ? 'active' : '' }}">
@@ -204,7 +204,7 @@
                     <li class="{{ Request::is('users*') ? 'active' : '' }}">
                         <a href="{{ route('users.index') }}" class="svg-icon">
                             <x-heroicon-o-users class="w-6 h-6" />
-                            <span class="ml-3">Users</span>
+                            <span class="ml-3">Pengguna</span>
                             </a>
                             </li>
                 @endif
@@ -221,7 +221,7 @@
                 <li class="{{ Request::is('help*') ? 'active' : '' }}">
                     <a href="{{ route('help.index') }}" class="svg-icon">
                         <x-heroicon-o-question-mark-circle class="w-6 h-6" />
-                        <span class="ml-3">Help</span>
+                        <span class="ml-3">Bantuan</span>
                     </a>
                 </li>
             </ul>

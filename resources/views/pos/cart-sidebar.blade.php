@@ -51,8 +51,8 @@
             <div class="bg-light rounded-circle p-3 mb-3">
                 <x-heroicon-o-shopping-bag class="w-8 h-8 text-secondary" />
             </div>
-            <p class="mb-0 font-weight-medium">Cart is empty</p>
-            <small>Select products to add</small>
+            <p class="mb-0 font-weight-medium">Cart kosong</p>
+            <small>Pilih produk untuk ditambahkan</small>
         </div>
     @endif
 </div>
@@ -64,7 +64,7 @@
         <span class="font-weight-bold">{{ Cart::subtotal() }}</span>
     </div>
     <div class="d-flex justify-content-between mb-3">
-        <span class="text-secondary small">Tax</span>
+        <span class="text-secondary small">Pajak</span>
         <span class="font-weight-bold">{{ Cart::tax() }}</span>
     </div>
     <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dashed">
@@ -80,9 +80,9 @@
             <!-- Payment Method -->
             <div class="col-6 pr-1">
                 <div class="form-group mb-2">
-                    <label class="small font-weight-bold text-muted mb-1">Method</label>
+                    <label class="small font-weight-bold text-muted mb-1">Metode</label>
                     <select class="form-control form-control-sm" id="payment_type">
-                        <option value="Cash" selected>Cash</option>
+                        <option value="Cash" selected>Tunai</option>
                         <option value="Transfer">Transfer</option>
                     </select>
                 </div>
@@ -90,7 +90,7 @@
             <!-- Amount Received Input -->
             <div class="col-6 pl-1">
                 <div class="form-group mb-2">
-                    <label class="small font-weight-bold text-muted mb-1">Received</label>
+                    <label class="small font-weight-bold text-muted mb-1">Diterima</label>
                     <input type="number" class="form-control form-control-sm" id="pay_amount" placeholder="0"
                         oninput="calculateChange()" min="0">
                 </div>
@@ -99,7 +99,7 @@
 
         <!-- Change Display -->
         <div class="d-flex justify-content-between align-items-center mb-3 px-2 py-2 bg-light rounded">
-            <span class="small font-weight-bold text-muted">Change</span>
+            <span class="small font-weight-bold text-muted">Kembalian</span>
             <span class="font-weight-bold text-success" id="change_amount">0.00</span>
         </div>
 
@@ -107,13 +107,13 @@
         <button type="button"
             class="btn btn-primary btn-lg btn-block rounded-pill shadow-lg d-flex align-items-center justify-content-center"
             onclick="validateAndShowModal()">
-            <span class="mr-2">Confirm Payment</span>
+            <span class="mr-2">Konfirmasi Pembayaran</span>
             <x-heroicon-o-arrow-right class="w-5 h-5" />
         </button>
     @else
         <!-- Disabled Button -->
         <button type="button" class="btn btn-light btn-lg btn-block rounded-pill text-muted" disabled>
-            Start Sale
+            Mulai Penjualan
         </button>
     @endif
 </div>

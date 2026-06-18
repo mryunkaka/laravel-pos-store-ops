@@ -38,7 +38,7 @@
                                         <div class="form-group row mb-0 col-md-5">
                                             <div class="input-group">
                                                 <input type="text" class="form-control" name="search" id="pos_search"
-                                                    placeholder="Search by name or barcode..." value="{{ request('search') }}" autocomplete="off">
+                                                    placeholder="Cari nama atau barcode..." value="{{ request('search') }}" autocomplete="off">
                                                 <div class="input-group-append">
                                                     <button type="submit" class="input-group-text bg-primary text-white">
                                                         <x-heroicon-o-magnifying-glass class="w-5 h-5" />
@@ -55,7 +55,7 @@
                                         <!-- Category Filter -->
                                         <div class="form-group row mb-0 col-md-4">
                                             <select class="form-control" name="category_id" onchange="this.form.submit()">
-                                                <option value="">All Categories</option>
+                                                <option value="">Semua Kategori</option>
                                                 @foreach ($categories as $category)
                                                     <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                                             {{ $category->name }}
@@ -68,11 +68,11 @@
                                         <div class="form-group row mb-0 col-md-3">
                                             <select class="form-control" name="row" onchange="this.form.submit()">
                                                 <option value="10" {{ request('row') == '10' ? 'selected' : '' }}>10 /
-                                                    Page</option>
+                                                    Halaman</option>
                                                 <option value="20" {{ request('row') == '20' ? 'selected' : '' }}>20 /
-                                                    Page</option>
+                                                    Halaman</option>
                                                 <option value="50" {{ request('row') == '50' ? 'selected' : '' }}>50 /
-                                                    Page</option>
+                                                    Halaman</option>
                                             </select>
                                         </div>
                                     </div>
@@ -95,7 +95,7 @@
                                             <!-- Stock Badge -->
                                             <span class="badge position-absolute shadow-sm"
                                                 style="top: 12px; right: 12px; font-size: 0.75rem; padding: 0.5em 0.8em; {{ $product->stock > 10 ? 'background-color: #10b981; color: white;' : 'background-color: #ef4444; color: white;' }}">
-                                                Stock: {{ $product->stock }}
+                                                Stok: {{ $product->stock }}
                                             </span>
                                         </div>
 
@@ -118,7 +118,7 @@
                                                     <input type="hidden" name="price" value="{{ $product->selling_price }}">
                                                     <button type="submit"
                                                         class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center">
-                                                        <x-heroicon-o-plus class="w-4 h-4 mr-1" /> Add
+                                                        <x-heroicon-o-plus class="w-4 h-4 mr-1" /> Tambah
                                                     </button>
                                                 </form>
                                             </div>
@@ -129,7 +129,7 @@
                                 <div class="col-12">
                                     <div class="alert alert-info text-center">
                                         <x-heroicon-o-information-circle class="w-6 h-6 mx-auto mb-2" />
-                                        No products found.
+                                        Produk tidak ditemukan.
                                     </div>
                                 </div>
                             @endforelse
@@ -150,10 +150,10 @@
                 <div class="card border-0 shadow-lg sticky-top" style="top: 20px; z-index: 100;">
                     <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between p-3">
                         <h5 class="mb-0 text-white">
-                            <x-heroicon-o-shopping-cart class="w-5 h-5 mr-1 inline" /> Current Order
+                            <x-heroicon-o-shopping-cart class="w-5 h-5 mr-1 inline" /> Order Saat Ini
                         </h5>
                         <span class="badge badge-light text-primary font-weight-bold" id="cart-count-badge">
-                            {{ Cart::count() }} items
+                            {{ Cart::count() }} item
                         </span>
                     </div>
 
@@ -161,13 +161,13 @@
                         <!-- Customer Selection -->
                         <div class="p-3 border-bottom bg-light">
                             <div class="form-group mb-0">
-                                <label class="font-weight-bold mb-1">Customer</label>
+                                <label class="font-weight-bold mb-1">Pelanggan</label>
                                 <div class="input-group">
                                     <select class="form-control select2" id="customer_id" name="customer_id" style="width: 85%;">
-                                        <option value="" selected disabled>-- Search Customer --</option>
+                                        <option value="" selected disabled>-- Cari Pelanggan --</option>
                                     </select>
                                     <div class="input-group-append" style="width: 15%;">
-                                        <button type="button" class="btn btn-outline-primary btn-block" title="Add New Customer" data-toggle="modal"
+                                        <button type="button" class="btn btn-outline-primary btn-block" title="Tambah Pelanggan Baru" data-toggle="modal"
                                             data-target="#addCustomerModal">
                                             <x-heroicon-o-plus class="w-5 h-5 mx-auto" />
                                         </button>
@@ -192,7 +192,7 @@
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header bg-primary text-white"
                     style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
-                    <h5 class="modal-title font-weight-bold mx-auto">Complete Payment</h5>
+                    <h5 class="modal-title font-weight-bold mx-auto">Konfirmasi Pembayaran</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -205,22 +205,22 @@
                         <div class="table-responsive">
                             <table class="table table-borderless">
                                 <tr>
-                                    <td class="text-muted font-weight-bold">Total Bill:</td>
+                                    <td class="text-muted font-weight-bold">Total Tagihan:</td>
                                     <td class="text-right font-weight-bold h5 text-primary" id="modal_total_display">
                                         {{ Cart::total() }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted font-weight-bold">Paid With:</td>
-                                    <td class="text-right font-weight-bold" id="modal_payment_method">Cash</td>
+                                    <td class="text-muted font-weight-bold">Dibayar Dengan:</td>
+                                    <td class="text-right font-weight-bold" id="modal_payment_method">Tunai</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted font-weight-bold">Amount Paid:</td>
+                                    <td class="text-muted font-weight-bold">Jumlah Dibayar:</td>
                                     <td class="text-right font-weight-bold h5 text-success" id="modal_pay_amount">0.00
                                     </td>
                                 </tr>
                                 <tr class="border-top">
-                                    <td class="text-muted font-weight-bold">Change:</td>
+                                    <td class="text-muted font-weight-bold">Kembalian:</td>
                                     <td class="text-right font-weight-bold h5 text-danger" id="modal_change_amount">0.00
                                     </td>
                                 </tr>
@@ -230,8 +230,8 @@
                             <!-- Modal Actions -->
                             <div class="modal-footer border-top-0 d-flex justify-content-between p-4 bg-light"
                                 style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
-                                <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary px-5 shadow-sm">Confirm Payment</button>
+                                <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary px-5 shadow-sm">Konfirmasi Pembayaran</button>
                             </div>
                             </form>
                             </div>
@@ -243,7 +243,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title font-weight-bold">Add New Customer</h5>
+                    <h5 class="modal-title font-weight-bold">Tambah Pelanggan Baru</h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -253,7 +253,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 form-group">
-                                <label for="name">Name <span class="text-danger">*</span></label>
+                                <label for="name">Nama <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="name" required>
                             </div>
                             <div class="col-md-6 form-group">
@@ -261,22 +261,22 @@
                                 <input type="email" class="form-control" name="email">
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="phone">Phone</label>
+                                <label for="phone">Telepon</label>
                                 <input type="text" class="form-control" name="phone">
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="city">City</label>
+                                <label for="city">Kota</label>
                                 <input type="text" class="form-control" name="city">
                             </div>
                             <div class="col-md-12 form-group">
-                                <label for="address">Address</label>
+                                <label for="address">Alamat</label>
                                 <textarea class="form-control" name="address" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Customer</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan Pelanggan</button>
                     </div>
                 </form>
             </div>
@@ -293,7 +293,7 @@
         // Initialize Select2 on Load
             window.addEventListener('load', function () {
             $('.select2').select2({
-                placeholder: "-- Search Customer --",
+                placeholder: "-- Cari Pelanggan --",
                 allowClear: true,
                 width: 'resolve',
                 ajax: {
@@ -343,7 +343,7 @@
                     // Update Cart Sidebar HTML
                     document.getElementById('cart-sidebar-container').innerHTML = data.cart_html;
                     // Update Cart Count Badge
-                    document.getElementById('cart-count-badge').innerText = data.cart_count + ' items';
+                    document.getElementById('cart-count-badge').innerText = data.cart_count + ' item';
                 }
             } catch (error) {
                 console.error('Error adding to cart:', error);
@@ -369,7 +369,7 @@
                 const data = await response.json();
                 if (data.success) {
                     document.getElementById('cart-sidebar-container').innerHTML = data.cart_html;
-                    document.getElementById('cart-count-badge').innerText = data.cart_count + ' items';
+                    document.getElementById('cart-count-badge').innerText = data.cart_count + ' item';
                 }
             } catch (error) {
                 console.error('Error updating cart:', error);
@@ -390,7 +390,7 @@
                 const data = await response.json();
                 if (data.success) {
                     document.getElementById('cart-sidebar-container').innerHTML = data.cart_html;
-                    document.getElementById('cart-count-badge').innerText = data.cart_count + ' items';
+                    document.getElementById('cart-count-badge').innerText = data.cart_count + ' item';
                 }
             } catch (error) {
                 console.error('Error deleting cart:', error);
@@ -425,11 +425,11 @@
                     form.reset();
                     alert(data.message);
                 } else {
-                    alert('Failed to create customer');
+                    alert('Gagal membuat pelanggan');
                 }
             } catch (error) {
                 console.error('Error creating customer:', error);
-                alert('Error creating customer. Please check inputs.');
+                alert('Gagal membuat pelanggan. Periksa input.');
             }
         }
 
@@ -462,7 +462,7 @@
             // 1. Ensure Customer Selected
             var customerId = $('#customer_id').val();
             if (!customerId) {
-                alert("Please select a customer first!");
+                alert("Silakan pilih pelanggan terlebih dahulu!");
                 return;
             }
             document.getElementById('modal_customer_id').value = customerId;
@@ -475,12 +475,12 @@
             const method = document.getElementById('payment_type').value;
 
             if (isNaN(payAmount) || payAmount <= 0) {
-                alert('Please enter a valid amount!');
+                alert('Masukkan jumlah yang valid!');
                 return;
             }
 
             if (payAmount < totalAmount) {
-                alert('Insufficient payment! Total amount is ' + totalText);
+                alert('Pembayaran kurang! Total tagihan ' + totalText);
                 return;
             }
 
@@ -539,7 +539,7 @@
 
                     // Update Cart Count Badge
                     if (data.cart_count !== undefined) {
-                        document.getElementById('cart-count-badge').innerText = data.cart_count + ' items';
+                        document.getElementById('cart-count-badge').innerText = data.cart_count + ' item';
                     }
 
                     // Optional: Reset Pay Input
@@ -547,14 +547,14 @@
                     if (document.getElementById('change_amount')) document.getElementById('change_amount').innerText =
                         '0.00';
 
-                    alert('Order Successful!');
+                    alert('Order Berhasil!');
 
                 } else {
-                    alert('Order Failed: ' + (data.message || 'Unknown error'));
+                    alert('Order Gagal: ' + (data.message || 'Kesalahan tidak diketahui'));
                 }
             } catch (error) {
                 console.error('Error submitting order:', error);
-                alert('An error occurred while processing the order.');
+                alert('Terjadi kesalahan saat memproses order.');
             }
         }
 

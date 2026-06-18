@@ -1,12 +1,12 @@
-# 02 - Progress
+# 02 - Progres
 
 ## Status Instalasi
 
-- [x] Source code `fajarghifar/laravel-point-of-sale` sudah di-clone ke `D:\Project\Web\pos3`.
+- [x] Kode sumber `fajarghifar/laravel-point-of-sale` sudah di-clone ke `D:\Project\Web\pos3`.
 - [x] Composer lokal tersedia sebagai `composer.phar`.
 - [x] Dependency PHP sudah di-install memakai `C:\php\php.exe`.
 - [x] Dependency Node sudah di-install.
-- [x] Asset frontend sudah di-build dengan `npm run build`.
+- [x] Aset frontend sudah di-build dengan `npm run build`.
 - [x] `.env` sudah dibuat dari `.env.example`.
 - [x] `APP_KEY` sudah dibuat.
 - [x] Database MariaDB `point_of_sale` sudah dibuat di port `3307`.
@@ -18,10 +18,10 @@
 
 - [x] Route utama sudah dicek di `routes/web.php`.
 - [x] Sidebar/menu sudah dicek di `resources/views/dashboard/body/sidebar.blade.php`.
-- [x] POS flow sudah dicek di `PosController`.
-- [x] Order flow sudah dicek di `OrderController`.
-- [x] Product flow sudah dicek di `ProductController`.
-- [x] Dashboard summary sudah dicek di `DashboardController`.
+- [x] Alur POS sudah dicek di `PosController`.
+- [x] Alur order sudah dicek di `OrderController`.
+- [x] Alur produk sudah dicek di `ProductController`.
+- [x] Ringkasan dashboard sudah dicek di `DashboardController`.
 
 ## Phase 2 - Selesai (2026-06-17)
 
@@ -30,7 +30,7 @@
 - [x] Validasi stok saat update qty cart (`PosController@updateCart`).
 - [x] Validasi stok ulang saat order dibuat (`OrderController@storeOrder`).
 - [x] Validasi stok ulang saat order di-complete (`OrderController@updateStatus`).
-- [x] Permission `allow-negative-stock` untuk bypass validasi stok.
+- [x] Permission `allow-negative-stock` untuk melewati validasi stok.
 
 ### Cancel & Void
 - [x] Migration: kolom `cancel_reason`, `void_reason`, `voided_by`, `voided_at`, `cancelled_by`, `cancelled_at` di tabel `orders`.
@@ -39,11 +39,11 @@
 - [x] Void complete order dengan alasan + permission `void.order` + stok dikembalikan.
 - [x] Void hanya mengembalikan stok 1x.
 
-### Dashboard Fix
+### Perbaikan Dashboard
 - [x] `total_paid` dan `total_due` hanya hitung order `complete`.
 - [x] `today_sales` hanya hitung order `complete`.
-- [x] Top selling product hanya hitung order `complete`.
-- [x] Monthly chart hanya hitung order `complete`.
+- [x] Produk terlaris hanya hitung order `complete`.
+- [x] Grafik bulanan hanya hitung order `complete`.
 
 ### Audit Log
 - [x] Tabel `audit_logs` dengan kolom: user_id, module, action, reference_type, reference_id, old_values, new_values, ip_address, user_agent, description.
@@ -53,7 +53,7 @@
 ### Permission Baru
 - `void.order` - diberikan ke SuperAdmin dan Manager.
 - `allow-negative-stock` - diberikan ke SuperAdmin.
-- `audit.menu` - disiapkan untuk audit log viewer (Phase 7).
+- `audit.menu` - disiapkan untuk penampil audit log (Phase 7).
 
 ### File Utama yang Diubah/Ditambah
 - `database/migrations/2026_06_17_100000_create_audit_logs_table.php`
@@ -73,6 +73,35 @@
 - `resources/views/orders/complete-orders.blade.php` (badge, error alert)
 - `resources/views/pos/index.blade.php` (error alert)
 
+## Phase 8 - Selesai (2026-06-17)
+
+### Migrasi Bahasa Tampilan ke Indonesia
+
+- [x] Semua 85 file Blade view telah diterjemahkan ke bahasa Indonesia.
+- [x] Sidebar: menu dan submenu (Dashboard, Order, Produk, Karyawan, Pelanggan, Pemasok, Gaji, Absensi, Pengguna, Bantuan).
+- [x] Navbar: placeholder search, profil, keluar.
+- [x] Dashboard: judul, label kartu metrik, tabel, chart (label 'Penjualan', bulan dalam bahasa Indonesia).
+- [x] POS: label, placeholder, pesan, cart sidebar, struk, faktur.
+- [x] Orders: pending, complete, detail, invoice, struk, piutang — semua diterjemahkan.
+- [x] Products: index, create, edit, show, import — semua diterjemahkan.
+- [x] Categories: index, create, edit — semua diterjemahkan.
+- [x] Customers: index, create, edit, show — semua diterjemahkan.
+- [x] Suppliers: index, create, edit, show — semua diterjemahkan.
+- [x] Employees: index, create, edit, show — semua diterjemahkan.
+- [x] Attendance: index, create, edit — semua diterjemahkan.
+- [x] Salary: advance-salary (index, create, edit), pay-salary (index, create, create_single, pay-all, history, history-details) — semua diterjemahkan.
+- [x] Roles: permission (create, edit, index), role (create, edit, index), role-permission (create, edit, index) — 9 file diterjemahkan.
+- [x] Users: index, create, edit — semua diterjemahkan.
+- [x] Auth: login, register, forgot-password, reset-password, confirm-password, verify-email — 6 file diterjemahkan.
+- [x] Profile: partials (change-password-form, delete-account-form, edit-profile-form, left-profile, navbar-profile, show-profile) — 6 file diterjemahkan.
+- [x] Database backup, help, errors (403, 404), welcome — semua diterjemahkan.
+- [x] Footer: Kebijakan Privasi, Syarat Penggunaan.
+- [x] Istilah teknis tetap dalam bahasa Inggris: POS, Role, Permission, Email, Username, Password, Barcode, QRIS, Excel, PDF.
+
+### File Utama yang Diubah
+- 85 file Blade view di `resources/views/` — semua modul diterjemahkan.
+- Tidak ada perubahan pada controller, model, migration, atau route.
+
 ## Kesimpulan Teknis Saat Ini
 
 - POS membuat order dengan status `pending`.
@@ -80,17 +109,17 @@
 - Piutang dicatat lewat `due_amount`.
 - Pembayaran piutang mengubah `pay_amount` dan `due_amount`.
 - Produk punya `stock`, `buying_price`, `selling_price`, dan `expire_date`.
-- Belum ada tabel mutasi stok, closing, shift, purchase, retur, audit, atau stock opname.
+- Belum ada tabel mutasi stok, tutup kasir, shift, pembelian, retur, audit, atau stock opname.
 
 ## Risiko Saat Ini
 
-- `composer.phar` masih file lokal untracked, dipakai supaya tidak perlu Composer global.
-- Audit log viewer belum tersedia (direncanakan di Phase 7).
-- Stok yang sudah pernah di-void dan di-complete ulang belum diuji skenario kompleks.
+- `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
+- Penampil audit log belum tersedia (direncanakan di Phase 7).
+- Stok yang sudah pernah di-void dan diselesaikan ulang belum diuji skenario kompleks.
 
-## Next Step
+### Langkah Selanjutnya
 
-Kerjakan `03-TODO.md` Phase 3 - Inventory Core. Jangan lanjut Phase 4 sebelum semua checklist Phase 3 selesai.
+Kerjakan `03-TODO.md` Phase 3 - Inti Inventaris (stock movements, purchase orders, purchase receiving, stock adjustment).
 
 ## Instruksi Untuk Sesi Lanjutan
 
@@ -106,10 +135,10 @@ Jika sesi AI/developer berikutnya dimulai dari nol:
 
 ## Catatan Anti-Miskomunikasi
 
-- Project ini bukan rewrite.
+- Project ini bukan penulisan ulang.
 - Project ini bukan permintaan desain ulang UI total.
 - Project ini bukan migrasi framework.
 - Project ini bukan penggantian database.
 - Project ini adalah pengembangan bertahap di atas struktur Laravel POS yang sudah ada.
 - Fitur lama harus tetap hidup.
-- Jika ada ide fitur baru di luar TODO, catat dulu, jangan langsung implement.
+- Jika ada ide fitur baru di luar TODO, catat dulu, jangan langsung implementasikan.

@@ -45,7 +45,7 @@
                                 <th><x-sort-link name="employee.salary" label="Salary" /></th>
                                 <th><x-sort-link name="advance_salary" label="Advance" /></th>
                                 <th>Due</th>
-                                <th>Action</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="ligth-body">

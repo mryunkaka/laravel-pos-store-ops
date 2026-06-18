@@ -5,7 +5,7 @@ Aturan pengerjaan:
 - Phase harus dikerjakan berurutan.
 - Jangan mulai Phase 2 jika masih ada item Phase 1 yang belum checklist.
 - Jangan mulai Phase 3 jika masih ada item Phase 2 yang belum checklist.
-- Setelah mengerjakan item, update checklist, catatan di `02-PROGRESS.md`, dan perubahan penting di `04-HISTORY.md`.
+- Setelah mengerjakan item, perbarui checklist, catatan di `02-PROGRESS.md`, dan perubahan penting di `04-HISTORY.md`.
 - Jangan mengubah struktur project awal untuk mengejar item TODO.
 - Jangan mencentang item jika hanya sebagian selesai.
 - Jangan menggabungkan banyak item besar dalam satu perubahan jika membuat review sulit.
@@ -18,23 +18,23 @@ Sebelum mengerjakan:
 
 1. Baca semua file `docs/*.md`.
 2. Cek phase aktif di file ini.
-3. Pilih item unchecked paling atas pada phase aktif.
+3. Pilih item belum dicentang paling atas pada phase aktif.
 4. Baca controller/model/view/route yang terkait.
 5. Tulis asumsi singkat di `02-PROGRESS.md` jika ada hal yang belum pasti.
 
 Saat mengerjakan:
 
 1. Buat perubahan kecil dan terarah.
-2. Gunakan pola existing.
-3. Tambahkan migration baru jika perlu schema.
-4. Tambahkan validation request jika input kompleks.
+2. Gunakan pola yang sudah ada.
+3. Tambahkan migration baru jika perlu skema.
+4. Tambahkan validasi request jika input kompleks.
 5. Tambahkan permission jika fitur masuk sidebar/menu.
 6. Jangan menghapus data/fitur lama.
 
 Setelah mengerjakan:
 
-1. Jalankan command validasi yang relevan.
-2. Test manual flow utama.
+1. Jalankan perintah validasi yang relevan.
+2. Uji manual alur utama.
 3. Update checklist item.
 4. Update `02-PROGRESS.md`.
 5. Update `04-HISTORY.md`.
@@ -49,25 +49,25 @@ Setelah mengerjakan:
 
 ## Larangan Implementasi
 
-- Jangan rewrite POS menjadi aplikasi baru.
+- Jangan menulis ulang POS menjadi aplikasi baru.
 - Jangan mengganti Laravel Blade menjadi SPA.
 - Jangan menghapus module salary/attendance/supplier walaupun tidak prioritas.
 - Jangan mengubah auth default tanpa instruksi.
 - Jangan memindahkan semua route ke file baru.
-- Jangan mengganti nama tabel existing.
-- Jangan membuat migration destructive seperti drop/rename table existing tanpa backup dan instruksi eksplisit.
+- Jangan mengganti nama tabel yang ada.
+- Jangan membuat migration destructive seperti drop/rename table yang ada tanpa backup dan instruksi eksplisit.
 - Jangan mengubah semua tampilan sekaligus.
 - Jangan install package besar kecuali benar-benar diperlukan dan dicatat alasannya.
 
-## Phase 1 - Baseline Project Saat Ini
+## Phase 1 - Dasar Project Saat Ini
 
-Tujuan: memastikan fitur bawaan project tercatat, bisa dipakai, dan menjadi baseline sebelum enhancement.
+Tujuan: memastikan fitur bawaan project tercatat, bisa dipakai, dan menjadi dasar sebelum peningkatan.
 
 - [x] Login admin tersedia.
 - [x] Dashboard ringkas tersedia.
 - [x] POS cart tersedia.
 - [x] Create order dari POS tersedia.
-- [x] Print invoice/receipt tersedia.
+- [x] Cetak invoice/struk tersedia.
 - [x] Pending orders tersedia.
 - [x] Complete orders tersedia.
 - [x] Pending due dan pembayaran piutang tersedia.
@@ -77,27 +77,27 @@ Tujuan: memastikan fitur bawaan project tercatat, bisa dipakai, dan menjadi base
 - [x] Product export Excel tersedia.
 - [x] Product barcode display tersedia.
 - [x] CRUD customers tersedia.
-- [x] CRUD suppliers tersedia.
-- [x] CRUD employees tersedia.
-- [x] Attendance tersedia.
-- [x] Salary dan advance salary tersedia.
+- [x] Pemasok: CRUD pemasok.
+- [x] Karyawan: CRUD karyawan.
+- [x] Absensi tersedia.
+- [x] Gaji dan gaji di muka tersedia.
 - [x] Role & permission tersedia.
-- [x] Users management tersedia.
+- [x] Manajemen pengguna tersedia.
 - [x] Database backup tersedia.
-- [x] Local install, migration, seeder, storage link, dan server port `8084` selesai.
+- [x] Instalasi lokal, migration, seeder, storage link, dan server port `8084` selesai.
 
 ## Phase 2 - Prioritas Data Aman Untuk POS
 
 Tujuan: mencegah transaksi dan stok menjadi salah. Phase ini paling prioritas sebelum fitur besar lain.
 
-Acceptance criteria Phase 2:
+Kriteria penerimaan Phase 2:
 
-- Transaksi tidak bisa menjual qty melebihi stok tersedia.
-- Order pending bisa dibatalkan dengan alasan tanpa menghapus histori.
-- Order complete bisa divoid dengan permission supervisor dan alasan.
-- Void complete order mengembalikan stok satu kali saja.
-- Dashboard tidak lagi menghitung pending order sebagai sales final.
-- Audit log minimal menyimpan user, action, module, referensi ID, old value/new value jika relevan, IP/user agent jika mudah tersedia.
+- Transaksi tidak bisa menjual jumlah melebihi stok tersedia.
+- Order tertunda bisa dibatalkan dengan alasan tanpa menghapus riwayat.
+- Order selesai bisa divoid dengan permission supervisor dan alasan.
+- Void order selesai mengembalikan stok satu kali saja.
+- Dashboard tidak lagi menghitung order tertunda sebagai penjualan akhir.
+- Audit log minimal menyimpan pengguna, aksi, modul, referensi ID, nilai lama/nilai baru jika relevan, IP/user agent jika mudah tersedia.
 
 - [x] Validasi stok saat add product ke cart.
 - [x] Validasi stok saat update qty cart.
@@ -112,65 +112,65 @@ Acceptance criteria Phase 2:
 - [x] Perbaiki top selling product agar hanya menghitung order `complete`.
 - [x] Tambahkan audit log dasar untuk login, create order, complete order, cancel/void order, update due, dan update product.
 
-## Phase 3 - Inventory Core
+## Phase 3 - Inti Inventaris
 
-Tujuan: stok tidak hanya angka akhir, tapi punya histori lengkap dan sumber perubahan.
+Tujuan: stok tidak hanya angka akhir, tapi punya riwayat lengkap dan sumber perubahan.
 
-Acceptance criteria Phase 3:
+Kriteria penerimaan Phase 3:
 
-- Setiap perubahan stok dari order, purchase, retur, adjustment, atau opname masuk ke stock movement.
-- Stock movement tidak boleh diedit sembarangan. Koreksi dilakukan dengan movement baru.
-- Produk punya halaman histori stok.
-- Purchase dari supplier tidak otomatis menambah stok sebelum receiving.
-- Receiving yang sudah selesai tidak boleh diproses dua kali.
+- Setiap perubahan stok dari order, pembelian, retur, penyesuaian, atau opname masuk ke pergerakan stok.
+- Pergerakan stok tidak boleh diedit sembarangan. Koreksi dilakukan dengan pergerakan baru.
+- Produk punya halaman riwayat stok.
+- Pembelian dari pemasok tidak otomatis menambah stok sebelum penerimaan barang.
+- Penerimaan yang sudah selesai tidak boleh diproses dua kali.
 
-- [ ] Buat modul stock movements/kartu stok.
-- [ ] Catat stock out otomatis saat order complete.
-- [ ] Catat stock in manual.
-- [ ] Catat stock adjustment manual dengan alasan.
-- [ ] Tampilkan histori stok per produk.
-- [ ] Tambahkan filter histori stok berdasarkan tanggal, tipe, produk, dan user.
-- [ ] Buat purchase order dari supplier.
-- [ ] Buat purchase receiving/penerimaan barang.
-- [ ] Saat purchase diterima, stok produk bertambah dan stock movement tercatat.
-- [ ] Tambahkan retur pembelian ke supplier.
-- [ ] Saat retur pembelian selesai, stok berkurang dan stock movement tercatat.
-- [ ] Tambahkan transfer stok antar lokasi sebagai struktur awal, walau default lokasi masih satu toko.
+- [ ] Buat modul pergerakan stok/kartu stok.
+- [ ] Catat stok keluar otomatis saat order selesai.
+- [ ] Catat stok masuk manual.
+- [ ] Catat penyesuaian stok manual dengan alasan.
+- [ ] Tampilkan riwayat stok per produk.
+- [ ] Tambahkan filter riwayat stok berdasarkan tanggal, tipe, produk, dan pengguna.
+- [ ] Buat purchase order dari pemasok.
+- [ ] Buat penerimaan barang/purchase receiving.
+- [ ] Saat pembelian diterima, stok produk bertambah dan pergerakan stok tercatat.
+- [ ] Tambahkan retur pembelian ke pemasok.
+- [ ] Saat retur pembelian selesai, stok berkurang dan pergerakan stok tercatat.
+- [ ] Tambahkan transfer stok antar lokasi sebagai struktur awal, walau lokasi default masih satu toko.
 
-## Phase 4 - Operasional Kasir dan Closing
+## Phase 4 - Operasional Kasir dan Tutup Kasir
 
 Tujuan: kasir bisa buka/tutup shift, uang kas bisa dicocokkan, dan transaksi harian bisa ditutup resmi.
 
-Acceptance criteria Phase 4:
+Kriteria penerimaan Phase 4:
 
 - Kasir tidak bisa transaksi tanpa shift aktif jika aturan shift sudah diaktifkan.
-- Satu user kasir tidak boleh punya dua shift aktif bersamaan.
-- Closing shift menyimpan snapshot, bukan hanya hitung live.
-- Data yang sudah closing tidak berubah diam-diam.
-- Multi payment menyimpan detail pembayaran, bukan hanya string `payment_type`.
+- Satu pengguna kasir tidak boleh punya dua shift aktif bersamaan.
+- Tutup shift menyimpan cuplikan, bukan hanya hitung langsung.
+- Data yang sudah ditutup tidak berubah diam-diam.
+- Multi pembayaran menyimpan detail pembayaran, bukan hanya teks `payment_type`.
 
 - [ ] Buat modul shift kasir.
 - [ ] Buka shift dengan kas awal.
 - [ ] Batasi transaksi POS agar kasir harus punya shift aktif.
-- [ ] Catat cash in/cash out selama shift.
-- [ ] Tambahkan multi payment per order: cash, QRIS, debit, transfer, e-wallet.
-- [ ] Tambahkan split payment dalam satu order.
-- [ ] Buat closing shift kasir.
-- [ ] Closing menghitung total transaksi, total cash, total non-cash, due, void, dan refund.
-- [ ] Closing mencatat uang fisik, selisih kas, catatan kasir, dan user supervisor.
-- [ ] Buat closing harian outlet dari kumpulan shift.
-- [ ] Lock transaksi yang sudah masuk closing agar tidak bisa diedit tanpa permission khusus.
-- [ ] Tambahkan cetak laporan closing shift dan closing harian.
+- [ ] Catat kas masuk/kas keluar selama shift.
+- [ ] Tambahkan multi pembayaran per order: tunai, QRIS, debit, transfer, e-wallet.
+- [ ] Tambahkan pembayaran terpisah dalam satu order.
+- [ ] Buat tutup shift kasir.
+- [ ] Tutup kasir menghitung total transaksi, total tunai, total non-tunai, piutang, void, dan refund.
+- [ ] Tutup kasir mencatat uang fisik, selisih kas, catatan kasir, dan pengguna supervisor.
+- [ ] Buat tutup kasir harian outlet dari kumpulan shift.
+- [ ] Kunci transaksi yang sudah masuk tutup kasir agar tidak bisa diedit tanpa permission khusus.
+- [ ] Tambahkan cetak laporan tutup shift dan tutup kasir harian.
 
 ## Phase 5 - Stock Opname dan Retur Penjualan
 
 Tujuan: kontrol fisik barang dan penanganan pengembalian barang dari customer.
 
-Acceptance criteria Phase 5:
+Kriteria penerimaan Phase 5:
 
 - Stock opname punya batch/header dan detail per produk.
-- Opname tidak langsung mengubah stok sebelum approval.
-- Hasil approval membuat stock adjustment dan stock movement.
+- Opname tidak langsung mengubah stok sebelum persetujuan.
+- Hasil persetujuan membuat penyesuaian stok dan pergerakan stok.
 - Retur penjualan harus terhubung ke order asal.
 - Refund/tukar barang harus tercatat dan mempengaruhi laporan.
 
@@ -179,9 +179,9 @@ Acceptance criteria Phase 5:
 - [ ] Input stok fisik manual.
 - [ ] Import hasil opname dari Excel.
 - [ ] Hitung selisih stok sistem vs stok fisik.
-- [ ] Submit hasil opname untuk approval.
-- [ ] Approval opname membuat stock adjustment dan stock movement.
-- [ ] Simpan histori opname per batch.
+- [ ] Submit hasil opname untuk persetujuan.
+- [ ] Persetujuan opname membuat penyesuaian stok dan pergerakan stok.
+- [ ] Simpan riwayat opname per batch.
 - [ ] Buat retur penjualan.
 - [ ] Retur penjualan bisa refund uang atau tukar barang.
 - [ ] Retur penjualan mengembalikan stok jika barang layak jual.
@@ -192,55 +192,87 @@ Acceptance criteria Phase 5:
 
 Tujuan: POS lebih fleksibel untuk skenario toko nyata.
 
-Acceptance criteria Phase 6:
+Kriteria penerimaan Phase 6:
 
-- Diskon tercatat di order/order detail, bukan hanya perubahan tampilan total.
+- Diskon tercatat di order/detail order, bukan hanya perubahan tampilan total.
 - Promo punya periode aktif dan bisa dinonaktifkan.
-- Pajak/service charge punya konfigurasi dan nilai tersimpan di transaksi.
-- Barcode scanner flow bisa add item dari input kode.
+- Pajak/biaya layanan punya konfigurasi dan nilai tersimpan di transaksi.
+- Alur barcode scanner bisa menambah item dari input kode.
 - Struk thermal punya layout khusus dan tetap bisa dicetak dari browser.
 
 - [ ] Diskon per item.
 - [ ] Diskon per invoice.
 - [ ] Voucher/promo sederhana berdasarkan periode.
-- [ ] Harga grosir atau customer/member price.
+- [ ] Harga grosir atau harga pelanggan/member.
 - [ ] Pajak fleksibel per produk/kategori.
-- [ ] Service charge opsional.
-- [ ] Barcode scanner workflow di POS: scan kode langsung add/update qty.
+- [ ] Biaya layanan opsional.
+- [ ] Alur kerja barcode scanner di POS: scan kode langsung tambah/ubah jumlah.
 - [ ] Cetak label barcode produk.
 - [ ] Optimasi cetak struk thermal 58mm/80mm.
-- [ ] Auto print receipt setelah order complete.
+- [ ] Cetak otomatis struk setelah order selesai.
 
 ## Phase 7 - Laporan, Audit, dan Administrasi Lanjutan
 
-Tujuan: owner/supervisor punya laporan dan kontrol administrasi yang cukup.
+Tujuan: pemilik/supervisor punya laporan dan kontrol administrasi yang cukup.
 
-Acceptance criteria Phase 7:
+Kriteria penerimaan Phase 7:
 
 - Laporan bisa difilter tanggal.
-- Laporan sales final memakai order `complete`, memperhitungkan void/retur sesuai kebutuhan.
-- Laporan laba memakai harga beli yang tersimpan pada saat transaksi atau fallback yang jelas.
-- Export Excel/PDF menghasilkan data yang sama dengan tampilan.
-- Audit log viewer tidak boleh mengizinkan edit log.
+- Laporan penjualan akhir memakai order `complete`, memperhitungkan void/retur sesuai kebutuhan.
+- Laporan laba memakai harga beli yang tersimpan pada saat transaksi atau cadangan yang jelas.
+- Ekspor Excel/PDF menghasilkan data yang sama dengan tampilan.
+- Penampil audit log tidak boleh mengizinkan edit log.
 
 - [ ] Laporan penjualan per tanggal.
 - [ ] Laporan penjualan per kasir.
 - [ ] Laporan penjualan per produk.
 - [ ] Laporan metode pembayaran.
 - [ ] Laporan piutang.
-- [ ] Laporan laba kotor berdasarkan buying price vs selling price.
-- [ ] Laporan stok minimum/reorder.
-- [ ] Notifikasi produk expired/dekat expired.
-- [ ] Export laporan ke Excel.
-- [ ] Export laporan ke PDF.
-- [ ] Audit log viewer dengan filter user, tanggal, module, dan action.
-- [ ] Restore database dari backup lewat UI dengan permission khusus.
-- [ ] Pengaturan toko: nama toko, alamat, logo, pajak default, currency.
+- [ ] Laporan laba kotor berdasarkan harga beli vs harga jual.
+- [ ] Laporan stok minimum/pesan ulang.
+- [ ] Notifikasi produk kedaluwarsa/dekat kedaluwarsa.
+- [ ] Ekspor laporan ke Excel.
+- [ ] Ekspor laporan ke PDF.
+- [ ] Penampil audit log dengan filter pengguna, tanggal, modul, dan aksi.
+- [ ] Pulihkan database dari backup lewat UI dengan permission khusus.
+- [ ] Pengaturan toko: nama toko, alamat, logo, pajak default, mata uang.
 - [ ] Pengaturan role kasir lebih detail: diskon, void, edit harga, akses laporan.
+
+## Phase 8 - Migrasi Bahasa Tampilan ke Indonesia
+
+Tujuan: semua teks tampilan aplikasi (UI) menggunakan bahasa Indonesia, kecuali tombol/teks singkat yang sudah umum dimengerti secara global (Submit, Edit, Delete, Total, Subtotal, dll).
+
+Kriteria penerimaan Phase 8:
+
+- Semua label, judul halaman, deskripsi, pesan sukses/error, dan navigasi di sidebar/navbar menggunakan bahasa Indonesia.
+- Tombol singkat seperti Submit, Edit, Delete, Save, Update, Cancel, Total, Subtotal, Qty, dll boleh tetap bahasa Inggris.
+- Status badge boleh tetap bahasa Inggris (Pending, Complete, Cancelled, Void).
+- Teks placeholder input diterjemahkan.
+- Pesan alert dan notifikasi diterjemahkan.
+- Nama bulan di chart dan format tanggal disesuaikan.
+
+- [x] Sidebar: semua menu dan submenu diterjemahkan.
+- [x] Navbar: placeholder search, label profil, dan teks tombol diterjemahkan.
+- [x] Dashboard: judul, label kartu metrik, judul tabel, header kolom, dan teks kosong diterjemahkan.
+- [x] POS: label, placeholder, pesan, dan teks cart sidebar diterjemahkan.
+- [x] Order: semua halaman (pending, complete, detail, invoice, struk, piutang) diterjemahkan.
+- [x] Produk: semua halaman (index, create, edit, show, import) diterjemahkan.
+- [x] Kategori: semua halaman (index, create, edit) diterjemahkan.
+- [x] Pelanggan: semua halaman (index, create, edit, show) diterjemahkan.
+- [x] Pemasok: semua halaman (index, create, edit, show) diterjemahkan.
+- [x] Karyawan: semua halaman (index, create, edit, show) diterjemahkan.
+- [x] Absensi: semua halaman (index, create, edit) diterjemahkan.
+- [x] Gaji: semua halaman gaji di muka dan bayar gaji diterjemahkan.
+- [x] Role & Permission: semua halaman diterjemahkan.
+- [x] Pengguna: semua halaman (index, create, edit) diterjemahkan.
+- [x] Backup database, bantuan, error, dan halaman selamat datang diterjemahkan.
+- [x] Otentikasi: halaman login, register, lupa password, dll diterjemahkan.
+- [x] Profil: semua halaman profil diterjemahkan.
+- [x] Footer dan layout utama diterjemahkan.
 
 ## Daftar 20 Fitur Tambahan Utama
 
-Daftar ini adalah ringkasan fitur enhancement utama yang tersebar di phase 2 sampai phase 7:
+Daftar ini adalah ringkasan fitur peningkatan utama yang tersebar dari phase 2 sampai phase 7:
 
 1. Validasi stok POS.
 2. Cancel/void transaksi dengan alasan.

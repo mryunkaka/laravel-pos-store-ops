@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="header-title">
-                            <h4 class="card-title">Create Category</h4>
+                            <h4 class="card-title">Tambah Kategori</h4>
                         </div>
                     </div>
 
@@ -17,7 +17,7 @@
                             <div class="row align-items-center">
                                 <!-- Input: Name -->
                                 <div class="form-group col-md-12">
-                                    <label for="name">Category Name <span class="text-danger">*</span></label>
+                                    <label for="name">Nama Kategori <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
                                         name="name" value="{{ old('name') }}" required>
                                     @error('name')
@@ -29,7 +29,7 @@
 
                                 <!-- Input: Slug (Auto-generated) -->
                                 <div class="form-group col-md-12">
-                                    <label for="slug">Category Slug <span class="text-danger">*</span></label>
+                                    <label for="slug">Slug Kategori <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug"
                                         name="slug" value="{{ old('slug') }}" required readonly>
                                     @error('slug')
@@ -41,7 +41,7 @@
 
                                 <!-- Input: Description -->
                                 <div class="form-group col-md-12">
-                                    <label for="description">Description</label>
+                                    <label for="description">Deskripsi</label>
                                     <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description"
                                         rows="3">{{ old('description') }}</textarea>
                                     @error('description')
@@ -54,8 +54,8 @@
 
                             <!-- Action Buttons -->
                             <div class="mt-2">
-                                <button type="submit" class="btn btn-primary mr-2">Save</button>
-                                <a class="btn btn-outline-danger" href="{{ route('categories.index') }}">Cancel</a>
+                                <button type="submit" class="btn btn-primary mr-2">Simpan</button>
+                                <a class="btn btn-outline-danger" href="{{ route('categories.index') }}">Batal</a>
                             </div>
                         </form>
                     </div>

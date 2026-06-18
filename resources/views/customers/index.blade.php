@@ -17,16 +17,16 @@
                 <!-- Section: Header and Add Button -->
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                     <div>
-                        <h4 class="mb-3">Customer List</h4>
-                        <p class="mb-0">A customer dashboard lets you easily gather and visualize customer data from optimizing <br>
-                            the customer experience, ensuring customer retention. </p>
+                        <h4 class="mb-3">Daftar Pelanggan</h4>
+                        <p class="mb-0">Dashboard pelanggan memungkinkan Anda dengan mudah mengumpulkan dan memvisualisasikan data pelanggan <br>
+                            untuk mengoptimalkan pengalaman pelanggan dan menjaga retensi pelanggan.</p>
                     </div>
                     <div>
                         <a href="{{ route('customers.create') }}" class="btn btn-primary add-list">
-                            <x-heroicon-o-plus class="w-5 h-5 mr-3" />Add Customer
+                            <x-heroicon-o-plus class="w-5 h-5 mr-3" />Tambah Pelanggan
                         </a>
                         <a href="{{ route('customers.index') }}" class="btn btn-danger add-list">
-                            <x-heroicon-o-x-mark class="w-5 h-5 mr-3" />Clear Search
+                            <x-heroicon-o-x-mark class="w-5 h-5 mr-3" />Bersihkan Pencarian
                         </a>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                     <div class="d-flex flex-wrap align-items-center justify-content-between">
                         <!-- Row Per Page Checkbox -->
                         <div class="form-group row">
-                            <label for="row" class="col-sm-3 align-self-center">Row:</label>
+                            <label for="row" class="col-sm-3 align-self-center">Baris:</label>
                             <div class="col-sm-9">
                                 <select class="form-control" name="row" onchange="this.form.submit()">
                                     <option value="10" @if (request('row') == '10') selected="selected" @endif>10</option>
@@ -51,11 +51,11 @@
 
                         <!-- Search Box -->
                         <div class="form-group row">
-                            <label class="control-label col-sm-3 align-self-center" for="search">Search:</label>
+                            <label class="control-label col-sm-3 align-self-center" for="search">Cari:</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
                                     <input type="text" id="search" class="form-control" name="search"
-                                        placeholder="Search customer" value="{{ request('search') }}">
+                                        placeholder="Cari pelanggan" value="{{ request('search') }}">
                                     <div class="input-group-append">
                                         <button type="submit" class="input-group-text bg-primary">
                                             <x-heroicon-o-magnifying-glass class="w-5 h-5" />
@@ -75,11 +75,11 @@
                         <thead class="bg-white text-uppercase">
                             <tr class="ligth ligth-data">
                                 <th>No.</th>
-                                <th><x-sort-link name="name" label="Name" /></th>
+                                <th><x-sort-link name="name" label="Nama" /></th>
                                 <th><x-sort-link name="email" label="Email" /></th>
-                                <th><x-sort-link name="phone" label="Phone" /></th>
-                                <th><x-sort-link name="city" label="City" /></th>
-                                <th>Action</th>
+                                <th><x-sort-link name="phone" label="Telepon" /></th>
+                                <th><x-sort-link name="city" label="Kota" /></th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="ligth-body">
@@ -92,11 +92,11 @@
                                     <td>{{ $customer->city }}</td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center list-action">
-                                            <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="View"
+                                            <a class="btn btn-info mr-2" data-toggle="tooltip" data-placement="top" title="Lihat"
                                                 href="{{ route('customers.show', $customer->id) }}">
                                                 <x-heroicon-o-eye class="w-5 h-5 mr-0" />
                                             </a>
-                                            <a class="btn btn-success mr-2" data-toggle="tooltip" data-placement="top" title="Edit"
+                                            <a class="btn btn-success mr-2" data-toggle="tooltip" data-placement="top" title="Ubah"
                                                 href="{{ route('customers.edit', $customer->id) }}">
                                                 <x-heroicon-o-pencil class="w-5 h-5 mr-0" />
                                             </a>
@@ -105,8 +105,8 @@
                                                 @method('delete')
                                                 @csrf
                                                 <button type="submit" class="btn btn-warning border-0"
-                                                    onclick="return confirm('Are you sure you want to delete this record?')"
-                                                    data-toggle="tooltip" data-placement="top" title="Delete">
+                                                    onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')"
+                                                    data-toggle="tooltip" data-placement="top" title="Hapus">
                                                     <x-heroicon-o-trash class="w-5 h-5 mr-0" />
                                                 </button>
                                             </form>

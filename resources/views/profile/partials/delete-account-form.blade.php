@@ -1,12 +1,12 @@
 <!-- begin: Delete Account -->
 <div class="card-header d-flex justify-content-between">
     <div class="iq-header-title">
-        <h4 class="card-title">Delete Account</h4>
+        <h4 class="card-title">Hapus Akun</h4>
     </div>
 </div>
 <div class="card-body">
     <div class="alert alert-warning" role="alert">
-        <strong class="pr-2">Warning:</strong> Once your account is deleted, all of your data will be permanently removed. This action cannot be undone.
+        <strong class="pr-2">Peringatan:</strong> Setelah akun Anda dihapus, semua data Anda akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
     </div>
 
     <form action="{{ route('profile.destroy') }}" method="POST">
@@ -22,13 +22,13 @@
                     {{ $message }}
                 </div>
                 @enderror
-                <small class="form-text text-muted">Please enter your password to confirm account deletion.</small>
+                <small class="form-text text-muted">Silakan masukkan password Anda untuk mengonfirmasi penghapusan akun.</small>
             </div>
         </div>
         <!-- end: Input Data -->
         <div class="mt-2">
-            <button type="submit" class="btn btn-danger mr-2">Delete Account</button>
-            <a class="btn bg-secondary" href="{{ route('profile') }}">Cancel</a>
+            <button type="submit" class="btn btn-danger mr-2">Hapus Akun</button>
+            <a class="btn bg-secondary" href="{{ route('profile') }}">Batal</a>
         </div>
     </form>
 </div>

@@ -1,8 +1,8 @@
-# 05 - Project Structure
+# 05 - Struktur Project
 
-Dokumen ini menjelaskan struktur yang harus dipertahankan. AI/developer berikutnya tidak boleh menganggap struktur ini sebagai saran opsional. Fitur baru harus menempel ke struktur existing, bukan mengganti pondasi project.
+Dokumen ini menjelaskan struktur yang harus dipertahankan. AI/developer berikutnya tidak boleh menganggap struktur ini sebagai saran opsional. Fitur baru harus menempel ke struktur yang ada, bukan mengganti pondasi project.
 
-## Aturan Struktur Non-Negotiable
+## Aturan Struktur Yang Tidak Bisa Ditawar
 
 - Pertahankan Laravel 10 sebagai framework.
 - Pertahankan Blade view di `resources/views`.
@@ -10,9 +10,9 @@ Dokumen ini menjelaskan struktur yang harus dipertahankan. AI/developer berikutn
 - Pertahankan model di `app/Models`.
 - Pertahankan route web utama di `routes/web.php`.
 - Pertahankan Spatie Permission sebagai role/permission.
-- Pertahankan layout dashboard existing.
-- Pertahankan nama tabel existing.
-- Pertahankan flow order pending lalu complete, kecuali perubahan dilakukan bertahap sesuai TODO dan tetap backward compatible.
+- Pertahankan layout dashboard yang ada.
+- Pertahankan nama tabel yang ada.
+- Pertahankan alur order tertunda lalu selesai, kecuali perubahan dilakukan bertahap sesuai TODO dan tetap kompatibel ke depan.
 - Jangan membuat folder paralel seperti `src`, `frontend`, `api-v2`, atau `new-pos` untuk menggantikan aplikasi lama.
 
 ## Root Penting
@@ -33,7 +33,7 @@ Dokumen ini menjelaskan struktur yang harus dipertahankan. AI/developer berikutn
 ## File Dokumentasi
 
 - `docs/01-PRD.md`: visi produk, batasan, persona, prinsip, dan instruksi wajib.
-- `docs/02-PROGRESS.md`: status pekerjaan, risiko, dan next step.
+- `docs/02-PROGRESS.md`: status pekerjaan, risiko, dan langkah selanjutnya.
 - `docs/03-TODO.md`: checklist phase yang harus dikerjakan berurutan.
 - `docs/04-HISTORY.md`: histori perubahan dan keputusan penting.
 - `docs/05-PROJECT_STRUCTURE.md`: struktur project, alur data, dan panduan penambahan modul.
@@ -42,26 +42,26 @@ Jika AI lain hanya diberi satu instruksi, instruksinya adalah: baca lima dokumen
 
 ## Controller Utama
 
-- `DashboardController`: ringkasan dashboard, metric, recent orders, top products, monthly chart.
-- `PosController`: halaman POS, cart add/update/delete, create customer AJAX, search customer.
-- `OrderController`: create order, pending/complete order, detail order, complete order, invoice, receipt, due payment.
-- `ProductController`: CRUD product, import/export Excel, barcode display.
-- `CategoryController`: CRUD category.
-- `CustomerController`: CRUD customer.
-- `SupplierController`: CRUD supplier.
-- `EmployeeController`: CRUD employee.
-- `AttendanceController`: attendance.
-- `PaySalaryController`: pay salary dan history.
-- `AdvanceSalaryController`: advance salary.
-- `RoleController`: permissions, roles, role-permissions.
-- `UserController`: users management.
+- `DashboardController`: ringkasan dashboard, metrik, order terbaru, produk terlaris, grafik bulanan.
+- `PosController`: halaman POS, tambah/ubah/hapus cart, buat pelanggan AJAX, cari pelanggan.
+- `OrderController`: buat order, order tertunda/selesai, detail order, selesaikan order, invoice, struk, bayar piutang.
+- `ProductController`: CRUD produk, impor/ekspor Excel, tampilan barcode.
+- `CategoryController`: CRUD kategori.
+- `CustomerController`: CRUD pelanggan.
+- `SupplierController`: CRUD pemasok.
+- `EmployeeController`: CRUD karyawan.
+- `AttendanceController`: absensi.
+- `PaySalaryController`: bayar gaji dan riwayat.
+- `AdvanceSalaryController`: gaji di muka.
+- `RoleController`: permission, role, role-permission.
+- `UserController`: manajemen pengguna.
 - `DatabaseBackupController`: backup database.
 
 ## Controller Yang Jangan Diubah Sembarangan
 
 - `OrderController`: sensitif karena mengubah status order, due, invoice, dan stok.
 - `PosController`: sensitif karena cart dan create order dipakai kasir.
-- `ProductController`: sensitif karena import/export dan update stok produk.
+- `ProductController`: sensitif karena impor/ekspor dan perbarui stok produk.
 - `DashboardController`: sensitif karena angka laporan bisa menyesatkan jika query salah.
 - `RoleController` dan `UserController`: sensitif karena permission dan akses.
 
@@ -120,7 +120,7 @@ Catatan: `stock` masih angka akhir tanpa histori. Jangan hanya mengandalkan fiel
 - `invoice_no`: nomor invoice.
 - `order_date`: tanggal order.
 - `order_status`: saat ini `pending` atau `complete`.
-- `total_products`: total qty/cart count.
+- `total_products`: total qty/jumlah item cart.
 - `sub_total`: subtotal.
 - `vat`: pajak dari cart package.
 - `total`: total akhir.
@@ -147,52 +147,52 @@ Catatan: jika nanti butuh laporan laba historis akurat, pertimbangkan menyimpan 
 - `/orders/pending`: pending orders.
 - `/orders/complete`: complete orders.
 - `/pending/due`: pending due.
-- `/products`: products list.
-- `/products/create`: add product.
-- `/products/import`: import products.
-- `/products/export`: export products.
-- `/categories`: categories.
-- `/customers`: customers.
-- `/suppliers`: suppliers.
-- `/employees`: employees.
-- `/attendance`: attendance.
-- `/pay-salary`: pay salary.
-- `/advance-salary`: advance salary.
-- `/permission`, `/role`, `/role/permission`: role and permission.
-- `/users`: users.
-- `/database/backup`: database backup.
-- `/help`: help.
+- `/products`: daftar produk.
+- `/products/create`: tambah produk.
+- `/products/import`: impor produk.
+- `/products/export`: ekspor produk.
+- `/categories`: kategori.
+- `/customers`: pelanggan.
+- `/suppliers`: pemasok.
+- `/employees`: karyawan.
+- `/attendance`: absensi.
+- `/pay-salary`: bayar gaji.
+- `/advance-salary`: gaji di muka.
+- `/permission`, `/role`, `/role/permission`: role dan permission.
+- `/users`: pengguna.
+- `/database/backup`: backup database.
+- `/help`: bantuan.
 
 ## Alur Data POS Saat Ini
 
-1. User buka `/pos`.
+1. Pengguna membuka `/pos`.
 2. `PosController@index` menampilkan produk yang `expire_date > today`.
-3. User add product ke cart.
+3. Pengguna menambah produk ke cart.
 4. Cart disimpan oleh package `hardevine/shoppingcart`.
-5. User submit order.
-6. `OrderController@storeOrder` membuat record `orders` status `pending`.
+5. Pengguna mengirim order.
+6. `OrderController@storeOrder` membuat record `orders` dengan status `pending`.
 7. `OrderController@storeOrder` membuat record `order_details`.
 8. Cart dikosongkan.
 9. Invoice ditampilkan.
-10. User buka pending order detail.
-11. User klik `Complete Order`.
+10. Pengguna membuka detail order tertunda.
+11. Pengguna klik `Complete Order`.
 12. `OrderController@updateStatus` mengurangi `products.stock`.
 13. Status order berubah menjadi `complete`.
 
-## Invariant Alur POS
+## Aturan Tetap Alur POS
 
-Invariant adalah aturan yang harus tetap benar:
+Aturan tetap adalah aturan yang harus selalu benar:
 
-- Order pending belum dianggap penjualan final.
-- Order complete dianggap penjualan final.
+- Order tertunda belum dianggap penjualan akhir.
+- Order selesai dianggap penjualan akhir.
 - Stok tidak boleh dikurangi dua kali untuk order yang sama.
-- Jika order complete divoid, stok harus dikembalikan satu kali.
+- Jika order selesai divoid, stok harus dikembalikan satu kali.
 - Invoice number harus tetap unik.
 - Order detail harus tetap menyimpan item yang dijual walaupun produk berubah nama/harga setelah transaksi.
-- Pembayaran due tidak boleh membuat `due_amount` negatif.
-- Cart user tidak boleh mempengaruhi cart user lain.
+- Pembayaran piutang tidak boleh membuat `due_amount` negatif.
+- Cart pengguna tidak boleh mempengaruhi cart pengguna lain.
 
-Jika implementasi baru melanggar invariant ini, jangan lanjut sebelum diperbaiki.
+Jika implementasi baru melanggar aturan tetap ini, jangan lanjut sebelum diperbaiki.
 
 ## Struktur Yang Disarankan Untuk Fitur Baru
 
@@ -298,18 +298,18 @@ Untuk phase berikutnya, tabel yang kemungkinan dibutuhkan:
 
 - Baca dokumen berurutan: `01-PRD`, `02-PROGRESS`, `03-TODO`, `04-HISTORY`, `05-PROJECT_STRUCTURE`.
 - Kerjakan item dari `03-TODO.md` secara berurutan.
-- Update checklist dan history setiap selesai fitur.
+- Perbarui checklist dan riwayat setiap selesai fitur.
 - Jangan mengubah dependency besar tanpa alasan teknis kuat.
 - Jalankan Laravel dengan `C:\php\php.exe artisan serve --host=127.0.0.1 --port=8084` jika server mati.
 - Composer lokal: `C:\php\php.exe composer.phar install`.
 
-## Checklist Sebelum Commit/Final
+## Checklist Sebelum Commit/Selesai
 
 - `git status --short` dicek.
 - File docs diperbarui jika pekerjaan mengubah status/arah project.
 - Migration baru tidak destructive.
 - Route baru punya middleware yang tepat.
-- View baru memakai layout dashboard existing.
+- View baru memakai layout dashboard yang ada.
 - Query laporan memakai status order yang benar.
-- Stok/kas/transaksi penting punya histori.
-- Tidak ada fitur existing yang sengaja dihapus.
+- Stok/kas/transaksi penting punya riwayat.
+- Tidak ada fitur yang ada yang sengaja dihapus.
