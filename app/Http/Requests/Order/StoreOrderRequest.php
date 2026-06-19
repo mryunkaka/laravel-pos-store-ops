@@ -25,6 +25,9 @@ class StoreOrderRequest extends FormRequest
             'customer_id' => 'required|exists:customers,id',
             'payment_type' => 'required|string',
             'pay_amount' => 'required|numeric|min:0',
+            'payments' => 'nullable|array',
+            'payments.*.payment_type' => 'required_with:payments|string|in:cash,qris,debit,transfer,ewallet',
+            'payments.*.amount' => 'required_with:payments|numeric|min:1',
         ];
     }
 }

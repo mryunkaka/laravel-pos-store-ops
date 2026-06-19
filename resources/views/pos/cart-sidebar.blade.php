@@ -76,23 +76,29 @@
 <!-- Payment Section -->
 <div class="p-3 bg-white border-top">
     @if (Cart::count() > 0)
-        <div class="row">
-            <!-- Payment Method -->
-            <div class="col-6 pr-1">
-                <div class="form-group mb-2">
-                    <label class="small font-weight-bold text-muted mb-1">Metode</label>
-                    <select class="form-control form-control-sm" id="payment_type">
-                        <option value="Cash" selected>Tunai</option>
-                        <option value="Transfer">Transfer</option>
-                    </select>
+        <div id="payments-container">
+            <div class="row payment-row">
+                <div class="col-5 pr-1">
+                    <div class="form-group mb-2">
+                        <label class="small font-weight-bold text-muted mb-1">Metode</label>
+                        <select class="form-control form-control-sm payment-type" id="payment_type" onchange="calculateChange()">
+                            <option value="cash" selected>Tunai</option>
+                            <option value="qris">QRIS</option>
+                            <option value="debit">Debit</option>
+                            <option value="transfer">Transfer</option>
+                            <option value="ewallet">E-Wallet</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <!-- Amount Received Input -->
-            <div class="col-6 pl-1">
-                <div class="form-group mb-2">
-                    <label class="small font-weight-bold text-muted mb-1">Diterima</label>
-                    <input type="number" class="form-control form-control-sm" id="pay_amount" placeholder="0"
-                        oninput="calculateChange()" min="0">
+                <div class="col-5 px-1">
+                    <div class="form-group mb-2">
+                        <label class="small font-weight-bold text-muted mb-1">Diterima</label>
+                        <input type="number" class="form-control form-control-sm payment-amount" id="pay_amount" placeholder="0"
+                            oninput="calculateChange()" min="0">
+                    </div>
+                </div>
+                <div class="col-2 pl-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm btn-block mb-2" onclick="addPaymentRow()" title="Tambah pembayaran">+</button>
                 </div>
             </div>
         </div>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Dashboard;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderDetails;
+use App\Models\CashShift;
+use App\Models\CashShiftDetail;
 use App\Models\CashClosing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -91,6 +93,20 @@ class OrderController extends Controller
         // Validation handled by StoreOrderRequest
 
         return DB::transaction(function () use ($request) {
+            $activeShift = CashShift::where('user_id', auth()->id())
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$activeShift) {
+                $message = 'Anda harus membuka shift kasir terlebih dahulu sebelum bertransaksi.';
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $message], 422);
+                }
+
+                return Redirect::route('cash-shifts.create')->with('error', $message);
+            }
+
             // Stock validation before creating order
             $insufficientStock = [];
             $contents = Cart::content();
@@ -121,7 +137,8 @@ class OrderController extends Controller
             ]);
 
             $total = (float) Cart::total(null, null, ''); // Get float value
-            $pay_amount = $request->pay_amount;
+            $payments = $this->normalizePayments($request);
+            $pay_amount = array_sum(array_column($payments, 'amount'));
             $due_amount = $total - $pay_amount;
 
             $order = Order::create([
@@ -133,7 +150,7 @@ class OrderController extends Controller
                 'sub_total' => (float) Cart::subtotal(null, null, ''),
                 'vat' => (float) Cart::tax(null, null, ''),
                 'total' => $total,
-                'payment_type' => $request->payment_type,
+                'payment_type' => $this->paymentSummary($payments),
                 'pay_amount' => $pay_amount,
                 'due_amount' => $due_amount,
             ]);
@@ -146,6 +163,18 @@ class OrderController extends Controller
                     'quantity' => $content->qty,
                     'unit_price' => $content->price,
                     'total' => $content->total,
+                ]);
+            }
+
+            foreach ($payments as $payment) {
+                CashShiftDetail::create([
+                    'cash_shift_id' => $activeShift->id,
+                    'order_id' => $order->id,
+                    'transaction_type' => 'sale',
+                    'amount' => $payment['amount'],
+                    'payment_type' => $payment['payment_type'],
+                    'description' => "Pembayaran order {$invoice_no}",
+                    'transaction_time' => now(),
                 ]);
             }
 
@@ -256,7 +285,7 @@ class OrderController extends Controller
         // Check if order exists in any cash closing detail
         return CashClosing::whereHas('details.cashShift.details', function($query) use ($order) {
             $query->where('order_id', $order->id);
-        })->where('status', 'closed')->exists();
+        })->whereIn('status', ['closed', 'verified'])->exists();
     }
 
     /**
@@ -288,6 +317,8 @@ class OrderController extends Controller
             'cancelled_by' => auth()->id(),
             'cancelled_at' => Carbon::now(),
         ]);
+
+        $this->recordShiftCorrection($order, 'void', 'Order dibatalkan');
 
         // Audit log
         AuditService::log('order', 'cancel', $order, ['order_status' => $oldStatus], ['order_status' => 'cancelled', 'cancel_reason' => $request->cancel_reason], "Order {$order->invoice_no} cancelled");
@@ -341,6 +372,8 @@ class OrderController extends Controller
                 'voided_by' => auth()->id(),
                 'voided_at' => Carbon::now(),
             ]);
+
+            $this->recordShiftCorrection($order, 'void', 'Order di-void');
 
             // Audit log
             AuditService::log('order', 'void', $order, ['order_status' => $oldStatus], ['order_status' => 'void', 'void_reason' => $request->void_reason], "Order {$order->invoice_no} voided, stock restored");
@@ -445,5 +478,72 @@ class OrderController extends Controller
         AuditService::log('order', 'update_due', $order, $oldValues, ['pay_amount' => $paid_pay, 'due_amount' => $paid_due], "Due payment for {$order->invoice_no}");
 
         return Redirect::route('order.pendingDue')->with('success', 'Due Amount Updated Successfully!');
+    }
+
+    private function normalizePayments(StoreOrderRequest $request): array
+    {
+        $payments = collect($request->input('payments', []))
+            ->map(function ($payment) {
+                return [
+                    'payment_type' => strtolower($payment['payment_type'] ?? ''),
+                    'amount' => (float) ($payment['amount'] ?? 0),
+                ];
+            })
+            ->filter(function ($payment) {
+                return in_array($payment['payment_type'], ['cash', 'qris', 'debit', 'transfer', 'ewallet'], true)
+                    && $payment['amount'] > 0;
+            })
+            ->values()
+            ->all();
+
+        if (!empty($payments)) {
+            return $payments;
+        }
+
+        return [[
+            'payment_type' => strtolower($request->payment_type),
+            'amount' => (float) $request->pay_amount,
+        ]];
+    }
+
+    private function paymentSummary(array $payments): string
+    {
+        $labels = [
+            'cash' => 'Tunai',
+            'qris' => 'QRIS',
+            'debit' => 'Debit',
+            'transfer' => 'Transfer',
+            'ewallet' => 'E-Wallet',
+        ];
+
+        return collect($payments)
+            ->groupBy('payment_type')
+            ->map(function ($items, $type) use ($labels) {
+                return ($labels[$type] ?? ucfirst($type)) . ' Rp ' . number_format($items->sum('amount'), 0, ',', '.');
+            })
+            ->implode(', ');
+    }
+
+    private function recordShiftCorrection(Order $order, string $type, string $description): void
+    {
+        $shiftDetails = CashShiftDetail::where('order_id', $order->id)
+            ->where('transaction_type', 'sale')
+            ->get();
+
+        if ($shiftDetails->isEmpty()) {
+            return;
+        }
+
+        foreach ($shiftDetails as $shiftDetail) {
+            CashShiftDetail::create([
+                'cash_shift_id' => $shiftDetail->cash_shift_id,
+                'order_id' => $order->id,
+                'transaction_type' => $type,
+                'amount' => $shiftDetail->amount,
+                'payment_type' => $shiftDetail->payment_type,
+                'description' => "{$description}: {$order->invoice_no}",
+                'transaction_time' => now(),
+            ]);
+        }
     }
 }

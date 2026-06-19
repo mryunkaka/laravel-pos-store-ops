@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\CashClosing;
 use App\Models\CashClosingDetail;
 use App\Models\CashShift;
-use App\Models\Order;
-use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -41,13 +39,14 @@ class CashClosingController extends Controller
     /**
      * Show the form for creating a new closing.
      */
-    public function create()
+    public function create(Request $request)
     {
         $date = $request->input('date', now()->toDateString());
         $shifts = CashShift::where('location_id', 1)
             ->whereDate('start_time', $date)
             ->where('status', 'closed')
-            ->with(['user', 'details'])
+            ->whereDoesntHave('closingDetails')
+            ->with(['user', 'details.order'])
             ->get();
 
         // Calculate summary from shifts
@@ -56,8 +55,17 @@ class CashClosingController extends Controller
         $totalNonCash = $shifts->sum('total_non_cash');
         $totalVoid = $shifts->sum('total_void');
         $totalRefund = $shifts->sum('total_refund');
+        $totalDue = $shifts->sum(function ($shift) {
+            return $shift->details
+                ->where('transaction_type', 'sale')
+                ->whereNotNull('order')
+                ->unique('order_id')
+                ->sum(function ($detail) {
+                    return max((float) $detail->order->due_amount, 0);
+                });
+        });
 
-        return view('cash-closings.create', compact('shifts', 'date', 'totalSales', 'totalCash', 'totalNonCash', 'totalVoid', 'totalRefund'));
+        return view('cash-closings.create', compact('shifts', 'date', 'totalSales', 'totalCash', 'totalNonCash', 'totalVoid', 'totalRefund', 'totalDue'));
     }
 
     /**
@@ -88,11 +96,14 @@ class CashClosingController extends Controller
             $totalNonCash = 0;
             $totalVoid = 0;
             $totalRefund = 0;
+            $totalDue = 0;
             $cashExpected = 0;
             $cashActual = 0;
 
             foreach ($request->shifts as $shiftData) {
-                $shift = CashShift::findOrFail($shiftData['id']);
+                $shift = CashShift::where('status', 'closed')
+                    ->whereDoesntHave('closingDetails')
+                    ->findOrFail($shiftData['id']);
 
                 // Get summary from shift details
                 $sales = $shift->details()->where('transaction_type', 'sale')->sum('amount');
@@ -102,9 +113,25 @@ class CashClosingController extends Controller
                     ->where('payment_type', '!=', 'cash')->sum('amount');
                 $refund = $shift->details()->where('transaction_type', 'refund')->sum('amount');
                 $void = $shift->details()->where('transaction_type', 'void')->sum('amount');
+                $cashIn = $shift->details()->where('transaction_type', 'cash_in')->sum('amount');
+                $cashOut = $shift->details()->where('transaction_type', 'cash_out')->sum('amount');
+                $cashVoid = $shift->details()->where('transaction_type', 'void')
+                    ->where('payment_type', 'cash')->sum('amount');
+                $cashRefund = $shift->details()->where('transaction_type', 'refund')
+                    ->where('payment_type', 'cash')->sum('amount');
+                $due = $shift->details()
+                    ->where('transaction_type', 'sale')
+                    ->whereNotNull('order_id')
+                    ->with('order')
+                    ->get()
+                    ->unique('order_id')
+                    ->sum(function ($detail) {
+                        return max((float) optional($detail->order)->due_amount, 0);
+                    });
+                $shiftCashExpected = $cashIn + $cash - $cashOut - $cashVoid - $cashRefund;
 
                 // Create closing detail
-                $cashExpected += $shift->closing_balance;
+                $cashExpected += $shiftCashExpected;
                 $cashActual += $shiftData['cash_actual'];
 
                 CashClosingDetail::create([
@@ -115,9 +142,9 @@ class CashClosingController extends Controller
                     'shift_non_cash' => $nonCash,
                     'shift_void' => $void,
                     'shift_refund' => $refund,
-                    'shift_cash_expected' => $shift->closing_balance,
+                    'shift_cash_expected' => $shiftCashExpected,
                     'shift_cash_actual' => $shiftData['cash_actual'],
-                    'shift_cash_difference' => $shift->closing_balance - $shiftData['cash_actual']
+                    'shift_cash_difference' => $shiftData['cash_actual'] - $shiftCashExpected
                 ]);
 
                 $totalSales += $sales;
@@ -125,6 +152,7 @@ class CashClosingController extends Controller
                 $totalNonCash += $nonCash;
                 $totalVoid += $void;
                 $totalRefund += $refund;
+                $totalDue += $due;
             }
 
             // Update closing summary
@@ -134,10 +162,10 @@ class CashClosingController extends Controller
                 'total_non_cash' => $totalNonCash,
                 'total_void' => $totalVoid,
                 'total_refund' => $totalRefund,
-                'total_due' => $totalNonCash,
+                'total_due' => $totalDue,
                 'cash_expected' => $cashExpected,
                 'cash_actual' => $cashActual,
-                'cash_difference' => $cashExpected - $cashActual
+                'cash_difference' => $cashActual - $cashExpected
             ]);
 
             DB::commit();

@@ -192,6 +192,7 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::post('/cash-shifts', [CashShiftController::class, 'store'])->name('cash-shifts.store');
     Route::get('/cash-shifts/{shift}', [CashShiftController::class, 'show'])->name('cash-shifts.show');
     Route::get('/cash-shifts/{shift}/print', [CashShiftController::class, 'print'])->name('cash-shifts.print');
+    Route::post('/cash-shifts/{shift}/movements', [CashShiftController::class, 'storeMovement'])->name('cash-shifts.movements.store');
     Route::put('/cash-shifts/{shift}/close', [CashShiftController::class, 'close'])->name('cash-shifts.close');
     Route::delete('/cash-shifts/{shift}', [CashShiftController::class, 'destroy'])->name('cash-shifts.destroy');
 

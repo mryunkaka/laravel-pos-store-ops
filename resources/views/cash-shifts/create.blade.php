@@ -2,13 +2,14 @@
 
 @section('title', 'Buka Shift Kasir')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Buka Shift Kasir</h5>
+                    <a href="{{ route('cash-shifts.index') }}" class="btn btn-secondary btn-sm mt-2 mt-sm-0">Kembali</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('cash-shifts.store') }}" method="POST" id="shiftForm">
@@ -34,7 +35,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Buka Shift</button>
                             <a href="{{ route('cash-shifts.index') }}" class="btn btn-secondary">Batal</a>
                         </div>

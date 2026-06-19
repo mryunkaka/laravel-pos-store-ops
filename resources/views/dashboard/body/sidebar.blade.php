@@ -148,7 +148,7 @@
                 @if (auth()->user()->can('orders.menu'))
                     <li>
                         <a href="#cashier" class="{{ Request::is('cash-shifts*') || Request::is('cash-closings*') ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ Request::is('cash-shifts*') || Request::is('cash-closings*') ? 'true' : 'false' }}">
-                            <x-heroicon-o-cash class="w-6 h-6" />
+                            <x-heroicon-o-banknotes class="w-6 h-6" />
                             <span class="ml-3">Kasir</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                         </a>

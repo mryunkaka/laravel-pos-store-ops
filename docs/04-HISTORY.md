@@ -279,6 +279,48 @@ Catatan risiko:
 - Phase 3 sudah clear.
 - Lanjut Phase 4: modul shift kasir.
 
+## 2026-06-19
+
+### Validasi dan Perbaikan Phase 4 - Operasional Kasir
+
+#### Ringkasan Perubahan
+- Validasi ulang checklist Phase 4 menemukan beberapa fitur sudah dicentang tetapi belum siap dipakai dari UI.
+- `CashClosingController@create` diperbaiki agar menerima `Request`.
+- Halaman `cash-closings/create.blade.php` ditambahkan untuk membuat tutup kasir harian.
+- View cash shift dan cash closing disesuaikan ke section layout `container`.
+- Kas masuk/kas keluar ditambahkan dari halaman detail shift aktif.
+- Tutup shift sekarang menyimpan snapshot total sales, tunai, non-tunai, void, refund, uang fisik, catatan, dan user penutup.
+- POS mendukung input split payment dengan metode tunai, QRIS, debit, transfer, dan e-wallet.
+- Detail pembayaran POS dicatat ke `cash_shift_details` per metode pembayaran.
+- Cancel/void order mencatat koreksi shift sesuai metode pembayaran asli.
+- Piutang pada tutup kasir harian dihitung dari `orders.due_amount`, bukan dari total non-tunai.
+- Shift yang sudah masuk closing harian tidak dapat dipakai ulang untuk closing berikutnya.
+- UI Phase 4 dirapikan agar konsisten dengan halaman inventaris: filter/select, tombol tambah kanan, spacing tombol aksi, dan table style.
+
+#### File Utama yang Diubah/Ditambah
+- `app/Http/Controllers/Dashboard/CashShiftController.php`
+- `app/Http/Controllers/Dashboard/CashClosingController.php`
+- `app/Http/Controllers/Dashboard/OrderController.php`
+- `app/Http/Requests/Order/StoreOrderRequest.php`
+- `app/Models/CashShift.php`
+- `routes/web.php`
+- `resources/views/cash-shifts/index.blade.php`
+- `resources/views/cash-shifts/create.blade.php`
+- `resources/views/cash-shifts/show.blade.php`
+- `resources/views/cash-closings/index.blade.php`
+- `resources/views/cash-closings/show.blade.php`
+- `resources/views/cash-closings/create.blade.php`
+- `resources/views/pos/cart-sidebar.blade.php`
+- `resources/views/pos/index.blade.php`
+
+#### Validasi
+- `php -l` untuk controller/model yang diubah.
+- Validasi route/view/migration dijalankan setelah perubahan.
+
+#### Status
+- Phase 4 sudah clear setelah perbaikan validasi.
+- Lanjut Phase 5: stock opname dan retur penjualan.
+
 ## Format Pembaruan Selanjutnya
 
 Setiap perubahan berikutnya sebaiknya dicatat dengan format:

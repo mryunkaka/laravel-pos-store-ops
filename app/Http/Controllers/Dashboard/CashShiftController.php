@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\CashShift;
 use App\Models\CashShiftDetail;
-use App\Models\Order;
-use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -108,9 +106,43 @@ class CashShiftController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $shift->load(['details', 'user']);
+        $shift->load(['details' => function ($query) {
+            $query->latest('transaction_time');
+        }, 'user']);
 
         return view('cash-shifts.show', compact('shift'));
+    }
+
+    /**
+     * Record cash in/out during an active shift.
+     */
+    public function storeMovement(Request $request, CashShift $shift)
+    {
+        if ($shift->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($shift->status !== 'active') {
+            return redirect()->back()->with('error', 'Kas masuk/keluar hanya bisa dicatat pada shift aktif.');
+        }
+
+        $request->validate([
+            'transaction_type' => 'required|in:cash_in,cash_out',
+            'amount' => 'required|numeric|min:1',
+            'description' => 'required|string|max:500',
+        ]);
+
+        CashShiftDetail::create([
+            'cash_shift_id' => $shift->id,
+            'transaction_type' => $request->transaction_type,
+            'amount' => $request->amount,
+            'payment_type' => 'cash',
+            'description' => $request->description,
+            'transaction_time' => now(),
+        ]);
+
+        return redirect()->route('cash-shifts.show', $shift->id)
+            ->with('success', 'Catatan kas berhasil ditambahkan.');
     }
 
     /**
@@ -148,12 +180,34 @@ class CashShiftController extends Controller
         DB::beginTransaction();
 
         try {
-            // Update shift status
+            $sales = $shift->details()->where('transaction_type', 'sale')->sum('amount');
+            $cashSales = $shift->details()->where('transaction_type', 'sale')
+                ->where('payment_type', 'cash')
+                ->sum('amount');
+            $nonCashSales = $shift->details()->where('transaction_type', 'sale')
+                ->where('payment_type', '!=', 'cash')
+                ->sum('amount');
+            $void = $shift->details()->where('transaction_type', 'void')->sum('amount');
+            $refund = $shift->details()->where('transaction_type', 'refund')->sum('amount');
+            $cashIn = $shift->details()->where('transaction_type', 'cash_in')->sum('amount');
+            $cashOut = $shift->details()->where('transaction_type', 'cash_out')->sum('amount');
+
             $shift->update([
                 'status' => 'closed',
                 'end_time' => now(),
                 'closing_balance' => $request->closing_balance,
-                'closing_notes' => $request->closing_notes
+                'total_sales' => $sales,
+                'total_cash' => $cashSales,
+                'total_non_cash' => $nonCashSales,
+                'total_void' => $void,
+                'total_refund' => $refund,
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+                'closing_notes' => $request->closing_notes ?: sprintf(
+                    'Ekspektasi kas: Rp %s. Selisih: Rp %s.',
+                    number_format(($cashIn + $cashSales - $cashOut - $refund), 0, ',', '.'),
+                    number_format($request->closing_balance - ($cashIn + $cashSales - $cashOut - $refund), 0, ',', '.')
+                )
             ]);
 
             DB::commit();

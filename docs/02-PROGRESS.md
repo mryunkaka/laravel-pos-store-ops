@@ -229,6 +229,18 @@
 |- `php artisan migrate`
 |- `php artisan migrate:status`
 
+### Validasi Ulang dan Perbaikan Phase 4 (2026-06-19)
+|- `CashClosingController@create` diperbaiki agar menerima `Request` dan tidak error saat membuka form tutup kasir harian.
+|- View `cash-closings/create.blade.php` ditambahkan untuk membuat tutup kasir dari shift tertutup.
+|- View `cash-shifts/*` dan `cash-closings/*` disesuaikan ke `@section('container')` agar tampil di layout utama.
+|- `CashShiftController` ditambah pencatatan kas masuk/kas keluar selama shift aktif.
+|- Tutup shift sekarang menyimpan snapshot total sales, tunai, non-tunai, void, refund, uang fisik, catatan, dan user penutup.
+|- POS checkout sekarang mengirim detail split payment dan `OrderController` menyimpan setiap metode pembayaran ke `cash_shift_details`.
+|- Cancel/void order membuat catatan koreksi pada shift sesuai metode pembayaran asli.
+|- `total_due` pada tutup kasir harian dihitung dari `orders.due_amount`, bukan disamakan dengan total non-tunai.
+|- Shift yang sudah masuk tutup kasir harian tidak muncul lagi sebagai kandidat closing baru.
+|- UI Phase 4 disamakan dengan halaman inventaris: `inventory-card`, `inventory-filter`, `inventory-actions`, `inventory-table`, select `form-control`, tombol tambah di kanan, dan action button tidak berdempetan.
+
 ### Catatan
 |- Phase 4 sesuai dengan checklist `03-TODO.md`.
 |- Item aktif berikutnya adalah Phase 5: stock opname dan retur penjualan.
@@ -240,7 +252,8 @@
 - Piutang dicatat lewat `due_amount`.
 - Pembayaran piutang mengubah `pay_amount` dan `due_amount`.
 - Produk punya `stock`, `buying_price`, `selling_price`, dan `expire_date`.
-- Belum ada modul tutup kasir, shift kasir, stock opname, retur penjualan, dan laporan lanjutan.
+- Modul shift kasir dan tutup kasir harian sudah tersedia.
+- Belum ada modul stock opname, retur penjualan, dan laporan lanjutan.
 
 ## Risiko Saat Ini
 
@@ -250,7 +263,7 @@
 
 ### Langkah Selanjutnya
 
-Lanjut ke Phase 4 di `03-TODO.md`: buat modul shift kasir.
+Lanjut ke Phase 5 di `03-TODO.md`: stock opname dan retur penjualan.
 
 ## Instruksi Untuk Sesi Lanjutan
 

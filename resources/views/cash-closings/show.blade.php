@@ -2,13 +2,17 @@
 
 @section('title', 'Detail Tutup Kasir')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Tutup Kasir {{ $closing->closing_date }}</h5>
+                    <div class="inventory-actions mt-2 mt-sm-0">
+                        <a href="{{ route('cash-closings.print', $closing->id) }}" target="_blank" class="btn btn-outline-secondary btn-sm">Cetak</a>
+                        <a href="{{ route('cash-closings.index') }}" class="btn btn-secondary btn-sm">Kembali</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Summary -->
@@ -50,7 +54,7 @@
                     <!-- Shift Details -->
                     <h6 class="mb-3">Detail Per Shift</h6>
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>Kasir</th>

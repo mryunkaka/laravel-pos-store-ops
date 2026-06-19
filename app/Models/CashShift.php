@@ -58,6 +58,11 @@ class CashShift extends Model
         return $this->hasMany(CashShiftDetail::class, 'cash_shift_id');
     }
 
+    public function closingDetails()
+    {
+        return $this->hasMany(CashClosingDetail::class, 'cash_shift_id');
+    }
+
     // Helper methods
     public function isActive()
     {

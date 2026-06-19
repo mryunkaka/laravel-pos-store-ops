@@ -2,32 +2,35 @@
 
 @section('title', 'Shift Kasir')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Daftar Shift Kasir</h5>
-                    <a href="{{ route('cash-shifts.create') }}" class="btn btn-primary btn-sm">+ Buka Shift Baru</a>
+                    <a href="{{ route('cash-shifts.create') }}" class="btn btn-primary btn-sm mt-2 mt-sm-0">+ Buka Shift Baru</a>
                 </div>
                 <div class="card-body">
                     <!-- Filter -->
-                    <form method="GET" class="mb-3 row g-2">
-                        <div class="col-md-3">
-                            <select name="status" class="form-select">
+                    <form method="GET" class="inventory-filter">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
                                 <option value="">Semua Status</option>
                                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
                                 <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Tutup</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Dari Tanggal</label>
                             <input type="date" name="start_date" class="form-control" placeholder="Dari" value="{{ request('start_date') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Sampai Tanggal</label>
                             <input type="date" name="end_date" class="form-control" placeholder="Sampai" value="{{ request('end_date') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('cash-shifts.index') }}" class="btn btn-secondary">Reset</a>
                         </div>
@@ -35,7 +38,7 @@
 
                     <!-- Data Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -67,8 +70,10 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('cash-shifts.show', $shift->id) }}" class="btn btn-sm btn-info">View</a>
-                                            <a href="{{ route('cash-shifts.print', $shift->id) }}" target="_blank" class="btn btn-sm btn-secondary">Print</a>
+                                            <div class="table-action">
+                                                <a href="{{ route('cash-shifts.show', $shift->id) }}" class="btn btn-sm btn-info">Lihat</a>
+                                                <a href="{{ route('cash-shifts.print', $shift->id) }}" target="_blank" class="btn btn-sm btn-secondary">Cetak</a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

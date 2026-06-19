@@ -434,10 +434,79 @@
         }
 
         // Logic: Real-time Change Calculation
+        function getPaymentRows() {
+            return Array.from(document.querySelectorAll('#payments-container .payment-row')).map(function(row) {
+                const typeElement = row.querySelector('.payment-type');
+                const amountElement = row.querySelector('.payment-amount');
+
+                return {
+                    payment_type: typeElement ? typeElement.value : 'cash',
+                    amount: parseFloat(amountElement && amountElement.value ? amountElement.value : 0)
+                };
+            }).filter(function(payment) {
+                return payment.amount > 0;
+            });
+        }
+
+        function getPaymentTotal() {
+            return getPaymentRows().reduce(function(total, payment) {
+                return total + payment.amount;
+            }, 0);
+        }
+
+        function getPaymentSummary() {
+            const labels = {
+                cash: 'Tunai',
+                qris: 'QRIS',
+                debit: 'Debit',
+                transfer: 'Transfer',
+                ewallet: 'E-Wallet'
+            };
+
+            return getPaymentRows().map(function(payment) {
+                return (labels[payment.payment_type] || payment.payment_type) + ' ' + payment.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }).join(', ');
+        }
+
+        function addPaymentRow() {
+            const container = document.getElementById('payments-container');
+            if (!container) return;
+
+            const row = document.createElement('div');
+            row.className = 'row payment-row';
+            row.innerHTML = `
+                <div class="col-5 pr-1">
+                    <div class="form-group mb-2">
+                        <select class="form-control form-control-sm payment-type" onchange="calculateChange()">
+                            <option value="cash">Tunai</option>
+                            <option value="qris">QRIS</option>
+                            <option value="debit">Debit</option>
+                            <option value="transfer">Transfer</option>
+                            <option value="ewallet">E-Wallet</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-5 px-1">
+                    <div class="form-group mb-2">
+                        <input type="number" class="form-control form-control-sm payment-amount" placeholder="0" oninput="calculateChange()" min="0">
+                    </div>
+                </div>
+                <div class="col-2 pl-1">
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-block" onclick="removePaymentRow(this)" title="Hapus pembayaran">&times;</button>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function removePaymentRow(button) {
+            button.closest('.payment-row').remove();
+            calculateChange();
+        }
+
         function calculateChange() {
             const totalText = document.getElementById('cart-total').innerText;
             const totalAmount = parseFloat(totalText.replace(/,/g, ''));
-            const payInput = parseFloat(document.getElementById('pay_amount').value);
+            const payInput = getPaymentTotal();
             const changeElement = document.getElementById('change_amount');
 
             if (!isNaN(payInput) && payInput >= 0) {
@@ -470,9 +539,8 @@
             // 2. Validate Payment Amount
             const totalText = document.getElementById('cart-total').innerText;
             const totalAmount = parseFloat(totalText.replace(/,/g, ''));
-            const payElement = document.getElementById('pay_amount');
-            const payAmount = parseFloat(payElement ? payElement.value : 0);
-            const method = document.getElementById('payment_type').value;
+            const payAmount = getPaymentTotal();
+            const method = getPaymentSummary();
 
             if (isNaN(payAmount) || payAmount <= 0) {
                 alert('Masukkan jumlah yang valid!');
@@ -509,9 +577,14 @@
 
             const paymentTypeElem = document.getElementById('payment_type');
             const payAmountElem = document.getElementById('pay_amount');
+            const payments = getPaymentRows();
 
             if (paymentTypeElem) formData.append('payment_type', paymentTypeElem.value);
-            if (payAmountElem) formData.append('pay_amount', payAmountElem.value);
+            formData.append('pay_amount', getPaymentTotal());
+            payments.forEach(function(payment, index) {
+                formData.append(`payments[${index}][payment_type]`, payment.payment_type);
+                formData.append(`payments[${index}][amount]`, payment.amount);
+            });
 
             try {
                 const response = await fetch("{{ route('pos.storeOrder') }}", {
@@ -543,7 +616,9 @@
                     }
 
                     // Optional: Reset Pay Input
-                    if (payAmountElem) payAmountElem.value = '';
+                    document.querySelectorAll('.payment-amount').forEach(function(input) {
+                        input.value = '';
+                    });
                     if (document.getElementById('change_amount')) document.getElementById('change_amount').innerText =
                         '0.00';
 

@@ -2,29 +2,31 @@
 
 @section('title', 'Tutup Kasir Harian')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Tutup Kasir Harian</h5>
-                    <a href="{{ route('cash-closings.create') }}" class="btn btn-primary btn-sm">+ Buat Tutup Kasir</a>
+                    <a href="{{ route('cash-closings.create') }}" class="btn btn-primary btn-sm mt-2 mt-sm-0">+ Buat Tutup Kasir</a>
                 </div>
                 <div class="card-body">
                     <!-- Filter -->
-                    <form method="GET" class="mb-3 row g-2">
-                        <div class="col-md-3">
+                    <form method="GET" class="inventory-filter">
+                        <div class="form-group">
+                            <label>Tanggal</label>
                             <input type="date" name="date" class="form-control" value="{{ request('date', now()->toDateString()) }}">
                         </div>
-                        <div class="col-md-2">
-                            <select name="status" class="form-select">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
                                 <option value="">Semua Status</option>
                                 <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Tutup</option>
                                 <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('cash-closings.index') }}" class="btn btn-secondary">Reset</a>
                         </div>
@@ -32,7 +34,7 @@
 
                     <!-- Data Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -56,8 +58,10 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('cash-closings.show', $closing->id) }}" class="btn btn-sm btn-info">View</a>
-                                            <a href="{{ route('cash-closings.print', $closing->id) }}" target="_blank" class="btn btn-sm btn-secondary">Print</a>
+                                            <div class="table-action">
+                                                <a href="{{ route('cash-closings.show', $closing->id) }}" class="btn btn-sm btn-info">Lihat</a>
+                                                <a href="{{ route('cash-closings.print', $closing->id) }}" target="_blank" class="btn btn-sm btn-secondary">Cetak</a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
