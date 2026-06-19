@@ -14,6 +14,7 @@ use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Redirect;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use App\Models\StockMovement;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use App\Http\Requests\Order\StoreOrderRequest;
 
@@ -227,6 +228,14 @@ class OrderController extends Controller
             foreach ($details as $detail) {
                 Product::where('id', $detail->product_id)
                     ->decrement('stock', $detail->quantity);
+
+                // Record stock movement
+                StockMovement::recordOut(
+                    Product::find($detail->product_id),
+                    $detail->quantity,
+                    "Order {$order->invoice_no} completed",
+                    auth()->user()
+                );
             }
 
             $order->update(['order_status' => 'complete']);
@@ -294,6 +303,14 @@ class OrderController extends Controller
             foreach ($details as $detail) {
                 Product::where('id', $detail->product_id)
                     ->increment('stock', $detail->quantity);
+
+                // Record stock movement (restore)
+                StockMovement::recordIn(
+                    Product::find($detail->product_id),
+                    $detail->quantity,
+                    "Order {$order->invoice_no} voided, stock restored",
+                    auth()->user()
+                );
             }
 
             $order->update([

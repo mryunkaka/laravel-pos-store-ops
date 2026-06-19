@@ -124,18 +124,18 @@ Kriteria penerimaan Phase 3:
 - Pembelian dari pemasok tidak otomatis menambah stok sebelum penerimaan barang.
 - Penerimaan yang sudah selesai tidak boleh diproses dua kali.
 
-- [ ] Buat modul pergerakan stok/kartu stok.
-- [ ] Catat stok keluar otomatis saat order selesai.
-- [ ] Catat stok masuk manual.
-- [ ] Catat penyesuaian stok manual dengan alasan.
-- [ ] Tampilkan riwayat stok per produk.
-- [ ] Tambahkan filter riwayat stok berdasarkan tanggal, tipe, produk, dan pengguna.
-- [ ] Buat purchase order dari pemasok.
-- [ ] Buat penerimaan barang/purchase receiving.
-- [ ] Saat pembelian diterima, stok produk bertambah dan pergerakan stok tercatat.
-- [ ] Tambahkan retur pembelian ke pemasok.
-- [ ] Saat retur pembelian selesai, stok berkurang dan pergerakan stok tercatat.
-- [ ] Tambahkan transfer stok antar lokasi sebagai struktur awal, walau lokasi default masih satu toko.
+- [x] Buat modul pergerakan stok/kartu stok.
+- [x] Catat stok keluar otomatis saat order selesai.
+|- [x] Catat stok masuk manual.
+|- [x] Catat penyesuaian stok manual dengan alasan.
+|- [x] Tampilkan riwayat stok per produk.
+|- [x] Tambahkan filter riwayat stok berdasarkan tanggal, tipe, produk, dan pengguna.
+|- [x] Buat purchase order dari pemasok.
+|- [x] Buat penerimaan barang/purchase receiving.
+|- [x] Saat pembelian diterima, stok produk bertambah dan pergerakan stok tercatat.
+|- [ ] Tambahkan retur pembelian ke pemasok.
+|- [ ] Saat retur pembelian selesai, stok berkurang dan pergerakan stok tercatat.
+|- [ ] Tambahkan transfer stok antar lokasi sebagai struktur awal, walau lokasi default masih satu toko.
 
 ## Phase 4 - Operasional Kasir dan Tutup Kasir
 

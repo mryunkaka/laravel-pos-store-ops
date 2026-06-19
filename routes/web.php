@@ -17,6 +17,9 @@ use App\Http\Controllers\Dashboard\OrderController;
 use App\Http\Controllers\Dashboard\PosController;
 use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\StockMovementController;
+use App\Http\Controllers\Dashboard\PurchaseOrderController;
+use App\Http\Controllers\Dashboard\PurchaseReceivingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -133,6 +136,26 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::post('/orders/void', [OrderController::class, 'voidOrder'])->middleware(['permission:void.order'])->name('order.void');
 
     // Stock Management
+
+    // Stock Movements
+    Route::get('/stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
+    Route::get('/stock-movements/history/{product}', [StockMovementController::class, 'history'])->name('stock-movements.history');
+    Route::get('/stock-movements/adjust/{product}', [StockMovementController::class, 'showAdjustForm'])->name('stock-movements.adjust.form');
+    Route::post('/stock-movements/adjust', [StockMovementController::class, 'adjust'])->name('stock-movements.adjust');
+
+    // Purchase Orders
+    Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
+    Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('purchase-orders.create');
+    Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
+    Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+    Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('purchase-orders.destroy');
+
+    // Purchase Receivings
+    Route::get('/purchase-receivings', [PurchaseReceivingController::class, 'index'])->name('purchase-receivings.index');
+    Route::get('/purchase-receivings/create', [PurchaseReceivingController::class, 'create'])->name('purchase-receivings.create');
+    Route::post('/purchase-receivings', [PurchaseReceivingController::class, 'store'])->name('purchase-receivings.store');
+    Route::get('/purchase-receivings/{receiving}', [PurchaseReceivingController::class, 'show'])->name('purchase-receivings.show');
+    Route::put('/purchase-receivings/{receiving}/complete', [PurchaseReceivingController::class, 'complete'])->name('purchase-receivings.complete');
 
 });
 

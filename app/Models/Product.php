@@ -22,10 +22,15 @@ class Product extends Model
         'expire_date',
     ];
 
-    protected $with = ['category'];
+    protected $with = ['category', 'stockMovements'];
 
     public function category(){
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class, 'product_id');
     }
 
     public function scopeFilter($query, array $filters)

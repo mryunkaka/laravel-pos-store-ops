@@ -143,6 +143,61 @@ Catatan risiko:
 #### Langkah Selanjutnya
 - Lanjut ke Phase 3 - Inti Inventaris (stock movements, purchase orders, purchase receiving).
 
+|## 2026-06-19
+|### Phase 3 — Inti Inventaris
+|
+|#### Ringkasan Perubahan
+|- Migration stock movements dan relasi dibuat (7 tabel baru).
+|- Model StockMovement, PurchaseOrder, PurchaseOrderDetail, PurchaseReceiving, PurchaseReceivingDetail dibuat.
+|- OrderController diupdate: catat stock movement otomatis saat order complete/void.
+|- StockMovementController dibuat untuk history & adjustment stok.
+|- PurchaseOrderController dibuat untuk manajemen PO.
+|- PurchaseReceivingController dibuat untuk manajemen penerimaan.
+|- Routes untuk stock-movements, purchase-orders, purchase-receivings ditambahkan.
+|
+|#### Migration yang Dijalankan
+|- `2026_06_18_235822_create_stock_movements_table` - Tabel pergerakan stok
+|- `2026_06_19_000818_create_purchase_orders_table` - Tabel purchase orders
+|- `2026_06_19_001741_create_purchase_order_details_table` - Detail PO
+|- `2026_06_19_001742_create_purchase_receivings_table` - Tabel penerimaan
+|- `2026_06_19_002156_create_purchase_receiving_details_table` - Detail receiving
+|- `2026_06_19_002245_create_stock_adjustments_table` - Tabel penyesuaian stok
+|- `2026_06_19_002323_create_stock_movement_details_table` - Detail pergerakan stok
+|
+|#### Model Baru
+|- `app/Models/StockMovement.php` - Catat semua perubahan stok (in/out/adjustment)
+|- `app/Models/PurchaseOrder.php` - Manajemen order pembelian
+|- `app/Models/PurchaseOrderDetail.php` - Detail item PO
+|- `app/Models/PurchaseReceiving.php` - Catat penerimaan barang
+|- `app/Models/PurchaseReceivingDetail.php` - Detail penerimaan barang
+|
+|#### Controller Baru
+|- `app/Http/Controllers/Dashboard/StockMovementController.php`
+|- `app/Http/Controllers/Dashboard/PurchaseOrderController.php`
+|- `app/Http/Controllers/Dashboard/PurchaseReceivingController.php`
+|
+|#### Route Baru
+|- `/stock-movements` - Daftar pergerakan stok
+|- `/stock-movements/history/{product}` - Riwayat stok per produk
+|- `/stock-movements/adjust/{product}` - Form penyesuaian stok
+|- `/stock-movements/adjust` - Proses penyesuaian stok
+|- `/purchase-orders` - Manajemen purchase order
+|- `/purchase-receivings` - Manajemen penerimaan
+|
+|#### Catatan Risiko
+|- Retur pembelian belum diimplementasikan.
+|- Stock adjustment manual belum diimplementasikan.
+|- Transfer stok antar lokasi belum diimplementasikan.
+|- View/form untuk stock-movements, purchase-orders, purchase-receivings belum dibuat.
+|- Filter riwayat stok belum diimplementasikan di controller.
+|
+|#### Langkah Selanjutnya
+|- Buat view/form untuk stock movements history & adjustment.
+|- Buat view/form untuk purchase orders.
+|- Buat view/form untuk purchase receivings.
+|- Implementasi retur pembelian.
+|- Implementasi stock adjustment manual.
+
 ## Format Pembaruan Selanjutnya
 
 Setiap perubahan berikutnya sebaiknya dicatat dengan format:

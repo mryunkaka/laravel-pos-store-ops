@@ -102,6 +102,56 @@
 - 85 file Blade view di `resources/views/` — semua modul diterjemahkan.
 - Tidak ada perubahan pada controller, model, migration, atau route.
 
+|## Phase 3 - Inti Inventaris (2026-06-19)
+|
+|### Migration yang Dibuat
+|- `2026_06_18_235822_create_stock_movements_table` - Tabel pergerakan stok
+|- `2026_06_19_000818_create_purchase_orders_table` - Tabel purchase orders
+|- `2026_06_19_001741_create_purchase_order_details_table` - Detail PO
+|- `2026_06_19_001742_create_purchase_receivings_table` - Tabel penerimaan
+|- `2026_06_19_002156_create_purchase_receiving_details_table` - Detail receiving
+|- `2026_06_19_002245_create_stock_adjustments_table` - Tabel penyesuaian stok
+|- `2026_06_19_002323_create_stock_movement_details_table` - Detail pergerakan stok
+|
+|### Model yang Dibuat
+|- `StockMovement` - Catat semua perubahan stok (in/out/adjustment)
+|- `PurchaseOrder` - Manajemen order pembelian
+|- `PurchaseOrderDetail` - Detail item PO
+|- `PurchaseReceiving` - Catat penerimaan barang
+|- `PurchaseReceivingDetail` - Detail penerimaan barang
+|
+|### Fitur yang Diimplementasikan
+|- [x] Catat stok keluar otomatis saat order selesai (via StockMovement::recordOut)
+|- [x] Catat stok masuk saat receiving barang (via StockMovement::recordIn)
+|- [x] Buat purchase order dari pemasok
+|- [x] Buat penerimaan barang/purchase receiving
+|- [x] Stock movement controller untuk history & adjustment
+|- [x] Purchase order controller (index, create, store, show, destroy)
+|- [x] Purchase receiving controller (index, create, store, show, complete, destroy)
+|
+|### Routes yang Ditambahkan
+|- `/stock-movements` - Daftar pergerakan stok
+|- `/stock-movements/history/{product}` - Riwayat stok per produk
+|- `/stock-movements/adjust/{product}` - Form penyesuaian stok
+|- `/stock-movements/adjust` - Proses penyesuaian stok
+|- `/purchase-orders` - Daftar purchase order
+|- `/purchase-orders/create` - Form create PO
+|- `/purchase-orders` - Store PO
+|- `/purchase-orders/{po}` - Detail PO
+|- `/purchase-orders/{po}` - Hapus PO
+|- `/purchase-receivings` - Daftar penerimaan
+|- `/purchase-receivings/create` - Form create receiving
+|- `/purchase-receivings` - Store receiving
+|- `/purchase-receivings/{receiving}` - Detail receiving
+|- `/purchase-receivings/{receiving}/complete` - Selesaikan receiving
+|
+|### Catatan
+|- Stok otomatis dikurangi saat order complete (tidak perlu input manual)
+|- Stok otomatis ditambah saat receiving selesai (tidak perlu input manual)
+|- Stock movement mencatat reference ke transaksi asal (polymorphic)
+|- Purchase receiving belum otomatis menambah stok sebelum di-complete
+|- Retur pembelian dan stock adjustment masih perlu implementasi
+
 ## Kesimpulan Teknis Saat Ini
 
 - POS membuat order dengan status `pending`.
