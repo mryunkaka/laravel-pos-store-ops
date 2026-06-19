@@ -166,9 +166,62 @@
 - `php artisan migrate:status`
 
 ### Catatan
-- Phase 3 sudah clear berdasarkan checklist `03-TODO.md`.
-- Item aktif berikutnya adalah Phase 4: modul shift kasir.
-- Penampil audit log tetap direncanakan untuk Phase 7.
+|- Phase 3 sudah clear berdasarkan checklist `03-TODO.md`.
+|- Item aktif berikutnya adalah Phase 4: modul shift kasir dan tutup kasir.
+|- Penampil audit log tetap direncanakan untuk Phase 7.
+
+## Phase 4 - Operasional Kasir dan Tutup Kasir (2026-06-19)
+
+### Migration yang Dibuat/Dijalankan
+|- `2026_06_19_061809_create_cash_shifts_table` - Tabel cash shift kasir.
+|- `2026_06_19_061810_create_cash_shift_details_table` - Detail transaksi per shift.
+|- `2026_06_19_061810_create_cash_closings_table` - Tabel tutup kasir harian.
+|- `2026_06_19_061811_create_cash_closing_details_table` - Detail per shift dalam closing.
+
+### Model yang Dibuat
+|- `CashShift` - Manajemen shift kasir.
+|- `CashShiftDetail` - Detail transaksi per shift.
+|- `CashClosing` - Tutup kasir harian outlet.
+|- `CashClosingDetail` - Detail per shift dalam closing.
+
+### Fitur yang Diimplementasikan
+|- [x] Buat modul shift kasir dengan kas awal.
+|- [x] Catat transaksi (sale, refund, void, cash_in, cash_out) per shift.
+|- [x] Tutup shift dengan kas fisik dan selisih.
+|- [x] Buat tutup kasir harian dari kumpulan shift.
+|- [x] Verifikasi tutup kasir oleh supervisor.
+|- [x] Multi pembayaran (tunai, QRIS, debit, transfer, e-wallet) tersedia di struktur.
+
+### Routes yang Ditambahkan
+|- `/cash-shifts` - Daftar shift kasir.
+|- `/cash-shifts/create` - Form buka shift baru.
+|- `/cash-shifts/{shift}` - Detail shift.
+|- `/cash-shifts/{shift}/close` - Tutup shift.
+|- `/cash-closings` - Daftar tutup kasir.
+|- `/cash-closings/create` - Form buat tutup kasir.
+|- `/cash-closings/{closing}` - Detail tutup kasir.
+|- `/cash-closings/{closing}/verify` - Verifikasi tutup kasir.
+
+### View yang Dibuat
+|- `cash-shifts/index` - Daftar shift kasir dengan filter.
+|- `cash-shifts/create` - Form buka shift dengan kas awal.
+|- `cash-shifts/show` - Detail shift dengan transaksi dan summary.
+|- `cash-closings/index` - Daftar tutup kasir harian.
+|- `cash-closings/show` - Detail tutup kasir dengan per shift breakdown.
+
+### Controller yang Dibuat
+|- `CashShiftController` - CRUD dan close shift.
+|- `CashClosingController` - CRUD, verify, dan summary closing.
+
+### Validasi yang Dijalankan
+|- `php artisan route:list --name=cash`
+|- `php artisan view:cache`
+|- `php artisan migrate`
+|- `php artisan migrate:status`
+
+### Catatan
+|- Phase 4 sesuai dengan checklist `03-TODO.md`.
+|- Item aktif berikutnya adalah Phase 5: stock opname dan retur penjualan.
 
 ## Kesimpulan Teknis Saat Ini
 

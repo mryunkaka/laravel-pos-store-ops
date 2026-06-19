@@ -23,6 +23,8 @@ use App\Http\Controllers\Dashboard\PurchaseReceivingController;
 use App\Http\Controllers\Dashboard\PurchaseReturnController;
 use App\Http\Controllers\Dashboard\StockAdjustmentController;
 use App\Http\Controllers\Dashboard\StockTransferController;
+use App\Http\Controllers\Dashboard\CashShiftController;
+use App\Http\Controllers\Dashboard\CashClosingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -183,6 +185,22 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'show'])->name('stock-transfers.show');
     Route::put('/stock-transfers/{stockTransfer}/complete', [StockTransferController::class, 'complete'])->name('stock-transfers.complete');
     Route::delete('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'destroy'])->name('stock-transfers.destroy');
+
+    // Cash Shifts
+    Route::get('/cash-shifts', [CashShiftController::class, 'index'])->name('cash-shifts.index');
+    Route::get('/cash-shifts/create', [CashShiftController::class, 'create'])->name('cash-shifts.create');
+    Route::post('/cash-shifts', [CashShiftController::class, 'store'])->name('cash-shifts.store');
+    Route::get('/cash-shifts/{shift}', [CashShiftController::class, 'show'])->name('cash-shifts.show');
+    Route::put('/cash-shifts/{shift}/close', [CashShiftController::class, 'close'])->name('cash-shifts.close');
+    Route::delete('/cash-shifts/{shift}', [CashShiftController::class, 'destroy'])->name('cash-shifts.destroy');
+
+    // Cash Closings
+    Route::get('/cash-closings', [CashClosingController::class, 'index'])->name('cash-closings.index');
+    Route::get('/cash-closings/create', [CashClosingController::class, 'create'])->name('cash-closings.create');
+    Route::post('/cash-closings', [CashClosingController::class, 'store'])->name('cash-closings.store');
+    Route::get('/cash-closings/{closing}', [CashClosingController::class, 'show'])->name('cash-closings.show');
+    Route::put('/cash-closings/{closing}/verify', [CashClosingController::class, 'verify'])->name('cash-closings.verify');
+    Route::delete('/cash-closings/{closing}', [CashClosingController::class, 'destroy'])->name('cash-closings.destroy');
 
 });
 

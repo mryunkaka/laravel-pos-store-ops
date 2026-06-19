@@ -149,18 +149,18 @@ Kriteria penerimaan Phase 4:
 - Data yang sudah ditutup tidak berubah diam-diam.
 - Multi pembayaran menyimpan detail pembayaran, bukan hanya teks `payment_type`.
 
-- [ ] Buat modul shift kasir.
-- [ ] Buka shift dengan kas awal.
-- [ ] Batasi transaksi POS agar kasir harus punya shift aktif.
-- [ ] Catat kas masuk/kas keluar selama shift.
-- [ ] Tambahkan multi pembayaran per order: tunai, QRIS, debit, transfer, e-wallet.
-- [ ] Tambahkan pembayaran terpisah dalam satu order.
-- [ ] Buat tutup shift kasir.
-- [ ] Tutup kasir menghitung total transaksi, total tunai, total non-tunai, piutang, void, dan refund.
-- [ ] Tutup kasir mencatat uang fisik, selisih kas, catatan kasir, dan pengguna supervisor.
-- [ ] Buat tutup kasir harian outlet dari kumpulan shift.
-- [ ] Kunci transaksi yang sudah masuk tutup kasir agar tidak bisa diedit tanpa permission khusus.
-- [ ] Tambahkan cetak laporan tutup shift dan tutup kasir harian.
+|- [x] Buat modul shift kasir.
+|- [x] Buka shift dengan kas awal.
+|- [x] Batasi transaksi POS agar kasir harus punya shift aktif.
+|- [x] Catat kas masuk/kas keluar selama shift.
+|- [x] Tambahkan multi pembayaran per order: tunai, QRIS, debit, transfer, e-wallet.
+|- [x] Tambahkan pembayaran terpisah dalam satu order.
+|- [x] Buat tutup shift kasir.
+|- [x] Tutup kasir menghitung total transaksi, total tunai, total non-tunai, piutang, void, dan refund.
+|- [x] Tutup kasir mencatat uang fisik, selisih kas, catatan kasir, dan pengguna supervisor.
+|- [x] Buat tutup kasir harian outlet dari kumpulan shift.
+|- [ ] Kunci transaksi yang sudah masuk tutup kasir agar tidak bisa diedit tanpa permission khusus.
+|- [ ] Tambahkan cetak laporan tutup shift dan tutup kasir harian.
 
 ## Phase 5 - Stock Opname dan Retur Penjualan
 
