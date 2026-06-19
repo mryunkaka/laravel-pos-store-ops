@@ -20,6 +20,8 @@ use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\StockMovementController;
 use App\Http\Controllers\Dashboard\PurchaseOrderController;
 use App\Http\Controllers\Dashboard\PurchaseReceivingController;
+use App\Http\Controllers\Dashboard\PurchaseReturnController;
+use App\Http\Controllers\Dashboard\StockAdjustmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -156,6 +158,20 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::post('/purchase-receivings', [PurchaseReceivingController::class, 'store'])->name('purchase-receivings.store');
     Route::get('/purchase-receivings/{receiving}', [PurchaseReceivingController::class, 'show'])->name('purchase-receivings.show');
     Route::put('/purchase-receivings/{receiving}/complete', [PurchaseReceivingController::class, 'complete'])->name('purchase-receivings.complete');
+
+    // Purchase Returns
+    Route::get('/purchase-returns', [PurchaseReturnController::class, 'index'])->name('purchase-returns.index');
+    Route::get('/purchase-returns/create', [PurchaseReturnController::class, 'create'])->name('purchase-returns.create');
+    Route::post('/purchase-returns', [PurchaseReturnController::class, 'store'])->name('purchase-returns.store');
+    Route::get('/purchase-returns/{return}', [PurchaseReturnController::class, 'show'])->name('purchase-returns.show');
+    Route::delete('/purchase-returns/{return}', [PurchaseReturnController::class, 'destroy'])->name('purchase-returns.destroy');
+
+    // Stock Adjustments
+    Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
+    Route::get('/stock-adjustments/create', [StockAdjustmentController::class, 'create'])->name('stock-adjustments.create');
+    Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store'])->name('stock-adjustments.store');
+    Route::get('/stock-adjustments/{adjustment}', [StockAdjustmentController::class, 'show'])->name('stock-adjustments.show');
+    Route::delete('/stock-adjustments/{adjustment}', [StockAdjustmentController::class, 'destroy'])->name('stock-adjustments.destroy');
 
 });
 
