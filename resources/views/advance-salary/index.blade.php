@@ -92,7 +92,7 @@
                                                 @method('delete')
                                                 @csrf
                                                 <button type="submit" class="btn btn-warning border-none"
-                                                    onclick="return confirm('Are you sure you want to delete this record?')" data-toggle="tooltip"
+                                                    onclick="return confirm('Yakin ingin menghapus data ini?')" data-toggle="tooltip"
                                                     data-placement="top" title="Hapus">
                                                     <x-heroicon-o-trash class="w-5 h-5" />
                                                 </button>

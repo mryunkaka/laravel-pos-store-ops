@@ -2,23 +2,23 @@
 
 @section('title', 'Tambah Retur Pembelian')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card inventory-card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Tambah Retur Pembelian</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('purchase-returns.store') }}" method="POST" id="returnForm">
+                    <form action="{{ route('purchase-returns.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Penerimaan Barang</label>
-                            <select name="purchase_receiving_id" class="form-select @error('purchase_receiving_id') is-invalid @enderror" required>
-                                <option value="">-- Pilih Receiving --</option>
+                            <select name="purchase_receiving_id" class="form-control @error('purchase_receiving_id') is-invalid @enderror" required>
+                                <option value="">-- Pilih Penerimaan --</option>
                                 @foreach($receivings as $receiving)
-                                    <option value="{{ $receiving->id }}" data-supplier="{{ $receiving->supplier_id }}">
+                                    <option value="{{ $receiving->id }}">
                                         {{ $receiving->receiving_number }} - {{ $receiving->supplier->name }}
                                     </option>
                                 @endforeach
@@ -45,32 +45,45 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Items</label>
+                            <label class="form-label">Item Retur</label>
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="itemsTable">
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Produk</th>
-                                            <th>Qty Received</th>
-                                            <th>Qty Return</th>
+                                            <th>Qty Diterima</th>
+                                            <th>Qty Retur</th>
                                             <th>Harga</th>
                                             <th>Total</th>
-                                            <th>Aksi</th>
+                                            <th>Catatan</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr id="itemRow0">
-                                            <td>
-                                                <select name="items[0][product_id]" class="form-select product-select" required disabled>
-                                                    <option value="">-- Pilih Produk --</option>
-                                                </select>
-                                            </td>
-                                            <td><input type="number" class="form-control qty-received" readonly></td>
-                                            <td><input type="number" name="items[0][quantity]" class="form-control qty-return" value="0" min="1" required></td>
-                                            <td><input type="text" class="form-control price-display" readonly></td>
-                                            <td><input type="text" class="form-control total-display" readonly></td>
-                                            <td><button type="button" class="btn btn-danger btn-sm remove-row">X</button></td>
-                                        </tr>
+                                        @foreach($receivings as $receiving)
+                                            @foreach($receiving->details as $detail)
+                                                @if($detail->received_quantity > 0)
+                                                    <tr class="return-item d-none" data-receiving-id="{{ $receiving->id }}">
+                                                        <td>
+                                                            {{ $detail->product->name }}
+                                                            <input type="hidden" name="items[{{ $detail->id }}][product_id]" value="{{ $detail->product_id }}" disabled>
+                                                        </td>
+                                                        <td>{{ $detail->received_quantity }}</td>
+                                                        <td>
+                                                            <input type="number" name="items[{{ $detail->id }}][quantity]" class="form-control qty-return" value="0" min="0" max="{{ $detail->received_quantity }}" disabled>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" name="items[{{ $detail->id }}][unit_price]" class="form-control price-input" value="{{ $detail->product->buying_price }}" min="0" readonly disabled>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" name="items[{{ $detail->id }}][total]" class="form-control total-input" value="0" min="0" readonly disabled>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" name="items[{{ $detail->id }}][description]" class="form-control" disabled>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -93,7 +106,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Simpan Retur</button>
                             <a href="{{ route('purchase-returns.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
@@ -103,3 +116,37 @@
         </div>
     </div>
 </div>
+
+@section('specificpagescripts')
+<script>
+$(document).on('change', 'select[name="purchase_receiving_id"]', function() {
+    const receivingId = $(this).val();
+
+    $('.return-item').addClass('d-none').find(':input').prop('disabled', true);
+    $('.return-item[data-receiving-id="' + receivingId + '"]').removeClass('d-none').find(':input').prop('disabled', false);
+    calculateReturnTotals();
+});
+
+$(document).on('input', '.qty-return, #discount', function() {
+    const row = $(this).closest('tr');
+    const qty = parseFloat(row.find('.qty-return').val()) || 0;
+    const price = parseFloat(row.find('.price-input').val()) || 0;
+
+    row.find('.total-input').val(qty * price);
+    calculateReturnTotals();
+});
+
+function calculateReturnTotals() {
+    let subTotal = 0;
+
+    $('.return-item:not(.d-none) .total-input').each(function() {
+        subTotal += parseFloat($(this).val()) || 0;
+    });
+
+    const discount = parseFloat($('#discount').val()) || 0;
+    $('#subTotal').val(subTotal.toLocaleString('id-ID'));
+    $('#total').val(Math.max(subTotal - discount, 0).toLocaleString('id-ID'));
+}
+</script>
+@endsection
+@endsection

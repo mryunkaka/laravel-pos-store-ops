@@ -42,11 +42,13 @@ class StockMovement extends Model
     }
 
     // Helper method to record stock movement
-    public static function recordOut(Product $product, $quantity, $description = null, $user = null)
+    public static function recordOut(Product $product, $quantity, $description = null, $user = null, $referenceType = null, $referenceId = null)
     {
         return self::create([
             'product_id' => $product->id,
             'type' => 'out',
+            'reference_type' => $referenceType ?? Product::class,
+            'reference_id' => $referenceId ?? $product->id,
             'quantity' => -$quantity,
             'unit_price' => $product->selling_price,
             'description' => $description,
@@ -54,11 +56,13 @@ class StockMovement extends Model
         ]);
     }
 
-    public static function recordIn(Product $product, $quantity, $description = null, $user = null)
+    public static function recordIn(Product $product, $quantity, $description = null, $user = null, $referenceType = null, $referenceId = null)
     {
         return self::create([
             'product_id' => $product->id,
             'type' => 'in',
+            'reference_type' => $referenceType ?? Product::class,
+            'reference_id' => $referenceId ?? $product->id,
             'quantity' => $quantity,
             'unit_price' => $product->buying_price,
             'description' => $description,
@@ -66,12 +70,14 @@ class StockMovement extends Model
         ]);
     }
 
-    public static function recordAdjustment(Product $product, $quantity, $description, $user = null)
+    public static function recordAdjustment(Product $product, $quantity, $description, $user = null, $referenceType = null, $referenceId = null)
     {
         $type = $quantity > 0 ? 'adjustment_in' : 'adjustment_out';
         return self::create([
             'product_id' => $product->id,
             'type' => $type,
+            'reference_type' => $referenceType ?? Product::class,
+            'reference_id' => $referenceId ?? $product->id,
             'quantity' => abs($quantity),
             'unit_price' => $product->buying_price,
             'description' => $description,

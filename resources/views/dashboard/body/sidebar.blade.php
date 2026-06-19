@@ -87,14 +87,23 @@
 
                 <hr>
 
+                @php
+                    $inventoryActive = Request::is('stock-movements*')
+                        || Request::is('stock-adjustments*')
+                        || Request::is('stock-transfers*')
+                        || Request::is('purchase-orders*')
+                        || Request::is('purchase-receivings*')
+                        || Request::is('purchase-returns*');
+                @endphp
+
                 @if (auth()->user()->can('orders.menu'))
                     <li>
-                        <a href="#inventory" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <a href="#inventory" class="{{ $inventoryActive ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ $inventoryActive ? 'true' : 'false' }}">
                             <x-heroicon-o-document-text class="w-6 h-6" />
                             <span class="ml-3">Inventaris</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                         </a>
-                        <ul id="inventory" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                        <ul id="inventory" class="iq-submenu collapse {{ $inventoryActive ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
 
                             <li class="{{ Request::is('stock-movements*') ? 'active' : '' }}">
                                 <a href="{{ route('stock-movements.index') }}">
@@ -102,25 +111,31 @@
                                 </a>
                             </li>
 
-                            <li class="{{ Request::is('stock-adjustments*') ? 'active' : '' }}">
+                            <li class="{{ Request::is('stock-adjustments') ? 'active' : '' }}">
                                 <a href="{{ route('stock-adjustments.index') }}">
                                     <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Penyesuaian Stok</span>
                                 </a>
                             </li>
 
-                            <li class="{{ Request::is('purchase-orders*') ? 'active' : '' }}">
-                                <a href="{{ route('purchase-orders.index') }}">
-                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Purchase Order</span>
+                            <li class="{{ Request::is('stock-transfers*') ? 'active' : '' }}">
+                                <a href="{{ route('stock-transfers.index') }}">
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Transfer Stok</span>
                                 </a>
                             </li>
 
-                            <li class="{{ Request::is('purchase-receivings*') ? 'active' : '' }}">
+                            <li class="{{ Request::is('purchase-orders') ? 'active' : '' }}">
+                                <a href="{{ route('purchase-orders.index') }}">
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Order Pembelian</span>
+                                </a>
+                            </li>
+
+                            <li class="{{ Request::is('purchase-receivings') ? 'active' : '' }}">
                                 <a href="{{ route('purchase-receivings.index') }}">
                                     <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Penerimaan Barang</span>
                                 </a>
                             </li>
 
-                            <li class="{{ Request::is('purchase-returns*') ? 'active' : '' }}">
+                            <li class="{{ Request::is('purchase-returns') ? 'active' : '' }}">
                                 <a href="{{ route('purchase-returns.index') }}">
                                     <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Retur Pembelian</span>
                                 </a>

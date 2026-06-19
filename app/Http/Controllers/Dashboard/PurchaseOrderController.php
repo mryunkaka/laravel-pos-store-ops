@@ -47,8 +47,10 @@ class PurchaseOrderController extends Controller
      */
     public function create()
     {
-        $suppliers = Supplier::all();
-        return view('purchase-orders.create', compact('suppliers'));
+        $suppliers = Supplier::orderBy('name')->get();
+        $products = Product::orderBy('name')->get();
+
+        return view('purchase-orders.create', compact('suppliers', 'products'));
     }
 
     /**
@@ -119,7 +121,7 @@ class PurchaseOrderController extends Controller
             }
 
             return redirect()->route('purchase-orders.index')
-                ->with('success', 'Purchase Order berhasil dibuat!');
+                ->with('success', 'Order pembelian berhasil dibuat!');
         });
     }
 
@@ -144,7 +146,7 @@ class PurchaseOrderController extends Controller
         $purchaseOrder->delete();
 
         return redirect()->route('purchase-orders.index')
-            ->with('success', 'Purchase Order berhasil dihapus.');
+            ->with('success', 'Order pembelian berhasil dihapus.');
     }
 
     /**
@@ -166,6 +168,6 @@ class PurchaseOrderController extends Controller
         ]);
 
         return redirect()->route('purchase-orders.index')
-            ->with('success', 'Purchase Order berhasil dibatalkan.');
+            ->with('success', 'Order pembelian berhasil dibatalkan.');
     }
 }

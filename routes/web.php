@@ -22,6 +22,7 @@ use App\Http\Controllers\Dashboard\PurchaseOrderController;
 use App\Http\Controllers\Dashboard\PurchaseReceivingController;
 use App\Http\Controllers\Dashboard\PurchaseReturnController;
 use App\Http\Controllers\Dashboard\StockAdjustmentController;
+use App\Http\Controllers\Dashboard\StockTransferController;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,6 +151,7 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('purchase-orders.create');
     Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
     Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+    Route::post('/purchase-orders/{purchaseOrder}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchase-orders.cancel');
     Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('purchase-orders.destroy');
 
     // Purchase Receivings
@@ -164,6 +166,7 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/purchase-returns/create', [PurchaseReturnController::class, 'create'])->name('purchase-returns.create');
     Route::post('/purchase-returns', [PurchaseReturnController::class, 'store'])->name('purchase-returns.store');
     Route::get('/purchase-returns/{return}', [PurchaseReturnController::class, 'show'])->name('purchase-returns.show');
+    Route::put('/purchase-returns/{return}/complete', [PurchaseReturnController::class, 'complete'])->name('purchase-returns.complete');
     Route::delete('/purchase-returns/{return}', [PurchaseReturnController::class, 'destroy'])->name('purchase-returns.destroy');
 
     // Stock Adjustments
@@ -172,6 +175,14 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store'])->name('stock-adjustments.store');
     Route::get('/stock-adjustments/{adjustment}', [StockAdjustmentController::class, 'show'])->name('stock-adjustments.show');
     Route::delete('/stock-adjustments/{adjustment}', [StockAdjustmentController::class, 'destroy'])->name('stock-adjustments.destroy');
+
+    // Stock Transfers
+    Route::get('/stock-transfers', [StockTransferController::class, 'index'])->name('stock-transfers.index');
+    Route::get('/stock-transfers/create', [StockTransferController::class, 'create'])->name('stock-transfers.create');
+    Route::post('/stock-transfers', [StockTransferController::class, 'store'])->name('stock-transfers.store');
+    Route::get('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'show'])->name('stock-transfers.show');
+    Route::put('/stock-transfers/{stockTransfer}/complete', [StockTransferController::class, 'complete'])->name('stock-transfers.complete');
+    Route::delete('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'destroy'])->name('stock-transfers.destroy');
 
 });
 

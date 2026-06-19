@@ -102,55 +102,73 @@
 - 85 file Blade view di `resources/views/` — semua modul diterjemahkan.
 - Tidak ada perubahan pada controller, model, migration, atau route.
 
-|## Phase 3 - Inti Inventaris (2026-06-19)
-|
-|### Migration yang Dibuat
-|- `2026_06_18_235822_create_stock_movements_table` - Tabel pergerakan stok
-|- `2026_06_19_000818_create_purchase_orders_table` - Tabel purchase orders
-|- `2026_06_19_001741_create_purchase_order_details_table` - Detail PO
-|- `2026_06_19_001742_create_purchase_receivings_table` - Tabel penerimaan
-|- `2026_06_19_002156_create_purchase_receiving_details_table` - Detail receiving
-|- `2026_06_19_002245_create_stock_adjustments_table` - Tabel penyesuaian stok
-|- `2026_06_19_002323_create_stock_movement_details_table` - Detail pergerakan stok
-|
-|### Model yang Dibuat
-|- `StockMovement` - Catat semua perubahan stok (in/out/adjustment)
-|- `PurchaseOrder` - Manajemen order pembelian
-|- `PurchaseOrderDetail` - Detail item PO
-|- `PurchaseReceiving` - Catat penerimaan barang
-|- `PurchaseReceivingDetail` - Detail penerimaan barang
-|
-|### Fitur yang Diimplementasikan
-|- [x] Catat stok keluar otomatis saat order selesai (via StockMovement::recordOut)
-|- [x] Catat stok masuk saat receiving barang (via StockMovement::recordIn)
-|- [x] Buat purchase order dari pemasok
-|- [x] Buat penerimaan barang/purchase receiving
-|- [x] Stock movement controller untuk history & adjustment
-|- [x] Purchase order controller (index, create, store, show, destroy)
-|- [x] Purchase receiving controller (index, create, store, show, complete, destroy)
-|
-|### Routes yang Ditambahkan
-|- `/stock-movements` - Daftar pergerakan stok
-|- `/stock-movements/history/{product}` - Riwayat stok per produk
-|- `/stock-movements/adjust/{product}` - Form penyesuaian stok
-|- `/stock-movements/adjust` - Proses penyesuaian stok
-|- `/purchase-orders` - Daftar purchase order
-|- `/purchase-orders/create` - Form create PO
-|- `/purchase-orders` - Store PO
-|- `/purchase-orders/{po}` - Detail PO
-|- `/purchase-orders/{po}` - Hapus PO
-|- `/purchase-receivings` - Daftar penerimaan
-|- `/purchase-receivings/create` - Form create receiving
-|- `/purchase-receivings` - Store receiving
-|- `/purchase-receivings/{receiving}` - Detail receiving
-|- `/purchase-receivings/{receiving}/complete` - Selesaikan receiving
-|
-|### Catatan
-|- Stok otomatis dikurangi saat order complete (tidak perlu input manual)
-|- Stok otomatis ditambah saat receiving selesai (tidak perlu input manual)
-|- Stock movement mencatat reference ke transaksi asal (polymorphic)
-|- Purchase receiving belum otomatis menambah stok sebelum di-complete
-|- Retur pembelian dan stock adjustment masih perlu implementasi
+## Phase 3 - Inti Inventaris (2026-06-19)
+
+### Migration yang Dibuat/Dijalankan
+- `2026_06_18_235822_create_stock_movements_table` - Tabel pergerakan stok.
+- `2026_06_19_000818_create_purchase_orders_table` - Tabel order pembelian.
+- `2026_06_19_001741_create_purchase_order_details_table` - Detail order pembelian.
+- `2026_06_19_001742_create_purchase_receivings_table` - Tabel penerimaan barang.
+- `2026_06_19_002156_create_purchase_receiving_details_table` - Detail penerimaan barang.
+- `2026_06_19_002245_create_stock_adjustments_table` - Tabel penyesuaian stok.
+- `2026_06_19_002323_create_stock_movement_details_table` - Detail pergerakan stok.
+- `2026_06_19_010621_create_purchase_returns_table` - Tabel retur pembelian.
+- `2026_06_19_010623_create_purchase_return_details_table` - Detail retur pembelian.
+- `2026_06_19_091500_add_stock_snapshots_to_stock_adjustments_table` - Snapshot stok lama/baru untuk penyesuaian stok.
+- `2026_06_19_120000_create_stock_locations_table` - Struktur awal lokasi stok.
+- `2026_06_19_120001_create_stock_transfers_table` - Tabel transfer stok.
+- `2026_06_19_120002_create_stock_transfer_details_table` - Detail transfer stok.
+
+### Model yang Dibuat
+- `StockMovement` - Catat perubahan stok.
+- `StockAdjustment` - Catat penyesuaian stok manual.
+- `PurchaseOrder` - Manajemen order pembelian.
+- `PurchaseOrderDetail` - Detail item order pembelian.
+- `PurchaseReceiving` - Catat penerimaan barang.
+- `PurchaseReceivingDetail` - Detail penerimaan barang.
+- `PurchaseReturn` - Catat retur pembelian.
+- `PurchaseReturnDetail` - Detail retur pembelian.
+- `StockLocation` - Lokasi stok awal.
+- `StockTransfer` - Header transfer stok.
+- `StockTransferDetail` - Detail item transfer stok.
+
+### Fitur yang Diimplementasikan
+- [x] Catat stok keluar otomatis saat order selesai.
+- [x] Catat stok masuk saat penerimaan barang diselesaikan.
+- [x] Penyesuaian stok manual dengan alasan dan snapshot stok lama/baru.
+- [x] Riwayat pergerakan stok dengan filter produk, tipe, dan tanggal.
+- [x] Order pembelian dari pemasok.
+- [x] Penerimaan barang dibuat sebagai `pending`, stok baru bertambah saat diselesaikan.
+- [x] Retur pembelian dibuat sebagai `pending`, stok baru berkurang saat diselesaikan.
+- [x] Transfer stok antar lokasi dibuat sebagai struktur awal dengan lokasi `Toko Utama` dan `Gudang Toko`.
+- [x] Halaman index/create/show untuk order pembelian, penerimaan barang, retur pembelian, dan penyesuaian stok.
+
+### Routes yang Ditambahkan/Diperbaiki
+- `/stock-movements`
+- `/stock-movements/history/{product}`
+- `/stock-movements/adjust/{product}`
+- `/stock-adjustments`
+- `/stock-transfers`
+- `/purchase-orders`
+- `/purchase-orders/{purchaseOrder}/cancel`
+- `/purchase-receivings`
+- `/purchase-receivings/{receiving}/complete`
+- `/purchase-returns`
+- `/purchase-returns/{return}/complete`
+
+### Validasi yang Dijalankan
+- `php -l` untuk controller/model inventaris yang diubah.
+- `php artisan route:list --name=purchase`
+- `php artisan route:list --name=stock`
+- `php artisan route:list`
+- `php artisan view:cache`
+- `php artisan migrate`
+- `php artisan migrate:status`
+
+### Catatan
+- Phase 3 sudah clear berdasarkan checklist `03-TODO.md`.
+- Item aktif berikutnya adalah Phase 4: modul shift kasir.
+- Penampil audit log tetap direncanakan untuk Phase 7.
 
 ## Kesimpulan Teknis Saat Ini
 
@@ -159,7 +177,7 @@
 - Piutang dicatat lewat `due_amount`.
 - Pembayaran piutang mengubah `pay_amount` dan `due_amount`.
 - Produk punya `stock`, `buying_price`, `selling_price`, dan `expire_date`.
-- Belum ada tabel mutasi stok, tutup kasir, shift, pembelian, retur, audit, atau stock opname.
+- Belum ada modul tutup kasir, shift kasir, stock opname, retur penjualan, dan laporan lanjutan.
 
 ## Risiko Saat Ini
 
@@ -169,7 +187,7 @@
 
 ### Langkah Selanjutnya
 
-Kerjakan `03-TODO.md` Phase 3 - Inti Inventaris (stock movements, purchase orders, purchase receiving, stock adjustment).
+Lanjut ke Phase 4 di `03-TODO.md`: buat modul shift kasir.
 
 ## Instruksi Untuk Sesi Lanjutan
 

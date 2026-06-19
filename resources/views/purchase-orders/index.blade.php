@@ -1,28 +1,28 @@
 @extends('dashboard.body.main')
 
-@section('title', 'Purchase Orders')
+@section('title', 'Order Pembelian')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Daftar Purchase Orders</h5>
-                    <a href="{{ route('purchase-orders.create') }}" class="btn btn-primary btn-sm">+ Tambah PO</a>
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Daftar Order Pembelian</h5>
+                    <a href="{{ route('purchase-orders.create') }}" class="btn btn-primary btn-sm mt-2 mt-sm-0">+ Tambah PO</a>
                 </div>
                 <div class="card-body">
-                    <!-- Filter -->
-                    <form method="GET" class="mb-3 row g-2">
-                        <div class="col-md-3">
-                            <select name="status" class="form-select">
+                    <form method="GET" class="inventory-filter">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
                                 <option value="">Semua Status</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
                                 <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Batal</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('purchase-orders.index') }}" class="btn btn-secondary">Reset</a>
                         </div>
@@ -30,11 +30,11 @@
 
                     <!-- Data Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>PO Number</th>
+                                    <th>No. PO</th>
                                     <th>Tanggal PO</th>
                                     <th>Pemasok</th>
                                     <th>Total</th>
@@ -62,10 +62,12 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('purchase-orders.show', $po->id) }}" class="btn btn-sm btn-info">View</a>
+                                            <div class="table-action">
+                                            <a href="{{ route('purchase-orders.show', $po->id) }}" class="btn btn-sm btn-info">Lihat</a>
                                             @if($po->status == 'pending')
-                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $po->id }}">Batal</button>
+                                                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#cancelModal{{ $po->id }}">Batal</button>
                                             @endif
+                                            </div>
                                         </td>
                                     </tr>
 
@@ -75,7 +77,9 @@
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title">Batal PO {{ $po->po_number }}</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
                                                 </div>
                                                 <form action="{{ route('purchase-orders.cancel', $po->id) }}" method="POST">
                                                     @csrf
@@ -86,7 +90,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                                         <button type="submit" class="btn btn-danger">Konfirmasi Batal</button>
                                                     </div>
                                                 </form>

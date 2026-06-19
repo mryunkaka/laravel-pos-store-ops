@@ -17,6 +17,12 @@ class StockMovementController extends Controller
      */
     public function history(Product $product)
     {
+        $summary = StockMovement::where('product_id', $product->id)
+            ->select('type', DB::raw('SUM(ABS(quantity)) as total_quantity'))
+            ->groupBy('type')
+            ->pluck('total_quantity', 'type')
+            ->toArray();
+
         $movements = QueryBuilder::for(StockMovement::class)
             ->where('product_id', $product->id)
             ->allowedFilters([
@@ -30,6 +36,7 @@ class StockMovementController extends Controller
         return view('stock-movements.history', [
             'product' => $product,
             'movements' => $movements,
+            'summary' => $summary,
         ]);
     }
 
@@ -62,9 +69,11 @@ class StockMovementController extends Controller
         }
 
         $movements = $query->latest()->paginate(20);
+        $products = Product::orderBy('name')->get();
 
         return view('stock-movements.index', [
             'movements' => $movements,
+            'products' => $products,
             'filters' => [
                 'type' => $type,
                 'product_id' => $productId,
@@ -89,12 +98,18 @@ class StockMovementController extends Controller
         $quantity = (int) $request->quantity;
 
         DB::transaction(function () use ($product, $quantity, $request) {
-            $product->increment('stock', abs($quantity));
+            if ($quantity > 0) {
+                $product->increment('stock', $quantity);
+            } else {
+                $product->decrement('stock', abs($quantity));
+            }
 
             $type = $quantity > 0 ? 'adjustment_in' : 'adjustment_out';
             StockMovement::create([
                 'product_id' => $product->id,
                 'type' => $type,
+                'reference_type' => Product::class,
+                'reference_id' => $product->id,
                 'quantity' => abs($quantity),
                 'unit_price' => $product->buying_price,
                 'description' => $request->reason,

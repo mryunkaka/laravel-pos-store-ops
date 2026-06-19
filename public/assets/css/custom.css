@@ -20,4 +20,62 @@ svg.h-4 { height: 1rem; }
 svg.w-5 { width: 1.25rem; }
 svg.h-5 { height: 1.25rem; }
 svg.w-6 { width: 1.5rem; }
+
+.inventory-card .card-header {
+    padding: 1.25rem 1.5rem;
+}
+
+.inventory-filter {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1.25rem;
+}
+
+.inventory-filter .form-group {
+    margin-bottom: 0;
+}
+
+.inventory-filter .form-control {
+    width: 100%;
+    min-height: 45px;
+}
+
+.inventory-filter label {
+    color: #6f7893;
+    font-size: 0.875rem;
+    margin-bottom: 0.35rem;
+}
+
+.inventory-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.inventory-actions .btn {
+    margin: 0;
+}
+
+.inventory-table th,
+.inventory-table td {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.inventory-table .table-action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.inventory-table .table-action form {
+    margin: 0;
+}
+
+.inventory-table .btn-sm {
+    min-height: 32px;
+}
 svg.h-6 { height: 1.5rem; }

@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\StockMovement;
-use App\Models\StockAdjustment;
 use App\Models\Product;
+use App\Models\StockAdjustment;
+use App\Models\StockMovement;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StockAdjustmentController extends Controller
 {
-    /**
-     * Display a listing of adjustments.
-     */
     public function index(Request $request)
     {
         $productId = $request->input('product_id');
@@ -20,6 +19,7 @@ class StockAdjustmentController extends Controller
         $endDate = $request->input('end_date');
 
         $query = StockAdjustment::with(['product', 'user']);
+        $products = Product::orderBy('name')->get();
 
         if ($productId) {
             $query->where('product_id', $productId);
@@ -35,21 +35,16 @@ class StockAdjustmentController extends Controller
 
         $adjustments = $query->latest()->paginate(15)->withQueryString();
 
-        return view('stock-adjustments.index', compact('adjustments'));
+        return view('stock-adjustments.index', compact('adjustments', 'products'));
     }
 
-    /**
-     * Show the form for creating a new adjustment.
-     */
     public function create()
     {
-        $products = Product::all();
+        $products = Product::orderBy('name')->get();
+
         return view('stock-adjustments.create', compact('products'));
     }
 
-    /**
-     * Store a newly created adjustment.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -57,101 +52,88 @@ class StockAdjustmentController extends Controller
             'adjustment_date' => 'required|date',
             'adjustment_type' => 'required|in:increase,decrease',
             'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string|min:3'
+            'reason' => 'required|string|min:3',
         ]);
 
         DB::beginTransaction();
 
         try {
             $product = Product::findOrFail($request->product_id);
-            $quantity = $request->quantity;
-            $oldStock = $product->stock;
+            $quantity = (int) $request->quantity;
+            $oldStock = (int) $product->stock;
 
             if ($request->adjustment_type === 'increase') {
                 $newStock = $oldStock + $quantity;
-                $product->update(['stock' => $newStock]);
-
-                // Record stock movement (stock increases)
-                StockMovement::recordIn(
-                    $product->id,
-                    $quantity,
-                    'stock_adjustment',
-                    null,
-                    "Penyesuaian stok (increase): {$request->reason}"
-                );
+                $adjustmentType = 'in';
+                $movementQuantity = $quantity;
             } else {
                 $newStock = $oldStock - $quantity;
-                $product->update(['stock' => $newStock]);
 
-                // Record stock movement (stock decreases)
-                StockMovement::recordOut(
-                    $product->id,
-                    $quantity,
-                    'stock_adjustment',
-                    null,
-                    "Penyesuaian stok (decrease): {$request->reason}"
-                );
+                if ($newStock < 0 && !auth()->user()->can('allow-negative-stock')) {
+                    DB::rollBack();
+
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Stok tidak boleh minus.');
+                }
+
+                $adjustmentType = 'out';
+                $movementQuantity = -$quantity;
             }
 
-            // Create adjustment record
-            StockAdjustment::create([
+            $product->update(['stock' => $newStock]);
+
+            $adjustment = StockAdjustment::create([
                 'product_id' => $product->id,
+                'adjustment_number' => IdGenerator::generate([
+                    'table' => 'stock_adjustments',
+                    'field' => 'adjustment_number',
+                    'length' => 12,
+                    'prefix' => 'ADJ-',
+                ]),
                 'adjustment_date' => $request->adjustment_date,
-                'adjustment_type' => $request->adjustment_type,
+                'type' => $adjustmentType,
                 'quantity' => $quantity,
                 'old_stock' => $oldStock,
                 'new_stock' => $newStock,
                 'reason' => $request->reason,
-                'created_by' => auth()->id()
+                'status' => 'approved',
+                'created_by' => auth()->id(),
+                'approved_by' => auth()->id(),
             ]);
+
+            StockMovement::recordAdjustment(
+                $product,
+                $movementQuantity,
+                "Penyesuaian stok: {$request->reason}",
+                auth()->user(),
+                StockAdjustment::class,
+                $adjustment->id
+            );
 
             DB::commit();
 
             return redirect()->route('stock-adjustments.index')
-                ->with('success', 'Penyesuaian stok berhasil dibuat');
+                ->with('success', 'Penyesuaian stok berhasil dibuat.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal membuat penyesuaian stok: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal membuat penyesuaian stok: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Display the specified adjustment.
-     */
     public function show(StockAdjustment $adjustment)
     {
-        $adjustment->load(['product', 'user']);
+        $adjustment->load(['product', 'user', 'approver']);
+
         return view('stock-adjustments.show', compact('adjustment'));
     }
 
-    /**
-     * Remove the specified adjustment.
-     */
     public function destroy(StockAdjustment $adjustment)
     {
-        if ($adjustment->deleted_at) {
-            return redirect()->back()->with('error', 'Penyesuaian sudah dihapus');
-        }
-
-        // Restore stock
-        $product = $adjustment->product;
-        $oldStock = $adjustment->old_stock;
-        $product->update(['stock' => $oldStock]);
-
-        // Reverse stock movement
-        if ($adjustment->adjustment_type === 'increase') {
-            StockMovement::where('reference_type', 'stock_adjustment')
-                ->where('reference_id', $adjustment->id)
-                ->update(['quantity' => 0]);
-        } else {
-            StockMovement::where('reference_type', 'stock_adjustment')
-                ->where('reference_id', $adjustment->id)
-                ->update(['quantity' => 0]);
-        }
-
-        $adjustment->delete();
-
         return redirect()->route('stock-adjustments.index')
-            ->with('success', 'Penyesuaian stok berhasil dihapus');
+            ->with('error', 'Penyesuaian stok tidak boleh dihapus. Buat penyesuaian baru untuk koreksi.');
     }
 }

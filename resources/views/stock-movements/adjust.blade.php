@@ -2,11 +2,11 @@
 
 @section('title', 'Adjustment Stok - ' . $product->name)
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card inventory-card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Adjustment Stok: {{ $product->name }}</h5>
                 </div>
@@ -47,8 +47,8 @@
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">Simpan Adjustment</button>
+                        <div class="inventory-actions">
+                            <button type="submit" class="btn btn-primary">Simpan Penyesuaian</button>
                             <a href="{{ route('stock-movements.history', $product->id) }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>

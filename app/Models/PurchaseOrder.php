@@ -52,10 +52,9 @@ class PurchaseOrder extends Model
 
     public function getPendingQuantityAttribute()
     {
-        $received = $this->receivings()->where('status', 'completed')->sum(function ($receiving) {
-            return $receiving->details->sum('received_quantity');
+        return $this->details->sum(function ($detail) {
+            return $detail->pending_quantity;
         });
-        return $this->details->sum('quantity') - $received;
     }
 
     public function canBeCompleted()

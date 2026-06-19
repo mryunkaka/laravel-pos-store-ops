@@ -2,26 +2,26 @@
 
 @section('title', 'Retur Pembelian')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Daftar Retur Pembelian</h5>
-                    <a href="{{ route('purchase-returns.create') }}" class="btn btn-primary btn-sm">+ Tambah Retur</a>
+                    <a href="{{ route('purchase-returns.create') }}" class="btn btn-primary btn-sm mt-2 mt-sm-0">+ Tambah Retur</a>
                 </div>
                 <div class="card-body">
-                    <!-- Filter -->
-                    <form method="GET" class="mb-3 row g-2">
-                        <div class="col-md-3">
-                            <select name="status" class="form-select">
+                    <form method="GET" class="inventory-filter">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
                                 <option value="">Semua Status</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('purchase-returns.index') }}" class="btn btn-secondary">Reset</a>
                         </div>
@@ -29,13 +29,13 @@
 
                     <!-- Data Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Retur Number</th>
+                                    <th>No. Retur</th>
                                     <th>Tanggal</th>
-                                    <th>Receiving</th>
+                                    <th>Penerimaan</th>
                                     <th>Pemasok</th>
                                     <th>Total</th>
                                     <th>Status</th>
@@ -61,14 +61,21 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('purchase-returns.show', $return->id) }}" class="btn btn-sm btn-info">View</a>
+                                            <div class="table-action">
+                                            <a href="{{ route('purchase-returns.show', $return->id) }}" class="btn btn-sm btn-info">Lihat</a>
                                             @if($return->status == 'pending')
+                                                <form action="{{ route('purchase-returns.complete', $return->id) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Selesaikan retur ini?')">Selesai</button>
+                                                </form>
                                                 <form action="{{ route('purchase-returns.destroy', $return->id) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus retur ini?')">Hapus</button>
                                                 </form>
                                             @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

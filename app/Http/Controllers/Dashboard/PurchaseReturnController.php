@@ -10,6 +10,7 @@ use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 
 class PurchaseReturnController extends Controller
@@ -42,7 +43,9 @@ class PurchaseReturnController extends Controller
      */
     public function create()
     {
-        $receivings = PurchaseReceiving::where('status', 'completed')->with('supplier')->get();
+        $receivings = PurchaseReceiving::where('status', 'completed')
+            ->with(['supplier', 'details.product'])
+            ->get();
         $suppliers = Supplier::all();
         $products = Product::all();
 
@@ -101,8 +104,19 @@ class PurchaseReturnController extends Controller
                 'status' => 'pending'
             ]);
 
-            // Create return details
-            foreach ($request->items as $item) {
+            $validItems = collect($request->items)->filter(function ($item) {
+                return (int) $item['quantity'] > 0;
+            });
+
+            if ($validItems->isEmpty()) {
+                abort(422, 'Minimal satu item retur harus diisi.');
+            }
+
+            foreach ($validItems as $item) {
+                if ((int) $item['quantity'] < 1) {
+                    continue;
+                }
+
                 PurchaseReturnDetail::create([
                     'purchase_return_id' => $return->id,
                     'product_id' => $item['product_id'],
@@ -111,15 +125,6 @@ class PurchaseReturnController extends Controller
                     'total' => $item['total'],
                     'description' => $item['description'] ?? null
                 ]);
-
-                // Record stock movement (stock decreases)
-                StockMovement::recordOut(
-                    $item['product_id'],
-                    $item['quantity'],
-                    'purchase_return',
-                    $return->id,
-                    "Retur pembelian #{$returnNumber}"
-                );
             }
 
             DB::commit();
@@ -140,6 +145,41 @@ class PurchaseReturnController extends Controller
         $return->load(['supplier', 'purchaseReceiving', 'user', 'details.product']);
 
         return view('purchase-returns.show', compact('return'));
+    }
+
+    public function complete(PurchaseReturn $return)
+    {
+        if ($return->status !== 'pending') {
+            return redirect()->back()->with('error', 'Retur pembelian ini sudah selesai atau dibatalkan.');
+        }
+
+        DB::transaction(function () use ($return) {
+            $return->load('details.product');
+
+            foreach ($return->details as $detail) {
+                $product = Product::findOrFail($detail->product_id);
+
+                if ($product->stock < $detail->quantity && !auth()->user()->can('allow-negative-stock')) {
+                    abort(422, "Stok {$product->name} tidak cukup untuk retur.");
+                }
+
+                $product->decrement('stock', $detail->quantity);
+
+                StockMovement::recordOut(
+                    $product,
+                    $detail->quantity,
+                    "Retur pembelian {$return->return_number}",
+                    auth()->user(),
+                    PurchaseReturn::class,
+                    $return->id
+                );
+            }
+
+            $return->update(['status' => 'completed']);
+        });
+
+        return redirect()->route('purchase-returns.index')
+            ->with('success', 'Retur pembelian berhasil diselesaikan dan stok sudah diperbarui.');
     }
 
     /**

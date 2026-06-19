@@ -1,27 +1,27 @@
 @extends('dashboard.body.main')
 
-@section('title', 'Purchase Receivings')
+@section('title', 'Penerimaan Barang')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card inventory-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Daftar Penerimaan Barang</h5>
-                    <a href="{{ route('purchase-receivings.create') }}" class="btn btn-primary btn-sm">+ Tambah Receiving</a>
+                    <a href="{{ route('purchase-receivings.create') }}" class="btn btn-primary btn-sm mt-2 mt-sm-0">+ Tambah Penerimaan</a>
                 </div>
                 <div class="card-body">
-                    <!-- Filter -->
-                    <form method="GET" class="mb-3 row g-2">
-                        <div class="col-md-3">
-                            <select name="status" class="form-select">
+                    <form method="GET" class="inventory-filter">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status" class="form-control">
                                 <option value="">Semua Status</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('purchase-receivings.index') }}" class="btn btn-secondary">Reset</a>
                         </div>
@@ -29,11 +29,11 @@
 
                     <!-- Data Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Receiving Number</th>
+                                    <th>No. Penerimaan</th>
                                     <th>Tanggal</th>
                                     <th>PO</th>
                                     <th>Pemasok</th>
@@ -61,10 +61,16 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('purchase-receivings.show', $receiving->id) }}" class="btn btn-sm btn-info">View</a>
+                                            <div class="table-action">
+                                            <a href="{{ route('purchase-receivings.show', $receiving->id) }}" class="btn btn-sm btn-info">Lihat</a>
                                             @if($receiving->status == 'pending')
-                                                <a href="{{ route('purchase-receivings.complete', $receiving->id) }}" class="btn btn-sm btn-success" onclick="return confirm('Selesaikan receiving ini?')">Selesai</a>
+                                                <form action="{{ route('purchase-receivings.complete', $receiving->id) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Selesaikan penerimaan ini?')">Selesai</button>
+                                                </form>
                                             @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

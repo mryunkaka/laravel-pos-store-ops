@@ -3,17 +3,186 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\PurchaseOrder;
 use App\Models\PurchaseReceiving;
 use App\Models\PurchaseReceivingDetail;
-use App\Models\PurchaseOrder;
-use App\Models\Supplier;
-use App\Models\Product;
 use App\Models\StockMovement;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Haruncpi\LaravelIdGenerator\IdGenerator;
 
 class PurchaseReceivingController extends Controller
 {
-    /**\n     * Display a listing of the resource.\n     */\n    public function index(Request $request)\n    {\n        $status = $request->input('status');\n        $supplierId = $request->input('supplier_id');\n\n        $query = PurchaseReceiving::with(['purchaseOrder', 'supplier', 'receiver']);\n\n        if ($status) {\n            $query->where('status', $status);\n        }\n\n        if ($supplierId) {\n            $query->where('supplier_id', $supplierId);\n        }\n\n        $receivings = $query->latest()->paginate(20);\n\n        return view('purchase-receivings.index', [\n            'receivings' => $receivings,\n            'filters' => [\n                'status' => $status,\n                'supplier_id' => $supplierId,\n            ],\n        ]);\n    }\n\n    /**\n     * Show the form for creating a new resource.\n     */\n    public function create()\n    {\n        $purchaseOrders = PurchaseOrder::where('status', 'pending')->get();\n        return view('purchase-receivings.create', compact('purchaseOrders'));\n    }\n
-    /**\n     * Store a newly created resource in storage.\n     */\n    public function store(Request $request)\n    {\n        $request->validate([\n            'purchase_order_id' => 'required|exists:purchase_orders,id',\n            'receiving_date' => 'required|date',\n            'items' => 'required|array|min:1',\n            'items.*.product_id' => 'required|exists:products,id',\n            'items.*.received_quantity' => 'required|integer|min:1',\n        ]);\n\n        return DB::transaction(function () use ($request) {\n            $receivingNumber = IdGenerator::generate([\n                'table' => 'purchase_receivings',\n                'field' => 'receiving_number',\n                'length' => 10,\n                'prefix' => 'REC-'\n            ]);\n\n            $purchaseOrder = PurchaseOrder::findOrFail($request->purchase_order_id);\n\n            $subTotal = 0;\n            $vat = 0;\n            $total = 0;\n\n            foreach ($request->items as $item) {\n                $product = Product::find($item['product_id']);\n                $receivedQty = $item['received_quantity'];\n                $unitPrice = $product->buying_price;\n                $itemTotal = $receivedQty * $unitPrice;\n\n                $subTotal += $itemTotal;\n                $total += $itemTotal;\n            }\n\n            $receiving = PurchaseReceiving::create([\n                'purchase_order_id' => $purchaseOrder->id,\n                'supplier_id' => $purchaseOrder->supplier_id,\n                'receiving_number' => $receivingNumber,\n                'receiving_date' => $request->receiving_date,\n                'status' => 'pending',\n                'sub_total' => $subTotal,\n                'vat' => $vat,\n                'total' => $total,\n                'received_by' => auth()->id(),\n            ]);\n\n            // Record stock movements for each item\n            foreach ($request->items as $item) {\n                $product = Product::find($item['product_id']);\n                $receivedQty = $item['received_quantity'];\n\n                // Update stock\n                $product->increment('stock', $receivedQty);\n\n                // Record stock movement\n                StockMovement::recordIn($product, $receivedQty, \"Receiving {$receivingNumber} for PO {$purchaseOrder->po_number}\", auth()->user());\n            }\n\n            return redirect()->route('purchase-receivings.index')\n                ->with('success', 'Penerimaan barang berhasil dicatat!');\n        });\n    }\n\n    /**\n     * Display the specified resource.\n     */\n    public function show(PurchaseReceiving $receiving)\n    {\n        $receiving->load(['purchaseOrder', 'details.product', 'supplier', 'receiver']);\n        return view('purchase-receivings.show', compact('receiving'));\n    }\n\n    /**\n     * Complete the receiving.\n     */\n    public function complete(Request $request, PurchaseReceiving $receiving)\n    {\n        if ($receiving->status !== 'pending') {\n            return redirect()->back()->with('error', 'Penerimaan ini sudah selesai atau dibatalkan.');\n        }\n\n        $receiving->update(['status' => 'completed']);\n\n        return redirect()->route('purchase-receivings.index')\n            ->with('success', 'Penerimaan barang berhasil diselesaikan!');\n    }\n\n    /**\n     * Remove the specified resource from storage.\n     */\n    public function destroy(PurchaseReceiving $receiving)\n    {\n        if ($receiving->status !== 'pending') {\n            return redirect()->back()->with('error', 'Hanya penerimaan dengan status pending yang bisa dihapus.');\n        }\n\n        $receiving->delete();\n\n        return redirect()->route('purchase-receivings.index')\n            ->with('success', 'Penerimaan barang berhasil dihapus.');\n    }\n}\n
+    public function index(Request $request)
+    {
+        $status = $request->input('status');
+        $supplierId = $request->input('supplier_id');
+
+        $query = PurchaseReceiving::with(['purchaseOrder', 'supplier', 'receiver']);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        $receivings = $query->latest()->paginate(20)->withQueryString();
+
+        return view('purchase-receivings.index', [
+            'receivings' => $receivings,
+            'filters' => [
+                'status' => $status,
+                'supplier_id' => $supplierId,
+            ],
+        ]);
+    }
+
+    public function create()
+    {
+        $purchaseOrders = PurchaseOrder::where('status', 'pending')
+            ->with(['supplier', 'details.product', 'details.receivingDetails'])
+            ->get();
+
+        return view('purchase-receivings.create', compact('purchaseOrders'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'purchase_order_id' => 'required|exists:purchase_orders,id',
+            'receiving_date' => 'required|date',
+            'items' => 'required|array|min:1',
+            'items.*.purchase_order_detail_id' => 'required|exists:purchase_order_details,id',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.received_quantity' => 'required|integer|min:0',
+            'items.*.rejected_quantity' => 'nullable|integer|min:0',
+            'items.*.notes' => 'nullable|string|max:500',
+        ]);
+
+        return DB::transaction(function () use ($request) {
+            $purchaseOrder = PurchaseOrder::with('details')->findOrFail($request->purchase_order_id);
+            $receivingNumber = IdGenerator::generate([
+                'table' => 'purchase_receivings',
+                'field' => 'receiving_number',
+                'length' => 10,
+                'prefix' => 'REC-',
+            ]);
+
+            $subTotal = 0;
+            $validItems = [];
+
+            foreach ($request->items as $item) {
+                $detail = $purchaseOrder->details->firstWhere('id', (int) $item['purchase_order_detail_id']);
+                if (!$detail || (int) $detail->product_id !== (int) $item['product_id']) {
+                    abort(422, 'Item penerimaan tidak sesuai dengan purchase order.');
+                }
+
+                $receivedQty = (int) $item['received_quantity'];
+                $rejectedQty = (int) ($item['rejected_quantity'] ?? 0);
+
+                if ($receivedQty < 1 && $rejectedQty < 1) {
+                    continue;
+                }
+
+                if (($receivedQty + $rejectedQty) > $detail->pending_quantity) {
+                    abort(422, "Qty penerimaan {$detail->product->name} melebihi sisa PO.");
+                }
+
+                $subTotal += $receivedQty * $detail->unit_price;
+                $validItems[] = [$detail, $receivedQty, $rejectedQty, $item['notes'] ?? null];
+            }
+
+            if (empty($validItems)) {
+                abort(422, 'Minimal satu item harus diterima atau ditolak.');
+            }
+
+            $receiving = PurchaseReceiving::create([
+                'purchase_order_id' => $purchaseOrder->id,
+                'supplier_id' => $purchaseOrder->supplier_id,
+                'receiving_number' => $receivingNumber,
+                'receiving_date' => $request->receiving_date,
+                'status' => 'pending',
+                'sub_total' => $subTotal,
+                'vat' => 0,
+                'total' => $subTotal,
+                'received_by' => auth()->id(),
+            ]);
+
+            foreach ($validItems as [$detail, $receivedQty, $rejectedQty, $notes]) {
+                PurchaseReceivingDetail::create([
+                    'purchase_receiving_id' => $receiving->id,
+                    'purchase_order_detail_id' => $detail->id,
+                    'product_id' => $detail->product_id,
+                    'received_quantity' => $receivedQty,
+                    'rejected_quantity' => $rejectedQty,
+                    'notes' => $notes,
+                ]);
+            }
+
+            return redirect()->route('purchase-receivings.index')
+                ->with('success', 'Penerimaan barang berhasil disimpan sebagai pending.');
+        });
+    }
+
+    public function show(PurchaseReceiving $receiving)
+    {
+        $receiving->load(['purchaseOrder', 'details.product', 'supplier', 'receiver']);
+
+        return view('purchase-receivings.show', compact('receiving'));
+    }
+
+    public function complete(PurchaseReceiving $receiving)
+    {
+        if ($receiving->status !== 'pending') {
+            return redirect()->back()->with('error', 'Penerimaan ini sudah selesai atau dibatalkan.');
+        }
+
+        DB::transaction(function () use ($receiving) {
+            $receiving->load(['details.product', 'purchaseOrder.details.receivingDetails']);
+
+            foreach ($receiving->details as $detail) {
+                if ($detail->received_quantity < 1) {
+                    continue;
+                }
+
+                $product = Product::findOrFail($detail->product_id);
+                $product->increment('stock', $detail->received_quantity);
+
+                StockMovement::recordIn(
+                    $product,
+                    $detail->received_quantity,
+                    "Penerimaan barang {$receiving->receiving_number}",
+                    auth()->user(),
+                    PurchaseReceiving::class,
+                    $receiving->id
+                );
+            }
+
+            $receiving->update(['status' => 'completed']);
+
+            $purchaseOrder = $receiving->purchaseOrder;
+            $purchaseOrder->refresh();
+            if ($purchaseOrder->canBeCompleted()) {
+                $purchaseOrder->update(['status' => 'completed']);
+            }
+        });
+
+        return redirect()->route('purchase-receivings.index')
+            ->with('success', 'Penerimaan barang berhasil diselesaikan dan stok sudah diperbarui.');
+    }
+
+    public function destroy(PurchaseReceiving $receiving)
+    {
+        if ($receiving->status !== 'pending') {
+            return redirect()->back()->with('error', 'Hanya penerimaan pending yang bisa dihapus.');
+        }
+
+        $receiving->delete();
+
+        return redirect()->route('purchase-receivings.index')
+            ->with('success', 'Penerimaan barang berhasil dihapus.');
+    }
+}

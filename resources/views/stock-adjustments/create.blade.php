@@ -2,11 +2,11 @@
 
 @section('title', 'Tambah Penyesuaian Stok')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card inventory-card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Tambah Penyesuaian Stok</h5>
                 </div>
@@ -15,7 +15,7 @@
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Produk</label>
-                            <select name="product_id" class="form-select @error('product_id') is-invalid @enderror" required>
+                            <select name="product_id" class="form-control @error('product_id') is-invalid @enderror" required>
                                 <option value="">-- Pilih Produk --</option>
                                 @foreach($products as $product)
                                     <option value="{{ $product->id }}" data-stock="{{ $product->stock }}">
@@ -29,7 +29,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Tanggal Adjustment</label>
+                            <label class="form-label">Tanggal Penyesuaian</label>
                             <input type="date" name="adjustment_date" class="form-control @error('adjustment_date') is-invalid @enderror" value="{{ old('adjustment_date', date('Y-m-d')) }}" required>
                             @error('adjustment_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -37,7 +37,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Tipe Adjustment</label>
+                            <label class="form-label">Tipe Penyesuaian</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="adjustment_type" id="typeIncrease" value="increase" checked>
                                 <label class="form-check-label" for="typeIncrease">Tambah Stok</label>
@@ -71,14 +71,14 @@
                                     <input type="text" id="currentStock" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Stok Setelah Adjustment</label>
+                                    <label class="form-label">Stok Setelah Penyesuaian</label>
                                     <input type="text" id="newStock" class="form-control" readonly>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">Simpan Adjustment</button>
+                        <div class="inventory-actions">
+                            <button type="submit" class="btn btn-primary">Simpan Penyesuaian</button>
                             <a href="{{ route('stock-adjustments.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
@@ -88,7 +88,7 @@
     </div>
 </div>
 
-@push('scripts')
+@section('specificpagescripts')
 <script>
 let products = [];
 @foreach($products as $p)
@@ -128,5 +128,5 @@ function calculateNewStock() {
 // Initialize
 calculateNewStock();
 </script>
-@endpush
+@endsection
 @endsection

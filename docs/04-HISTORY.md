@@ -198,6 +198,87 @@ Catatan risiko:
 |- Implementasi retur pembelian.
 |- Implementasi stock adjustment manual.
 
+## 2026-06-19
+
+### Perbaikan Validasi Phase 3 - Inti Inventaris
+
+#### Ringkasan Perubahan
+- Parse error di `PurchaseReceivingController` diperbaiki.
+- Penerimaan barang sekarang menyimpan detail saat status `pending`, dan stok baru bertambah saat penerimaan diselesaikan.
+- Retur pembelian ditambahkan dengan alur `pending` lalu `completed`; stok berkurang dan stock movement tercatat saat retur diselesaikan.
+- `StockAdjustment` model ditambahkan, controller penyesuaian stok disesuaikan dengan migration, dan stok minus dicegah kecuali user punya permission `allow-negative-stock`.
+- `StockMovement` diperbaiki agar selalu menyimpan `reference_type` dan `reference_id`.
+- View detail untuk order pembelian, penerimaan barang, retur pembelian, dan penyesuaian stok ditambahkan.
+- Label UI inventaris yang masih Inggris dirapikan ke bahasa Indonesia.
+
+#### Migration yang Dijalankan
+- `2026_06_19_010621_create_purchase_returns_table`
+- `2026_06_19_010623_create_purchase_return_details_table`
+- `2026_06_19_091500_add_stock_snapshots_to_stock_adjustments_table`
+
+#### File Utama yang Diubah/Ditambah
+- `app/Http/Controllers/Dashboard/PurchaseReceivingController.php`
+- `app/Http/Controllers/Dashboard/PurchaseReturnController.php`
+- `app/Http/Controllers/Dashboard/StockAdjustmentController.php`
+- `app/Http/Controllers/Dashboard/StockMovementController.php`
+- `app/Models/StockAdjustment.php`
+- `app/Models/StockMovement.php`
+- `app/Models/PurchaseOrder.php`
+- `routes/web.php`
+- `resources/views/purchase-orders/show.blade.php`
+- `resources/views/purchase-receivings/show.blade.php`
+- `resources/views/purchase-returns/show.blade.php`
+- `resources/views/stock-adjustments/show.blade.php`
+
+#### Validasi
+- `php -l` untuk controller/model inventaris yang diubah.
+- `php artisan route:list --name=purchase`
+- `php artisan route:list --name=stock`
+- `php artisan route:list`
+- `php artisan view:cache`
+- `php artisan migrate`
+- `php artisan migrate:status`
+
+#### Catatan Risiko
+- Transfer stok antar lokasi sudah tersedia sebagai struktur awal. Stok per lokasi belum dipisah; transfer mencatat dokumen dan pergerakan stok referensial tanpa mengubah total `products.stock`.
+- Belum dilakukan uji browser manual end-to-end oleh pengguna.
+
+## 2026-06-19
+
+### Penutupan Phase 3 - Transfer Stok
+
+#### Ringkasan Perubahan
+- Modul transfer stok ditambahkan sebagai item terakhir Phase 3.
+- Struktur lokasi stok awal dibuat dengan `Toko Utama` dan `Gudang Toko`.
+- Transfer stok punya status `pending` dan `completed`.
+- Saat transfer diselesaikan, sistem mencatat pergerakan stok keluar dan masuk dengan referensi dokumen transfer.
+- Sidebar Inventaris ditambah menu `Transfer Stok`.
+
+#### Migration yang Dijalankan
+- `2026_06_19_120000_create_stock_locations_table`
+- `2026_06_19_120001_create_stock_transfers_table`
+- `2026_06_19_120002_create_stock_transfer_details_table`
+
+#### File Utama yang Ditambah
+- `app/Models/StockLocation.php`
+- `app/Models/StockTransfer.php`
+- `app/Models/StockTransferDetail.php`
+- `app/Http/Controllers/Dashboard/StockTransferController.php`
+- `resources/views/stock-transfers/index.blade.php`
+- `resources/views/stock-transfers/create.blade.php`
+- `resources/views/stock-transfers/show.blade.php`
+
+#### Validasi
+- `php -l app/Http/Controllers/Dashboard/StockTransferController.php`
+- `php artisan migrate`
+- `php artisan view:cache`
+- `php artisan route:list --name=stock`
+- `php artisan migrate:status`
+
+#### Status
+- Phase 3 sudah clear.
+- Lanjut Phase 4: modul shift kasir.
+
 ## Format Pembaruan Selanjutnya
 
 Setiap perubahan berikutnya sebaiknya dicatat dengan format:

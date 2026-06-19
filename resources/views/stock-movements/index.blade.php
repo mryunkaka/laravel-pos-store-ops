@@ -2,19 +2,19 @@
 
 @section('title', 'Stock Movements')
 
-@section('content')
+@section('container')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card inventory-card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Daftar Pergerakan Stok</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Filter -->
-                    <form method="GET" class="mb-3 row g-2">
-                        <div class="col-md-3">
-                            <select name="type" class="form-select">
+                    <form method="GET" class="inventory-filter">
+                        <div class="form-group">
+                            <label>Tipe</label>
+                            <select name="type" class="form-control">
                                 <option value="">Semua Tipe</option>
                                 <option value="in" {{ request('type') == 'in' ? 'selected' : '' }}>Stok Masuk</option>
                                 <option value="out" {{ request('type') == 'out' ? 'selected' : '' }}>Stok Keluar</option>
@@ -22,21 +22,24 @@
                                 <option value="adjustment_out" {{ request('type') == 'adjustment_out' ? 'selected' : '' }}>Adjustment Keluar</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <select name="product_id" class="form-select">
+                        <div class="form-group">
+                            <label>Produk</label>
+                            <select name="product_id" class="form-control">
                                 <option value="">Semua Produk</option>
                                 @foreach($products as $p)
                                     <option value="{{ $p->id }}" {{ request('product_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Dari Tanggal</label>
                             <input type="date" name="start_date" class="form-control" placeholder="Dari Tanggal" value="{{ request('start_date') }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Sampai Tanggal</label>
                             <input type="date" name="end_date" class="form-control" placeholder="Sampai Tanggal" value="{{ request('end_date') }}">
                         </div>
-                        <div class="col-12">
+                        <div class="inventory-actions">
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('stock-movements.index') }}" class="btn btn-secondary">Reset</a>
                         </div>
@@ -44,7 +47,7 @@
 
                     <!-- Data Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover inventory-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
