@@ -191,6 +191,7 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/cash-shifts/create', [CashShiftController::class, 'create'])->name('cash-shifts.create');
     Route::post('/cash-shifts', [CashShiftController::class, 'store'])->name('cash-shifts.store');
     Route::get('/cash-shifts/{shift}', [CashShiftController::class, 'show'])->name('cash-shifts.show');
+    Route::get('/cash-shifts/{shift}/print', [CashShiftController::class, 'print'])->name('cash-shifts.print');
     Route::put('/cash-shifts/{shift}/close', [CashShiftController::class, 'close'])->name('cash-shifts.close');
     Route::delete('/cash-shifts/{shift}', [CashShiftController::class, 'destroy'])->name('cash-shifts.destroy');
 
@@ -199,6 +200,7 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/cash-closings/create', [CashClosingController::class, 'create'])->name('cash-closings.create');
     Route::post('/cash-closings', [CashClosingController::class, 'store'])->name('cash-closings.store');
     Route::get('/cash-closings/{closing}', [CashClosingController::class, 'show'])->name('cash-closings.show');
+    Route::get('/cash-closings/{closing}/print', [CashClosingController::class, 'print'])->name('cash-closings.print');
     Route::put('/cash-closings/{closing}/verify', [CashClosingController::class, 'verify'])->name('cash-closings.verify');
     Route::delete('/cash-closings/{closing}', [CashClosingController::class, 'destroy'])->name('cash-closings.destroy');
 

@@ -159,8 +159,8 @@ Kriteria penerimaan Phase 4:
 |- [x] Tutup kasir menghitung total transaksi, total tunai, total non-tunai, piutang, void, dan refund.
 |- [x] Tutup kasir mencatat uang fisik, selisih kas, catatan kasir, dan pengguna supervisor.
 |- [x] Buat tutup kasir harian outlet dari kumpulan shift.
-|- [ ] Kunci transaksi yang sudah masuk tutup kasir agar tidak bisa diedit tanpa permission khusus.
-|- [ ] Tambahkan cetak laporan tutup shift dan tutup kasir harian.
+|- [x] Kunci transaksi yang sudah masuk tutup kasir agar tidak bisa diedit tanpa permission khusus.
+|- [x] Tambahkan cetak laporan tutup shift dan tutup kasir harian.
 
 ## Phase 5 - Stock Opname dan Retur Penjualan
 

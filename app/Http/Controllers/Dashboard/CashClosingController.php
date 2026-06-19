@@ -165,6 +165,20 @@ class CashClosingController extends Controller
     }
 
     /**
+     * Print closing report.
+     */
+    public function print(CashClosing $closing)
+    {
+        if ($closing->location_id !== 1 && !auth()->user()->can('audit.menu')) {
+            abort(403, 'Unauthorized');
+        }
+
+        $closing->load(['details.cashShift.user', 'approvedBy']);
+
+        return view('cash-closings.print', compact('closing'));
+    }
+
+    /**
      * Verify the specified closing.
      */
     public function verify(Request $request, CashClosing $closing)

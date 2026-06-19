@@ -68,6 +68,7 @@
                                         </td>
                                         <td>
                                             <a href="{{ route('cash-shifts.show', $shift->id) }}" class="btn btn-sm btn-info">View</a>
+                                            <a href="{{ route('cash-shifts.print', $shift->id) }}" target="_blank" class="btn btn-sm btn-secondary">Print</a>
                                         </td>
                                     </tr>
                                 @empty

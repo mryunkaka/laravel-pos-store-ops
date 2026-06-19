@@ -114,6 +114,20 @@ class CashShiftController extends Controller
     }
 
     /**
+     * Print shift report.
+     */
+    public function print(CashShift $shift)
+    {
+        if ($shift->user_id !== auth()->id() && !auth()->user()->can('audit.menu')) {
+            abort(403, 'Unauthorized');
+        }
+
+        $shift->load(['details.order', 'user', 'approvedBy']);
+
+        return view('cash-shifts.print', compact('shift'));
+    }
+
+    /**
      * Close the specified shift.
      */
     public function close(Request $request, CashShift $shift)

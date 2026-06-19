@@ -57,6 +57,7 @@
                                         </td>
                                         <td>
                                             <a href="{{ route('cash-closings.show', $closing->id) }}" class="btn btn-sm btn-info">View</a>
+                                            <a href="{{ route('cash-closings.print', $closing->id) }}" target="_blank" class="btn btn-sm btn-secondary">Print</a>
                                         </td>
                                     </tr>
                                 @empty

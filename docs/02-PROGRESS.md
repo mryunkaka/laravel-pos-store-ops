@@ -191,27 +191,37 @@
 |- [x] Buat tutup kasir harian dari kumpulan shift.
 |- [x] Verifikasi tutup kasir oleh supervisor.
 |- [x] Multi pembayaran (tunai, QRIS, debit, transfer, e-wallet) tersedia di struktur.
+|- [x] Validasi shift aktif di PosController (kasir harus buka shift sebelum transaksi).
+|- [x] Kunci transaksi yang sudah masuk tutup kasir (cancel, void, bayar piutang).
+|- [x] Cetak laporan shift kasir.
+|- [x] Cetak laporan tutup kasir harian.
 
 ### Routes yang Ditambahkan
 |- `/cash-shifts` - Daftar shift kasir.
 |- `/cash-shifts/create` - Form buka shift baru.
 |- `/cash-shifts/{shift}` - Detail shift.
 |- `/cash-shifts/{shift}/close` - Tutup shift.
+|- `/cash-shifts/{shift}/print` - Cetak laporan shift.
 |- `/cash-closings` - Daftar tutup kasir.
 |- `/cash-closings/create` - Form buat tutup kasir.
 |- `/cash-closings/{closing}` - Detail tutup kasir.
+|- `/cash-closings/{closing}/print` - Cetak laporan tutup kasir.
 |- `/cash-closings/{closing}/verify` - Verifikasi tutup kasir.
 
 ### View yang Dibuat
 |- `cash-shifts/index` - Daftar shift kasir dengan filter.
 |- `cash-shifts/create` - Form buka shift dengan kas awal.
 |- `cash-shifts/show` - Detail shift dengan transaksi dan summary.
+|- `cash-shifts/print` - Cetak laporan shift kasir.
 |- `cash-closings/index` - Daftar tutup kasir harian.
 |- `cash-closings/show` - Detail tutup kasir dengan per shift breakdown.
+|- `cash-closings/print` - Cetak laporan tutup kasir harian.
 
-### Controller yang Dibuat
-|- `CashShiftController` - CRUD dan close shift.
-|- `CashClosingController` - CRUD, verify, dan summary closing.
+### Controller yang Dibuat/Diupdate
+|- `CashShiftController` - CRUD, close shift, dan print laporan.
+|- `CashClosingController` - CRUD, verify, summary closing, dan print laporan.
+|- `PosController` - Tambah validasi shift aktif.
+|- `OrderController` - Tambah validasi lock untuk order yang sudah masuk cash closing.
 
 ### Validasi yang Dijalankan
 |- `php artisan route:list --name=cash`

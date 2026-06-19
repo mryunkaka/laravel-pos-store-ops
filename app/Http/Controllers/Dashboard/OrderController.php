@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderDetails;
+use App\Models\CashClosing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -248,6 +249,17 @@ class OrderController extends Controller
     }
 
     /**
+     * Check if order is locked due to cash closing.
+     */
+    private function isOrderLocked(Order $order)
+    {
+        // Check if order exists in any cash closing detail
+        return CashClosing::whereHas('details.cashShift.details', function($query) use ($order) {
+            $query->where('order_id', $order->id);
+        })->where('status', 'closed')->exists();
+    }
+
+    /**
      * Cancel a pending order with reason.
      */
     public function cancelOrder(Request $request)
@@ -261,6 +273,11 @@ class OrderController extends Controller
 
         if (!$order->canBeCancelled()) {
             return Redirect::back()->with('error', 'Only pending orders can be cancelled.');
+        }
+
+        // Check if order is locked by cash closing
+        if ($this->isOrderLocked($order)) {
+            return Redirect::back()->with('error', 'Order tidak bisa dibatalkan karena sudah masuk tutup kasir.');
         }
 
         $oldStatus = $order->order_status;
@@ -293,6 +310,11 @@ class OrderController extends Controller
 
         if (!$order->canBeVoided()) {
             return Redirect::back()->with('error', 'Only completed orders can be voided.');
+        }
+
+        // Check if order is locked by cash closing
+        if ($this->isOrderLocked($order)) {
+            return Redirect::back()->with('error', 'Order tidak bisa di-void karena sudah masuk tutup kasir.');
         }
 
         DB::transaction(function () use ($order, $request) {
@@ -398,6 +420,11 @@ class OrderController extends Controller
         $order = Order::findOrFail($request->order_id);
         $mainPay = $order->pay_amount;
         $mainDue = $order->due_amount;
+
+        // Check if order is locked by cash closing
+        if ($this->isOrderLocked($order)) {
+            return Redirect::back()->with('error', 'Piutang tidak bisa dibayar karena order sudah masuk tutup kasir.');
+        }
 
         $paid_due = $mainDue - $request->due_amount;
         $paid_pay = $mainPay + $request->due_amount;

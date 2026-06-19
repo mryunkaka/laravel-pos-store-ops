@@ -145,6 +145,31 @@
                     </li>
                 @endif
 
+                @if (auth()->user()->can('orders.menu'))
+                    <li>
+                        <a href="#cashier" class="{{ Request::is('cash-shifts*') || Request::is('cash-closings*') ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ Request::is('cash-shifts*') || Request::is('cash-closings*') ? 'true' : 'false' }}">
+                            <x-heroicon-o-cash class="w-6 h-6" />
+                            <span class="ml-3">Kasir</span>
+                            <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
+                        </a>
+                        <ul id="cashier" class="iq-submenu collapse {{ Request::is('cash-shifts*') || Request::is('cash-closings*') ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
+
+                            <li class="{{ Request::is('cash-shifts*') ? 'active' : '' }}">
+                                <a href="{{ route('cash-shifts.index') }}">
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Shift Kasir</span>
+                                </a>
+                            </li>
+
+                            <li class="{{ Request::is('cash-closings*') ? 'active' : '' }}">
+                                <a href="{{ route('cash-closings.index') }}">
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Tutup Kasir</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+                @endif
+
                 @if (auth()->user()->can('employee.menu'))
                     <li class="{{ Request::is('employees*') ? 'active' : '' }}">
                         <a href="{{ route('employees.index') }}" class="svg-icon">

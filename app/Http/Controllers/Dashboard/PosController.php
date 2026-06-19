@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Customer;
+use App\Models\CashShift;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
@@ -19,6 +20,16 @@ class PosController extends Controller
      */
     public function index()
     {
+        // Validasi shift aktif
+        $activeShift = CashShift::where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->first();
+
+        if (!$activeShift) {
+            return redirect()->route('cash-shifts.create')
+                ->with('error', 'Anda harus membuka shift kasir terlebih dahulu sebelum bertransaksi.');
+        }
+
         $todayDate = Carbon::now();
         $row = (int) request('row', 10);
 
