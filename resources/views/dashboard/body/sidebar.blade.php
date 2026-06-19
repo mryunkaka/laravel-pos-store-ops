@@ -91,6 +91,8 @@
                     $inventoryActive = Request::is('stock-movements*')
                         || Request::is('stock-adjustments*')
                         || Request::is('stock-transfers*')
+                        || Request::is('stock-opnames*')
+                        || Request::is('sales-returns*')
                         || Request::is('purchase-orders*')
                         || Request::is('purchase-receivings*')
                         || Request::is('purchase-returns*');
@@ -120,6 +122,18 @@
                             <li class="{{ Request::is('stock-transfers*') ? 'active' : '' }}">
                                 <a href="{{ route('stock-transfers.index') }}">
                                     <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Transfer Stok</span>
+                                </a>
+                            </li>
+
+                            <li class="{{ Request::is('stock-opnames*') ? 'active' : '' }}">
+                                <a href="{{ route('stock-opnames.index') }}">
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Stock Opname</span>
+                                </a>
+                            </li>
+
+                            <li class="{{ Request::is('sales-returns*') ? 'active' : '' }}">
+                                <a href="{{ route('sales-returns.index') }}">
+                                    <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Retur Penjualan</span>
                                 </a>
                             </li>
 

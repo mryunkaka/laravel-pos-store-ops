@@ -321,6 +321,61 @@ Catatan risiko:
 - Phase 4 sudah clear setelah perbaikan validasi.
 - Lanjut Phase 5: stock opname dan retur penjualan.
 
+## 2026-06-19
+
+### Phase 5 - Stock Opname dan Retur Penjualan
+
+#### Ringkasan Perubahan
+- Modul stock opname batch dibuat.
+- Batch opname otomatis membuat detail dari semua produk dan menyimpan snapshot stok sistem.
+- User bisa input stok fisik manual per produk.
+- Hasil opname bisa diimport dari Excel.
+- Sistem menghitung selisih stok fisik vs stok sistem.
+- Draft opname bisa disubmit untuk persetujuan.
+- Approval opname mengubah stok produk, membuat `StockAdjustment`, dan mencatat `StockMovement`.
+- Riwayat opname per batch tersedia di halaman daftar dan detail.
+- Modul retur penjualan dibuat dan terhubung ke invoice/order asal.
+- Retur penjualan mendukung tipe refund dan tukar barang.
+- Qty retur divalidasi terhadap sisa item yang bisa diretur.
+- Barang layak jual dikembalikan ke stok dan tercatat di stock movement saat retur selesai.
+- Barang rusak dicatat di detail retur dan tidak kembali ke stok jual.
+- Refund retur tercatat ke shift aktif sebagai transaksi refund jika ada shift aktif.
+- Sidebar Inventaris ditambah menu `Stock Opname` dan `Retur Penjualan`.
+
+#### File Utama yang Ditambah/Diubah
+- `database/migrations/2026_06_19_130000_create_stock_opnames_table.php`
+- `database/migrations/2026_06_19_130001_create_stock_opname_details_table.php`
+- `database/migrations/2026_06_19_130002_add_fields_to_sales_returns_tables.php`
+- `app/Models/StockOpname.php`
+- `app/Models/StockOpnameDetail.php`
+- `app/Models/SalesReturn.php`
+- `app/Models/SalesReturnDetail.php`
+- `app/Http/Controllers/Dashboard/StockOpnameController.php`
+- `app/Http/Controllers/Dashboard/SalesReturnController.php`
+- `resources/views/stock-opnames/index.blade.php`
+- `resources/views/stock-opnames/create.blade.php`
+- `resources/views/stock-opnames/show.blade.php`
+- `resources/views/stock-opnames/import.blade.php`
+- `resources/views/sales-returns/index.blade.php`
+- `resources/views/sales-returns/create.blade.php`
+- `resources/views/sales-returns/show.blade.php`
+- `routes/web.php`
+- `resources/views/dashboard/body/sidebar.blade.php`
+
+#### Validasi
+- `php -l` untuk controller/model stock opname.
+- `php -l` untuk controller/model retur penjualan.
+- `php artisan migrate`
+- `php artisan route:list --name=stock-opnames`
+- `php artisan route:list --name=sales-returns`
+- `php artisan view:cache`
+- `php artisan migrate:status`
+
+#### Status
+- Phase 5 sudah clear berdasarkan checklist `03-TODO.md`.
+- Migration awal `sales_returns` dan `sales_return_details` sempat kosong, lalu dilengkapi lewat migration alter `2026_06_19_130002_add_fields_to_sales_returns_tables.php`.
+- Lanjut Phase 6: harga, promo, pajak, dan barcode.
+
 ## Format Pembaruan Selanjutnya
 
 Setiap perubahan berikutnya sebaiknya dicatat dengan format:

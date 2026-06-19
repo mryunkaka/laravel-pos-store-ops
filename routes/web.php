@@ -23,6 +23,8 @@ use App\Http\Controllers\Dashboard\PurchaseReceivingController;
 use App\Http\Controllers\Dashboard\PurchaseReturnController;
 use App\Http\Controllers\Dashboard\StockAdjustmentController;
 use App\Http\Controllers\Dashboard\StockTransferController;
+use App\Http\Controllers\Dashboard\StockOpnameController;
+use App\Http\Controllers\Dashboard\SalesReturnController;
 use App\Http\Controllers\Dashboard\CashShiftController;
 use App\Http\Controllers\Dashboard\CashClosingController;
 
@@ -185,6 +187,26 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'show'])->name('stock-transfers.show');
     Route::put('/stock-transfers/{stockTransfer}/complete', [StockTransferController::class, 'complete'])->name('stock-transfers.complete');
     Route::delete('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'destroy'])->name('stock-transfers.destroy');
+
+    // Stock Opnames
+    Route::get('/stock-opnames', [StockOpnameController::class, 'index'])->name('stock-opnames.index');
+    Route::get('/stock-opnames/create', [StockOpnameController::class, 'create'])->name('stock-opnames.create');
+    Route::post('/stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
+    Route::get('/stock-opnames/{stockOpname}', [StockOpnameController::class, 'show'])->name('stock-opnames.show');
+    Route::get('/stock-opnames/{stockOpname}/import', [StockOpnameController::class, 'importView'])->name('stock-opnames.import');
+    Route::post('/stock-opnames/{stockOpname}/import', [StockOpnameController::class, 'importStore'])->name('stock-opnames.import.store');
+    Route::put('/stock-opnames/{stockOpname}/counts', [StockOpnameController::class, 'updateCounts'])->name('stock-opnames.counts.update');
+    Route::put('/stock-opnames/{stockOpname}/submit', [StockOpnameController::class, 'submit'])->name('stock-opnames.submit');
+    Route::put('/stock-opnames/{stockOpname}/approve', [StockOpnameController::class, 'approve'])->name('stock-opnames.approve');
+    Route::put('/stock-opnames/{stockOpname}/cancel', [StockOpnameController::class, 'cancel'])->name('stock-opnames.cancel');
+
+    // Sales Returns
+    Route::get('/sales-returns', [SalesReturnController::class, 'index'])->name('sales-returns.index');
+    Route::get('/sales-returns/create', [SalesReturnController::class, 'create'])->name('sales-returns.create');
+    Route::post('/sales-returns', [SalesReturnController::class, 'store'])->name('sales-returns.store');
+    Route::get('/sales-returns/{salesReturn}', [SalesReturnController::class, 'show'])->name('sales-returns.show');
+    Route::put('/sales-returns/{salesReturn}/complete', [SalesReturnController::class, 'complete'])->name('sales-returns.complete');
+    Route::put('/sales-returns/{salesReturn}/cancel', [SalesReturnController::class, 'cancel'])->name('sales-returns.cancel');
 
     // Cash Shifts
     Route::get('/cash-shifts', [CashShiftController::class, 'index'])->name('cash-shifts.index');

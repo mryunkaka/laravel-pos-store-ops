@@ -174,19 +174,19 @@ Kriteria penerimaan Phase 5:
 - Retur penjualan harus terhubung ke order asal.
 - Refund/tukar barang harus tercatat dan mempengaruhi laporan.
 
-- [ ] Buat modul stock opname batch.
-- [ ] Generate daftar produk untuk opname.
-- [ ] Input stok fisik manual.
-- [ ] Import hasil opname dari Excel.
-- [ ] Hitung selisih stok sistem vs stok fisik.
-- [ ] Submit hasil opname untuk persetujuan.
-- [ ] Persetujuan opname membuat penyesuaian stok dan pergerakan stok.
-- [ ] Simpan riwayat opname per batch.
-- [ ] Buat retur penjualan.
-- [ ] Retur penjualan bisa refund uang atau tukar barang.
-- [ ] Retur penjualan mengembalikan stok jika barang layak jual.
-- [ ] Retur penjualan mencatat barang rusak jika tidak kembali ke stok jual.
-- [ ] Hubungkan retur dengan invoice/order asal.
+- [x] Buat modul stock opname batch.
+- [x] Generate daftar produk untuk opname.
+- [x] Input stok fisik manual.
+- [x] Import hasil opname dari Excel.
+- [x] Hitung selisih stok sistem vs stok fisik.
+- [x] Submit hasil opname untuk persetujuan.
+- [x] Persetujuan opname membuat penyesuaian stok dan pergerakan stok.
+- [x] Simpan riwayat opname per batch.
+- [x] Buat retur penjualan.
+- [x] Retur penjualan bisa refund uang atau tukar barang.
+- [x] Retur penjualan mengembalikan stok jika barang layak jual.
+- [x] Retur penjualan mencatat barang rusak jika tidak kembali ke stok jual.
+- [x] Hubungkan retur dengan invoice/order asal.
 
 ## Phase 6 - Harga, Promo, Pajak, dan Barcode
 

@@ -245,6 +245,63 @@
 |- Phase 4 sesuai dengan checklist `03-TODO.md`.
 |- Item aktif berikutnya adalah Phase 5: stock opname dan retur penjualan.
 
+## Phase 5 - Stock Opname dan Retur Penjualan (Mulai 2026-06-19)
+
+### Stock Opname yang Diimplementasikan
+|- [x] Modul stock opname batch.
+|- [x] Generate daftar produk dari snapshot `products.stock`.
+|- [x] Input stok fisik manual per produk.
+|- [x] Import hasil opname dari Excel.
+|- [x] Hitung selisih stok sistem vs stok fisik.
+|- [x] Submit hasil opname untuk persetujuan.
+|- [x] Persetujuan opname membuat `StockAdjustment` dan `StockMovement`.
+|- [x] Simpan riwayat opname per batch.
+
+### Retur Penjualan yang Diimplementasikan
+|- [x] Retur penjualan terhubung ke order asal yang sudah `complete`.
+|- [x] Retur bisa dipilih sebagai refund atau tukar barang.
+|- [x] Qty retur divalidasi agar tidak melebihi sisa item yang bisa diretur.
+|- [x] Barang layak jual dikembalikan ke stok saat retur diselesaikan.
+|- [x] Barang rusak dicatat di detail retur dan tidak kembali ke stok jual.
+|- [x] Refund tercatat di header retur dan masuk ke shift aktif sebagai transaksi refund jika ada shift aktif.
+
+### File Utama yang Ditambah/Diubah
+|- `database/migrations/2026_06_19_130000_create_stock_opnames_table.php`
+|- `database/migrations/2026_06_19_130001_create_stock_opname_details_table.php`
+|- `database/migrations/2026_06_19_130002_add_fields_to_sales_returns_tables.php`
+|- `app/Models/StockOpname.php`
+|- `app/Models/StockOpnameDetail.php`
+|- `app/Models/SalesReturn.php`
+|- `app/Models/SalesReturnDetail.php`
+|- `app/Http/Controllers/Dashboard/StockOpnameController.php`
+|- `app/Http/Controllers/Dashboard/SalesReturnController.php`
+|- `resources/views/stock-opnames/index.blade.php`
+|- `resources/views/stock-opnames/create.blade.php`
+|- `resources/views/stock-opnames/show.blade.php`
+|- `resources/views/stock-opnames/import.blade.php`
+|- `resources/views/sales-returns/index.blade.php`
+|- `resources/views/sales-returns/create.blade.php`
+|- `resources/views/sales-returns/show.blade.php`
+|- `routes/web.php`
+|- `resources/views/dashboard/body/sidebar.blade.php`
+
+### Validasi yang Dijalankan
+|- `php -l app/Http/Controllers/Dashboard/StockOpnameController.php`
+|- `php -l app/Models/StockOpname.php`
+|- `php -l app/Models/StockOpnameDetail.php`
+|- `php -l app/Http/Controllers/Dashboard/SalesReturnController.php`
+|- `php -l app/Models/SalesReturn.php`
+|- `php -l app/Models/SalesReturnDetail.php`
+|- `php artisan migrate`
+|- `php artisan route:list --name=stock-opnames`
+|- `php artisan route:list --name=sales-returns`
+|- `php artisan view:cache`
+|- `php artisan migrate:status`
+
+### Catatan Phase 5
+|- Phase 5 sudah clear berdasarkan checklist `03-TODO.md`.
+|- Migration awal `sales_returns` dan `sales_return_details` sempat kosong, lalu dilengkapi lewat migration alter `2026_06_19_130002_add_fields_to_sales_returns_tables.php`.
+
 ## Kesimpulan Teknis Saat Ini
 
 - POS membuat order dengan status `pending`.
@@ -253,7 +310,9 @@
 - Pembayaran piutang mengubah `pay_amount` dan `due_amount`.
 - Produk punya `stock`, `buying_price`, `selling_price`, dan `expire_date`.
 - Modul shift kasir dan tutup kasir harian sudah tersedia.
-- Belum ada modul stock opname, retur penjualan, dan laporan lanjutan.
+- Modul stock opname batch sudah tersedia sampai import Excel dan approval.
+- Modul retur penjualan sudah tersedia.
+- Belum ada laporan lanjutan.
 
 ## Risiko Saat Ini
 
@@ -263,7 +322,7 @@
 
 ### Langkah Selanjutnya
 
-Lanjut ke Phase 5 di `03-TODO.md`: stock opname dan retur penjualan.
+Lanjut ke Phase 6 di `03-TODO.md`: harga, promo, pajak, dan barcode.
 
 ## Instruksi Untuk Sesi Lanjutan
 

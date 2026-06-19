@@ -83,4 +83,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetails::class);
     }
+
+    public function salesReturns()
+    {
+        return $this->hasMany(SalesReturn::class);
+    }
 }
