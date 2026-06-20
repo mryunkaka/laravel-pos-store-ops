@@ -8,6 +8,7 @@ use App\Models\OrderDetails;
 use App\Models\CashShift;
 use App\Models\CashShiftDetail;
 use App\Models\CashClosing;
+use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -136,7 +137,8 @@ class OrderController extends Controller
                 'prefix' => 'INV-'
             ]);
 
-            $total = (float) Cart::total(null, null, ''); // Get float value
+            $summary = $this->calculateOrderSummary($request, $contents);
+            $total = $summary['total'];
             $payments = $this->normalizePayments($request);
             $pay_amount = array_sum(array_column($payments, 'amount'));
             $due_amount = $total - $pay_amount;
@@ -147,8 +149,13 @@ class OrderController extends Controller
                 'order_date' => Carbon::now(),
                 'order_status' => 'pending',
                 'total_products' => Cart::count(),
-                'sub_total' => (float) Cart::subtotal(null, null, ''),
-                'vat' => (float) Cart::tax(null, null, ''),
+                'sub_total' => $summary['gross_subtotal'],
+                'discount' => $summary['invoice_discount'] + $summary['voucher_discount'],
+                'discount_type' => $summary['voucher'] ? 'voucher' : 'fixed',
+                'service_charge' => $summary['service_charge'],
+                'tax_total' => $summary['tax_total'],
+                'tax_type' => 'exclusive',
+                'vat' => $summary['tax_total'],
                 'total' => $total,
                 'payment_type' => $this->paymentSummary($payments),
                 'pay_amount' => $pay_amount,
@@ -157,13 +164,63 @@ class OrderController extends Controller
 
             // Create Order Details
             foreach ($contents as $content) {
+                $product = Product::find($content->id);
+                $discount = (float) ($content->options->discount ?? 0);
+                $discountType = 'fixed';
+                
+                if ($product) {
+                    $discountType = $product->discount_type ?? 'fixed';
+                }
+                
                 OrderDetails::create([
                     'order_id' => $order->id,
                     'product_id' => $content->id,
                     'quantity' => $content->qty,
                     'unit_price' => $content->price,
-                    'total' => $content->total,
+                    'discount' => $discount,
+                    'discount_type' => $discountType,
+                    'total' => max(($content->price - $discount) * $content->qty, 0),
                 ]);
+            }
+
+            foreach ($summary['item_discounts'] as $discountRow) {
+                DB::table('order_discounts')->insert([
+                    'order_id' => $order->id,
+                    'type' => 'item',
+                    'reference_id' => $discountRow['product_id'],
+                    'reference_type' => Product::class,
+                    'amount' => $discountRow['amount'],
+                    'description' => $discountRow['description'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            if ($summary['invoice_discount'] > 0) {
+                DB::table('order_discounts')->insert([
+                    'order_id' => $order->id,
+                    'type' => 'invoice',
+                    'reference_id' => null,
+                    'reference_type' => null,
+                    'amount' => $summary['invoice_discount'],
+                    'description' => 'Diskon invoice manual',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            if ($summary['voucher'] && $summary['voucher_discount'] > 0) {
+                DB::table('order_discounts')->insert([
+                    'order_id' => $order->id,
+                    'type' => 'voucher',
+                    'reference_id' => $summary['voucher']->id,
+                    'reference_type' => Voucher::class,
+                    'amount' => $summary['voucher_discount'],
+                    'description' => "Voucher {$summary['voucher']->code}",
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $summary['voucher']->increment('used_count');
             }
 
             foreach ($payments as $payment) {
@@ -189,7 +246,7 @@ class OrderController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Order created successfully!',
-                    'invoice_url' => route('order.invoiceDownload', $order->id),
+                    'invoice_url' => route('order.printReceipt', $order->id),
                     'cart_html' => view('pos.cart-sidebar', ['productItem' => Cart::content()])->render(),
                     'cart_count' => Cart::count(),
                 ]);
@@ -254,7 +311,6 @@ class OrderController extends Controller
             }
 
             $oldStatus = $order->order_status;
-
             foreach ($details as $detail) {
                 Product::where('id', $detail->product_id)
                     ->decrement('stock', $detail->quantity);
@@ -267,9 +323,7 @@ class OrderController extends Controller
                     auth()->user()
                 );
             }
-
             $order->update(['order_status' => 'complete']);
-
             // Audit log
             AuditService::log('order', 'complete', $order, ['order_status' => $oldStatus], ['order_status' => 'complete'], "Order {$order->invoice_no} completed, stock reduced");
         });
@@ -299,7 +353,6 @@ class OrderController extends Controller
         ]);
 
         $order = Order::findOrFail($request->order_id);
-
         if (!$order->canBeCancelled()) {
             return Redirect::back()->with('error', 'Only pending orders can be cancelled.');
         }
@@ -310,16 +363,13 @@ class OrderController extends Controller
         }
 
         $oldStatus = $order->order_status;
-
         $order->update([
             'order_status' => 'cancelled',
             'cancel_reason' => $request->cancel_reason,
             'cancelled_by' => auth()->id(),
             'cancelled_at' => Carbon::now(),
         ]);
-
         $this->recordShiftCorrection($order, 'void', 'Order dibatalkan');
-
         // Audit log
         AuditService::log('order', 'cancel', $order, ['order_status' => $oldStatus], ['order_status' => 'cancelled', 'cancel_reason' => $request->cancel_reason], "Order {$order->invoice_no} cancelled");
 
@@ -338,7 +388,6 @@ class OrderController extends Controller
         ]);
 
         $order = Order::findOrFail($request->order_id);
-
         if (!$order->canBeVoided()) {
             return Redirect::back()->with('error', 'Only completed orders can be voided.');
         }
@@ -372,9 +421,7 @@ class OrderController extends Controller
                 'voided_by' => auth()->id(),
                 'voided_at' => Carbon::now(),
             ]);
-
             $this->recordShiftCorrection($order, 'void', 'Order di-void');
-
             // Audit log
             AuditService::log('order', 'void', $order, ['order_status' => $oldStatus], ['order_status' => 'void', 'void_reason' => $request->void_reason], "Order {$order->invoice_no} voided, stock restored");
         });
@@ -468,16 +515,106 @@ class OrderController extends Controller
         }
 
         $oldValues = ['pay_amount' => $mainPay, 'due_amount' => $mainDue];
-
         $order->update([
             'due_amount' => $paid_due,
             'pay_amount' => $paid_pay,
         ]);
-
         // Audit log
         AuditService::log('order', 'update_due', $order, $oldValues, ['pay_amount' => $paid_pay, 'due_amount' => $paid_due], "Due payment for {$order->invoice_no}");
 
         return Redirect::route('order.pendingDue')->with('success', 'Due Amount Updated Successfully!');
+    }
+
+    /**
+     * Calculate item discount (fixed amount or percentage).
+     */
+    private function calculateItemDiscount(Product $product, $unitPrice): float
+    {
+        if ($product->discount <= 0) {
+            return 0;
+        }
+
+        if ($product->discount_type === 'percentage') {
+            return ($product->discount / 100) * $unitPrice;
+        }
+
+        // Fixed discount
+        return min($product->discount, $unitPrice);
+    }
+
+    private function calculateOrderSummary(StoreOrderRequest $request, $contents): array
+    {
+        $grossSubtotal = 0;
+        $itemDiscountTotal = 0;
+        $taxTotal = 0;
+        $itemDiscounts = [];
+
+        foreach ($contents as $content) {
+            $product = Product::find($content->id);
+            $lineGross = (float) $content->price * (int) $content->qty;
+            $lineDiscount = (float) ($content->options->discount ?? 0) * (int) $content->qty;
+            $taxRate = $product
+                ? (float) ($product->tax_rate > 0 ? $product->tax_rate : ($product->category->tax_rate ?? 0))
+                : (float) ($content->options->tax_rate ?? 0);
+            $lineTaxable = max($lineGross - $lineDiscount, 0);
+            $lineTax = $lineTaxable * ($taxRate / 100);
+
+            $grossSubtotal += $lineGross;
+            $itemDiscountTotal += $lineDiscount;
+            $taxTotal += $lineTax;
+
+            if ($lineDiscount > 0) {
+                $itemDiscounts[] = [
+                    'product_id' => $content->id,
+                    'amount' => $lineDiscount,
+                    'description' => "Diskon item {$content->name}",
+                ];
+            }
+        }
+
+        $invoiceDiscount = max((float) $request->input('invoice_discount', 0), 0);
+        $serviceCharge = max((float) $request->input('service_charge', 0), 0);
+        $baseAfterItemDiscount = max($grossSubtotal - $itemDiscountTotal, 0);
+
+        $voucher = null;
+        $voucherDiscount = 0;
+        $voucherCode = strtoupper(trim((string) $request->input('voucher_code', '')));
+
+        if ($voucherCode !== '') {
+            $voucher = Voucher::where('code', $voucherCode)->first();
+            if (!$voucher || !$voucher->canUse()) {
+                abort(422, 'Voucher tidak valid atau sudah tidak aktif.');
+            }
+
+            if ($baseAfterItemDiscount < $voucher->min_purchase) {
+                abort(422, 'Minimal belanja untuk voucher belum terpenuhi.');
+            }
+
+            if ($voucher->type === 'percentage') {
+                $voucherDiscount = $baseAfterItemDiscount * ($voucher->discount / 100);
+                if ($voucher->max_discount) {
+                    $voucherDiscount = min($voucherDiscount, $voucher->max_discount);
+                }
+            } else {
+                $voucherDiscount = $voucher->discount;
+            }
+
+            $voucherDiscount = min($voucherDiscount, $baseAfterItemDiscount);
+        }
+
+        $total = max($grossSubtotal - $itemDiscountTotal - $invoiceDiscount - $voucherDiscount + $taxTotal + $serviceCharge, 0);
+
+        return [
+            'gross_subtotal' => $grossSubtotal,
+            'item_discount_total' => $itemDiscountTotal,
+            'invoice_discount' => $invoiceDiscount,
+            'voucher_discount' => $voucherDiscount,
+            'service_charge' => $serviceCharge,
+            'tax_total' => $taxTotal,
+            'total' => $total,
+            'voucher' => $voucher,
+            'item_discounts' => $itemDiscounts,
+        ];
     }
 
     private function normalizePayments(StoreOrderRequest $request): array

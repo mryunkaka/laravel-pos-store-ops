@@ -4,6 +4,21 @@
 -->
 
 <!-- Cart Items Container -->
+@php
+    $cartGross = 0;
+    $cartItemDiscount = 0;
+    $cartTax = 0;
+    foreach ($productItem as $cartLine) {
+        $lineGross = $cartLine->price * $cartLine->qty;
+        $lineDiscount = (float) ($cartLine->options->discount ?? 0) * $cartLine->qty;
+        $lineTaxable = max($lineGross - $lineDiscount, 0);
+        $lineTax = $lineTaxable * ((float) ($cartLine->options->tax_rate ?? 0) / 100);
+        $cartGross += $lineGross;
+        $cartItemDiscount += $lineDiscount;
+        $cartTax += $lineTax;
+    }
+    $cartBaseTotal = max($cartGross - $cartItemDiscount + $cartTax, 0);
+@endphp
 <div class="cart-items-wrapper position-relative" style="height: 350px; overflow-y: auto; overflow-x: hidden;">
     @if ($productItem->count() > 0)
         <div class="list-group list-group-flush">
@@ -12,12 +27,15 @@
                 <div class="list-group-item p-3 border-0 border-bottom">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h6 class="font-weight-bold text-dark mb-0">{{ $item->name }}</h6>
-                        <span class="font-weight-bolder text-dark">{{ number_format($item->subtotal) }}</span>
+                        <span class="font-weight-bolder text-dark">{{ number_format(($item->price - (float) ($item->options->discount ?? 0)) * $item->qty, 0, ',', '.') }}</span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-muted small">
                             {{ number_format($item->price) }}
+                            @if ((float) ($item->options->discount ?? 0) > 0)
+                                <span class="text-danger">-{{ number_format((float) $item->options->discount, 0, ',', '.') }}</span>
+                            @endif
                         </div>
 
                         <!-- Quantity Controls -->
@@ -61,15 +79,43 @@
 <div class="p-4 bg-white border-top">
     <div class="d-flex justify-content-between mb-2">
         <span class="text-secondary small">Subtotal</span>
-        <span class="font-weight-bold">{{ Cart::subtotal() }}</span>
+        <span class="font-weight-bold">{{ number_format($cartGross, 0, ',', '.') }}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+        <span class="text-secondary small">Diskon Item</span>
+        <span class="font-weight-bold text-danger">-{{ number_format($cartItemDiscount, 0, ',', '.') }}</span>
     </div>
     <div class="d-flex justify-content-between mb-3">
         <span class="text-secondary small">Pajak</span>
-        <span class="font-weight-bold">{{ Cart::tax() }}</span>
+        <span class="font-weight-bold">{{ number_format($cartTax, 0, ',', '.') }}</span>
+    </div>
+    @if (Cart::count() > 0)
+        <div class="form-group mb-2">
+            <label class="small font-weight-bold text-muted mb-1">Voucher</label>
+            <input type="text" class="form-control form-control-sm" id="voucher_code" placeholder="Kode voucher" oninput="calculateChange()">
+        </div>
+        <div class="row">
+            <div class="col-6 pr-1">
+                <div class="form-group mb-2">
+                    <label class="small font-weight-bold text-muted mb-1">Diskon Invoice</label>
+                    <input type="number" class="form-control form-control-sm" id="invoice_discount" value="0" min="0" oninput="calculateChange()">
+                </div>
+            </div>
+            <div class="col-6 pl-1">
+                <div class="form-group mb-2">
+                    <label class="small font-weight-bold text-muted mb-1">Service</label>
+                    <input type="number" class="form-control form-control-sm" id="service_charge" value="0" min="0" oninput="calculateChange()">
+                </div>
+            </div>
+        </div>
+    @endif
+    <div class="d-flex justify-content-between mb-2">
+        <span class="text-secondary small">Total Dasar</span>
+        <span class="font-weight-bold">{{ number_format($cartBaseTotal, 0, ',', '.') }}</span>
     </div>
     <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dashed">
         <span class="h6 font-weight-bold text-dark mb-0">Total</span>
-        <span class="h4 font-weight-bolder text-primary mb-0" id="cart-total">{{ Cart::total() }}</span>
+        <span class="h4 font-weight-bolder text-primary mb-0" id="cart-total" data-base-total="{{ $cartBaseTotal }}">{{ number_format($cartBaseTotal, 0, ',', '.') }}</span>
     </div>
 </div>
 

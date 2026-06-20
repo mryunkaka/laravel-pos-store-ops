@@ -84,6 +84,9 @@
                         <!-- end: Show Data -->
 
                         <div class="mt-2 text-center">
+                            <a class="btn btn-info mr-2" target="_blank" href="{{ route('products.barcodeLabel', $product->id) }}">
+                                Cetak Label
+                            </a>
                             <a class="btn btn-warning mr-2" href="{{ route('products.edit', $product->id) }}">
                                 <x-heroicon-o-pencil class="w-5 h-5 mr-1"
                                     style="display:inline-block; vertical-align:middle;" /> Edit

@@ -312,7 +312,20 @@
 - Modul shift kasir dan tutup kasir harian sudah tersedia.
 - Modul stock opname batch sudah tersedia sampai import Excel dan approval.
 - Modul retur penjualan sudah tersedia.
+- Modul harga, promo, pajak, biaya layanan, barcode scanner, label barcode, dan struk thermal sudah tersedia.
 - Belum ada laporan lanjutan.
+
+## Phase 6 - Progress (2026-06-20)
+
+### Status Phase 6
+- Phase 6 sudah clear berdasarkan checklist `03-TODO.md`.
+- Diskon per item, diskon invoice, voucher periode aktif, harga grosir, pajak produk/kategori, dan biaya layanan tersimpan di transaksi.
+- POS sudah punya input voucher, diskon invoice, biaya layanan, serta alur barcode scanner yang menambah qty item yang sama.
+- Produk dan kategori punya field konfigurasi harga/diskon/pajak.
+- Voucher/promo punya CRUD dan bisa dinonaktifkan.
+- Produk punya halaman cetak label barcode.
+- Struk thermal sudah memakai layout khusus 80mm dan auto-print setelah order selesai.
+- Validasi: `php -l` file Phase 6, `php artisan migrate`, `php artisan route:list`, dan `php artisan view:cache`.
 
 ## Risiko Saat Ini
 
@@ -322,7 +335,7 @@
 
 ### Langkah Selanjutnya
 
-Lanjut ke Phase 6 di `03-TODO.md`: harga, promo, pajak, dan barcode.
+Lanjut ke Phase 7 di `03-TODO.md`: laporan, audit, dan administrasi lanjutan.
 
 ## Instruksi Untuk Sesi Lanjutan
 

@@ -79,10 +79,11 @@
 
         /* PRINT MEDIA QUERY: Critical for correct output */
         @media print {
-            @page { margin: 0; size: auto; }
+            @page { margin: 0; size: 80mm auto; }
             body { background: #fff; }
             .receipt-container {
-                width: 100%; /* Fill Paper */
+                width: 80mm;
+                max-width: 80mm;
                 margin: 0;
                 padding: 2mm;
                 box-shadow: none;
@@ -169,9 +170,21 @@
                 <span>Subtotal</span>
                 <span>{{ number_format($order->sub_total, 0, ',', '.') }}</span>
             </div>
+            @if ($order->discount > 0)
+                <div class="d-flex justify-between mb-1">
+                    <span>Diskon</span>
+                    <span>-{{ number_format($order->discount, 0, ',', '.') }}</span>
+                </div>
+            @endif
+            @if ($order->service_charge > 0)
+                <div class="d-flex justify-between mb-1">
+                    <span>Service</span>
+                    <span>{{ number_format($order->service_charge, 0, ',', '.') }}</span>
+                </div>
+            @endif
             <div class="d-flex justify-between mb-1">
                 <span>Pajak</span>
-                <span>{{ number_format($order->vat, 0, ',', '.') }}</span>
+                <span>{{ number_format($order->tax_total ?: $order->vat, 0, ',', '.') }}</span>
             </div>
 
             <div class="grand-total d-flex justify-between align-center font-bold">

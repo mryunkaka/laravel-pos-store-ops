@@ -27,6 +27,7 @@ class UpdateCategoryRequest extends FormRequest
             'name' => 'required|unique:categories,name,' . $category->id,
             'slug' => 'required|alpha_dash|unique:categories,slug,' . $category->id,
             'description' => 'nullable|string',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
         ];
     }
 }

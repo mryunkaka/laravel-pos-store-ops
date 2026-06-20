@@ -59,13 +59,16 @@
                 @endif
 
                 @if (auth()->user()->can('product.menu'))
+                    @php
+                        $productActive = Request::is('products*') || Request::is('categories*') || Request::is('vouchers*');
+                    @endphp
                     <li>
-                        <a href="#products" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <a href="#products" class="{{ $productActive ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ $productActive ? 'true' : 'false' }}">
                             <x-heroicon-o-archive-box class="w-6 h-6" />
                             <span class="ml-3">Produk</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
-                            <ul id="products" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                            <ul id="products" class="iq-submenu collapse {{ $productActive ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
                                 <li class="{{ Request::is(['products']) ? 'active' : '' }}">
                                     <a href="{{ route('products.index') }}">
                                         <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Produk</span>
@@ -79,6 +82,11 @@
                                         <li class="{{ Request::is(['categories*']) ? 'active' : '' }}">
                                             <a href="{{ route('categories.index') }}">
                                         <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Kategori</span>
+                                        </a>
+                                        </li>
+                                        <li class="{{ Request::is(['vouchers*']) ? 'active' : '' }}">
+                                            <a href="{{ route('vouchers.index') }}">
+                                        <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Voucher/Promo</span>
                                         </a>
                                         </li>
                                         </ul>

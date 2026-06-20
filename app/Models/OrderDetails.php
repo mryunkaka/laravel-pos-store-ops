@@ -14,11 +14,15 @@ class OrderDetails extends Model
         'product_id',
         'quantity',
         'unit_price',
+        'discount',
+        'discount_type',
         'total',
     ];
 
     protected $casts = [
         'unit_price' => 'float',
+        'discount' => 'float',
+        'discount_type' => 'string',
         'total' => 'float',
     ];
 

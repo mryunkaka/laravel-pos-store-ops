@@ -25,6 +25,7 @@ class StoreCategoryRequest extends FormRequest
             'name' => 'required|unique:categories,name',
             'slug' => 'required|unique:categories,slug|alpha_dash',
             'description' => 'nullable|string',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
         ];
     }
 }

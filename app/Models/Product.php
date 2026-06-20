@@ -17,12 +17,27 @@ class Product extends Model
         'stock',
         'buying_price',
         'selling_price',
+        'discount',
+        'discount_type',
+        'wholesale_price',
+        'wholesale_qty',
+        'tax_rate',
         'image',
         'buying_date',
         'expire_date',
     ];
 
     protected $with = ['category', 'stockMovements'];
+
+    protected $casts = [
+        'buying_price' => 'float',
+        'selling_price' => 'float',
+        'discount' => 'float',
+        'discount_type' => 'string',
+        'wholesale_price' => 'float',
+        'wholesale_qty' => 'integer',
+        'tax_rate' => 'float',
+    ];
 
     public function category(){
         return $this->belongsTo(Category::class, 'category_id');

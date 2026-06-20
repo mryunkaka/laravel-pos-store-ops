@@ -29,6 +29,11 @@ class StoreProductRequest extends FormRequest
             'stock' => 'required|integer',
             'buying_price' => 'required|integer',
             'selling_price' => 'required|integer',
+            'discount' => 'nullable|numeric|min:0',
+            'discount_type' => 'nullable|in:fixed,percentage',
+            'wholesale_price' => 'nullable|numeric|min:0',
+            'wholesale_qty' => 'nullable|integer|min:1',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'buying_date' => 'date_format:Y-m-d|nullable',
             'expire_date' => 'date_format:Y-m-d|nullable',
         ];

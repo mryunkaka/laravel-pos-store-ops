@@ -1,4 +1,53 @@
-# 04 - Riwayat
+﻿# 04 - Riwayat
+
+## 2026-06-20
+
+### Phase 6 - Harga, Promo, Pajak, dan Barcode (Clear)
+
+#### Migration yang Dibuat/Dijalankan
+- `2026_06_19_231025_add_discount_to_order_details` - Tambah kolom discount dan discount_type di order_details
+- `2026_06_19_231147_add_discount_to_products` - Tambah kolom discount, discount_type, wholesale_price, wholesale_qty, tax_rate di products
+- `2026_06_19_231220_add_discount_to_orders` - Tambah kolom discount, discount_type, service_charge, tax_total, tax_type di orders
+- `2026_06_19_231728_add_voucher_table` - Tabel vouchers untuk promo
+- `2026_06_19_231942_create_order_discounts_table` - Tabel order_discounts untuk mencatat semua diskon per order
+- `2026_06_20_000001_add_tax_rate_to_categories_table` - Tambah tax_rate di categories
+
+#### Model yang Dibuat/Diupdate
+- `Voucher` - Manajemen voucher/promo dengan periode aktif, batas penggunaan
+- `OrderDetails` - Tambah fillable dan casts untuk discount dan discount_type
+- `Product` - Tambah fillable dan casts untuk discount, discount_type, wholesale_price, wholesale_qty, tax_rate
+- `Order` - Tambah fillable dan casts untuk discount, discount_type, service_charge, tax_total, tax_type
+- `Category` - Tambah fillable tax_rate untuk pajak per kategori
+
+#### Fitur yang Diimplementasikan
+- Diskon per item dari konfigurasi produk, tersimpan di order_details dan order_discounts
+- Diskon per invoice dari input POS, tersimpan di orders dan order_discounts
+- Voucher/promo dengan periode aktif, batas pemakaian, min purchase, max discount, dan status aktif/nonaktif
+- Harga grosir otomatis aktif saat qty memenuhi wholesale_qty
+- Pajak fleksibel per produk dengan fallback pajak kategori
+- Biaya layanan opsional dari POS dan tersimpan di orders
+- Barcode scanner di POS bisa scan kode, menambah produk, dan menaikkan qty item yang sama
+- Cetak label barcode dari detail produk
+- Struk thermal layout 80mm dan auto-print setelah order selesai
+
+#### Controller yang Diupdate
+- `PosController` - Hitung harga grosir, diskon item, pajak, barcode add/update qty, dan opsi cart
+- `OrderController` - Hitung summary order, diskon invoice/voucher, pajak, biaya layanan, dan catatan order_discounts
+- `ProductController` - Default field diskon/pajak/harga grosir dan halaman cetak label barcode
+- `VoucherController` - CRUD voucher/promo
+- `BarcodeController` - Endpoint search dan quickAdd untuk barcode scanner
+
+#### Routes yang Ditambahkan
+- `POST /pos/barcode/search` - Cari produk berdasarkan barcode
+- `POST /pos/barcode/quick-add` - Quick add produk ke cart via barcode
+- `GET /products/{product}/barcode-label` - Cetak label barcode produk
+- Resource `/vouchers` - Manajemen voucher/promo
+
+#### Catatan
+- Cart menggunakan session Gloudemans Shoppingcart, diskon disimpan di options
+- OrderController@storeOrder menyimpan diskon detail, diskon invoice/voucher, pajak, dan biaya layanan
+- View Phase 6 divalidasi dengan `php artisan view:cache`
+- Route Phase 6 divalidasi dengan `php artisan route:list`
 
 ## 2026-06-08
 

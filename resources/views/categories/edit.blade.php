@@ -51,6 +51,13 @@
                                         </div>
                                     @enderror
                                 </div>
+                                <div class="form-group col-md-6">
+                                    <label for="tax_rate">Pajak Kategori (%)</label>
+                                    <input type="number" class="form-control @error('tax_rate') is-invalid @enderror" id="tax_rate" name="tax_rate" value="{{ old('tax_rate', $category->tax_rate) }}" min="0" max="100" step="0.01">
+                                    @error('tax_rate')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                                 </div>
 
                             <!-- Action Buttons -->

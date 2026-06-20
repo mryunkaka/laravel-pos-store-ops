@@ -51,6 +51,32 @@ class PosController extends Controller
     }
 
     /**
+     * Calculate item discount (fixed amount or percentage).
+     */
+    private function calculateItemDiscount(Product $product, $unitPrice): float
+    {
+        if ($product->discount <= 0) {
+            return 0;
+        }
+
+        if ($product->discount_type === 'percentage') {
+            return ($product->discount / 100) * $unitPrice;
+        }
+
+        // Fixed discount
+        return min($product->discount, $unitPrice);
+    }
+
+    private function effectiveUnitPrice(Product $product, int $qty): float
+    {
+        if ($product->wholesale_price && $product->wholesale_qty && $qty >= $product->wholesale_qty) {
+            return (float) $product->wholesale_price;
+        }
+
+        return (float) $product->selling_price;
+    }
+
+    /**
      * Add item to the cart.
      */
     public function addCart(Request $request)
@@ -64,9 +90,11 @@ class PosController extends Controller
         // Stock validation
         $product = Product::findOrFail($validatedData['id']);
         $currentQtyInCart = 0;
+        $existingRowId = null;
         foreach (Cart::content() as $item) {
             if ($item->id == $validatedData['id']) {
                 $currentQtyInCart = $item->qty;
+                $existingRowId = $item->rowId;
                 break;
             }
         }
@@ -82,13 +110,31 @@ class PosController extends Controller
             return Redirect::back()->with('error', "Stok tidak mencukupi! Stok tersedia: {$product->stock}");
         }
 
-        Cart::add([
-            'id' => $validatedData['id'],
-            'name' => $validatedData['name'],
-            'qty' => 1,
-            'price' => $validatedData['price'],
-            'options' => ['size' => 'large']
-        ]);
+        // Hitung diskon untuk item ini
+        $unitPrice = $this->effectiveUnitPrice($product, $newQty);
+        $discount = $this->calculateItemDiscount($product, $unitPrice);
+
+        $cartPayload = [
+            'price' => $unitPrice,
+            'options' => [
+                'size' => 'large',
+                'discount' => $discount,
+                'discount_type' => $product->discount_type ?? 'fixed',
+                'tax_rate' => $product->tax_rate > 0 ? $product->tax_rate : ($product->category->tax_rate ?? 0),
+            ],
+        ];
+
+        if ($existingRowId) {
+            Cart::update($existingRowId, array_merge($cartPayload, [
+                'qty' => $newQty,
+            ]));
+        } else {
+            Cart::add(array_merge($cartPayload, [
+                'id' => $validatedData['id'],
+                'name' => $validatedData['name'],
+                'qty' => 1,
+            ]));
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -130,7 +176,26 @@ class PosController extends Controller
             }
         }
 
-        Cart::update($rowId, $validatedData['qty']);
+        // Update cart dengan discount yang baru (untuk handle perubahan qty)
+        $cartItem = Cart::get($rowId);
+        if ($cartItem) {
+            $product = Product::find($cartItem->id);
+            $newQty = $validatedData['qty'];
+            $unitPrice = $this->effectiveUnitPrice($product, $newQty);
+            $discount = $this->calculateItemDiscount($product, $unitPrice);
+
+            Cart::update($rowId, [
+                'qty' => $newQty,
+                'price' => $unitPrice,
+                'options' => [
+                    'discount' => $discount,
+                    'discount_type' => $product->discount_type ?? 'fixed',
+                    'tax_rate' => $product->tax_rate > 0 ? $product->tax_rate : ($product->category->tax_rate ?? 0),
+                ]
+            ]);
+        } else {
+            Cart::update($rowId, $validatedData['qty']);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([

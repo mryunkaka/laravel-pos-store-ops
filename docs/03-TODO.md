@@ -200,16 +200,16 @@ Kriteria penerimaan Phase 6:
 - Alur barcode scanner bisa menambah item dari input kode.
 - Struk thermal punya layout khusus dan tetap bisa dicetak dari browser.
 
-- [ ] Diskon per item.
-- [ ] Diskon per invoice.
-- [ ] Voucher/promo sederhana berdasarkan periode.
-- [ ] Harga grosir atau harga pelanggan/member.
-- [ ] Pajak fleksibel per produk/kategori.
-- [ ] Biaya layanan opsional.
-- [ ] Alur kerja barcode scanner di POS: scan kode langsung tambah/ubah jumlah.
-- [ ] Cetak label barcode produk.
-- [ ] Optimasi cetak struk thermal 58mm/80mm.
-- [ ] Cetak otomatis struk setelah order selesai.
+- [x] Diskon per item.
+- [x] Diskon per invoice.
+- [x] Voucher/promo sederhana berdasarkan periode.
+- [x] Harga grosir atau harga pelanggan/member.
+- [x] Pajak fleksibel per produk/kategori.
+- [x] Biaya layanan opsional.
+- [x] Alur kerja barcode scanner di POS: scan kode langsung tambah/ubah jumlah.
+- [x] Cetak label barcode produk.
+- [x] Optimasi cetak struk thermal 58mm/80mm.
+- [x] Cetak otomatis struk setelah order selesai.
 
 ## Phase 7 - Laporan, Audit, dan Administrasi Lanjutan
 

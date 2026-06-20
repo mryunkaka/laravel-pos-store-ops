@@ -71,6 +71,11 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $validatedData = $request->validated();
+        $validatedData['discount'] = $validatedData['discount'] ?? 0;
+        $validatedData['discount_type'] = $validatedData['discount_type'] ?? 'fixed';
+        $validatedData['tax_rate'] = $validatedData['tax_rate'] ?? 0;
+        $validatedData['wholesale_price'] = $validatedData['wholesale_price'] ?? null;
+        $validatedData['wholesale_qty'] = $validatedData['wholesale_qty'] ?? null;
 
         // Generate code only if not provided
         if (!isset($validatedData['code']) || empty($validatedData['code'])) {
@@ -116,6 +121,14 @@ class ProductController extends Controller
         ]);
     }
 
+    public function barcodeLabel(Product $product)
+    {
+        $generator = new BarcodeGeneratorHTML();
+        $barcode = $generator->getBarcode($product->code, $generator::TYPE_CODE_128);
+
+        return view('products.barcode-label', compact('product', 'barcode'));
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -133,6 +146,11 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $validatedData = $request->validated();
+        $validatedData['discount'] = $validatedData['discount'] ?? 0;
+        $validatedData['discount_type'] = $validatedData['discount_type'] ?? 'fixed';
+        $validatedData['tax_rate'] = $validatedData['tax_rate'] ?? 0;
+        $validatedData['wholesale_price'] = $validatedData['wholesale_price'] ?? null;
+        $validatedData['wholesale_qty'] = $validatedData['wholesale_qty'] ?? null;
         $validatedData['slug'] = Str::slug($validatedData['name']);
 
         /**

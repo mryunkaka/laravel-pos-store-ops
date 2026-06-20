@@ -129,6 +129,49 @@
                                     @enderror
                                     </div>
 
+                                <div class="form-group col-md-3">
+                                    <label for="discount">Diskon Item</label>
+                                    <input type="number" class="form-control @error('discount') is-invalid @enderror" id="discount" name="discount" value="{{ old('discount', 0) }}" min="0" step="0.01">
+                                    @error('discount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="discount_type">Tipe Diskon</label>
+                                    <select class="form-control @error('discount_type') is-invalid @enderror" id="discount_type" name="discount_type">
+                                        <option value="fixed" {{ old('discount_type') == 'fixed' ? 'selected' : '' }}>Nominal</option>
+                                        <option value="percentage" {{ old('discount_type') == 'percentage' ? 'selected' : '' }}>Persen</option>
+                                    </select>
+                                    @error('discount_type')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="wholesale_price">Harga Grosir</label>
+                                    <input type="number" class="form-control @error('wholesale_price') is-invalid @enderror" id="wholesale_price" name="wholesale_price" value="{{ old('wholesale_price') }}" min="0" step="0.01">
+                                    @error('wholesale_price')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="wholesale_qty">Min. Qty Grosir</label>
+                                    <input type="number" class="form-control @error('wholesale_qty') is-invalid @enderror" id="wholesale_qty" name="wholesale_qty" value="{{ old('wholesale_qty') }}" min="1">
+                                    @error('wholesale_qty')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="tax_rate">Pajak Produk (%)</label>
+                                    <input type="number" class="form-control @error('tax_rate') is-invalid @enderror" id="tax_rate" name="tax_rate" value="{{ old('tax_rate', 0) }}" min="0" max="100" step="0.01">
+                                    @error('tax_rate')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <div class="form-group col-md-6">
                                     <label for="buying_date">Tanggal Beli</label>
                                     <input id="buying_date" class="form-control @error('buying_date') is-invalid @enderror" name="buying_date"

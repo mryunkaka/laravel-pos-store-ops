@@ -454,6 +454,24 @@
             }, 0);
         }
 
+        function parseNumberText(value) {
+            return parseFloat(String(value || '0').replace(/,/g, '').replace(/\./g, '')) || 0;
+        }
+
+        function getOrderTotalAmount() {
+            const totalElement = document.getElementById('cart-total');
+            const baseTotal = totalElement ? parseFloat(totalElement.dataset.baseTotal || 0) : 0;
+            const invoiceDiscount = parseFloat(document.getElementById('invoice_discount')?.value || 0);
+            const serviceCharge = parseFloat(document.getElementById('service_charge')?.value || 0);
+            return Math.max(baseTotal - invoiceDiscount + serviceCharge, 0);
+        }
+
+        function refreshOrderTotalDisplay() {
+            const totalElement = document.getElementById('cart-total');
+            if (!totalElement) return;
+            totalElement.innerText = getOrderTotalAmount().toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
         function getPaymentSummary() {
             const labels = {
                 cash: 'Tunai',
@@ -504,8 +522,8 @@
         }
 
         function calculateChange() {
-            const totalText = document.getElementById('cart-total').innerText;
-            const totalAmount = parseFloat(totalText.replace(/,/g, ''));
+            refreshOrderTotalDisplay();
+            const totalAmount = getOrderTotalAmount();
             const payInput = getPaymentTotal();
             const changeElement = document.getElementById('change_amount');
 
@@ -537,8 +555,9 @@
             document.getElementById('modal_customer_id').value = customerId;
 
             // 2. Validate Payment Amount
+            refreshOrderTotalDisplay();
             const totalText = document.getElementById('cart-total').innerText;
-            const totalAmount = parseFloat(totalText.replace(/,/g, ''));
+            const totalAmount = getOrderTotalAmount();
             const payAmount = getPaymentTotal();
             const method = getPaymentSummary();
 
@@ -581,6 +600,9 @@
 
             if (paymentTypeElem) formData.append('payment_type', paymentTypeElem.value);
             formData.append('pay_amount', getPaymentTotal());
+            formData.append('invoice_discount', document.getElementById('invoice_discount')?.value || 0);
+            formData.append('service_charge', document.getElementById('service_charge')?.value || 0);
+            formData.append('voucher_code', document.getElementById('voucher_code')?.value || '');
             payments.forEach(function(payment, index) {
                 formData.append(`payments[${index}][payment_type]`, payment.payment_type);
                 formData.append(`payments[${index}][amount]`, payment.amount);
@@ -633,6 +655,49 @@
             }
         }
 
+        async function quickAddBarcode(code) {
+            try {
+                const response = await fetch("{{ route('pos.barcode.quickAdd') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+                const data = await response.json();
+                if (!data.success) {
+                    alert(data.message || 'Produk tidak ditemukan');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('id', data.product.id);
+                formData.append('name', data.product.name);
+                formData.append('price', data.product.price);
+
+                const addResponse = await fetch("{{ route('pos.addCart') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                const addData = await addResponse.json();
+                if (addData.success) {
+                    document.getElementById('cart-sidebar-container').innerHTML = addData.cart_html;
+                    document.getElementById('cart-count-badge').innerText = addData.cart_count + ' item';
+                } else {
+                    alert(addData.message || 'Gagal menambah produk');
+                }
+            } catch (error) {
+                console.error('Barcode quick add error:', error);
+                alert('Gagal memproses barcode.');
+            }
+        }
+
         // Barcode Scanner Handling for POS Search
         (function() {
             const posSearchField = document.getElementById('pos_search');
@@ -657,11 +722,9 @@
                         
                         const searchValue = posSearchField.value.trim();
                         if (searchValue) {
-                            // Check if this looks like a barcode scan (fast input + Enter)
-                            // Barcode scanners typically input very quickly
                             scannerTimeout = setTimeout(function() {
-                                // Submit the form to search
-                                searchForm.submit();
+                                quickAddBarcode(searchValue);
+                                posSearchField.value = '';
                             }, 100);
                         }
                     }
@@ -672,8 +735,8 @@
                     setTimeout(function() {
                         const pastedValue = posSearchField.value.trim();
                         if (pastedValue) {
-                            // Auto-submit on paste (likely from scanner)
-                            searchForm.submit();
+                            quickAddBarcode(pastedValue);
+                            posSearchField.value = '';
                         }
                     }, 50);
                 });

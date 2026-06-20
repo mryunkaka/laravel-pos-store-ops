@@ -27,6 +27,8 @@ use App\Http\Controllers\Dashboard\StockOpnameController;
 use App\Http\Controllers\Dashboard\SalesReturnController;
 use App\Http\Controllers\Dashboard\CashShiftController;
 use App\Http\Controllers\Dashboard\CashClosingController;
+use App\Http\Controllers\Dashboard\VoucherController;
+use App\Http\Controllers\BarcodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,7 +103,9 @@ Route::middleware(['permission:product.menu'])->group(function () {
     Route::get('/products/import', [ProductController::class, 'importView'])->name('products.importView');
     Route::post('/products/import', [ProductController::class, 'importStore'])->name('products.importStore');
     Route::get('/products/export', [ProductController::class, 'exportData'])->name('products.exportData');
+    Route::get('/products/{product}/barcode-label', [ProductController::class, 'barcodeLabel'])->name('products.barcodeLabel');
     Route::resource('/products', ProductController::class);
+    Route::resource('/vouchers', VoucherController::class)->except(['show']);
 });
 
 // ====== CATEGORY PRODUCTS ======
@@ -122,6 +126,10 @@ Route::middleware(['permission:pos.menu'])->group(function () {
 
     // Create Order
     Route::post('/pos/order', [OrderController::class, 'storeOrder'])->name('pos.storeOrder');
+    
+    // Barcode Scanner
+    Route::post('/pos/barcode/search', [BarcodeController::class, 'search'])->name('pos.barcode.search');
+    Route::post('/pos/barcode/quick-add', [BarcodeController::class, 'quickAdd'])->name('pos.barcode.quickAdd');
 });
 
 // ====== ORDERS ======
