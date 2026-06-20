@@ -9,6 +9,7 @@ use App\Models\CashShift;
 use App\Models\CashShiftDetail;
 use App\Models\CashClosing;
 use App\Models\Voucher;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -139,12 +140,20 @@ class OrderController extends Controller
 
             $summary = $this->calculateOrderSummary($request, $contents);
             $total = $summary['total'];
+            if ($summary['invoice_discount'] > 0 && !$request->user()->can('discount.order')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki permission untuk memberi diskon invoice.',
+                ], 403);
+            }
+
             $payments = $this->normalizePayments($request);
             $pay_amount = array_sum(array_column($payments, 'amount'));
             $due_amount = $total - $pay_amount;
 
             $order = Order::create([
                 'customer_id' => $request->customer_id,
+                'user_id' => auth()->id(),
                 'invoice_no' => $invoice_no,
                 'order_date' => Carbon::now(),
                 'order_status' => 'pending',
@@ -177,6 +186,7 @@ class OrderController extends Controller
                     'product_id' => $content->id,
                     'quantity' => $content->qty,
                     'unit_price' => $content->price,
+                    'buying_price' => $product?->buying_price ?? 0,
                     'discount' => $discount,
                     'discount_type' => $discountType,
                     'total' => max(($content->price - $discount) * $content->qty, 0),
@@ -554,7 +564,7 @@ class OrderController extends Controller
             $lineGross = (float) $content->price * (int) $content->qty;
             $lineDiscount = (float) ($content->options->discount ?? 0) * (int) $content->qty;
             $taxRate = $product
-                ? (float) ($product->tax_rate > 0 ? $product->tax_rate : ($product->category->tax_rate ?? 0))
+                ? (float) ($product->tax_rate > 0 ? $product->tax_rate : (($product->category->tax_rate ?? 0) ?: StoreSetting::current()->default_tax_rate))
                 : (float) ($content->options->tax_rate ?? 0);
             $lineTaxable = max($lineGross - $lineDiscount, 0);
             $lineTax = $lineTaxable * ($taxRate / 100);

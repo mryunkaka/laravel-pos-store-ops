@@ -56,6 +56,18 @@
                 'slug' => 'database',
                 'name' => 'Database'
             ],
+            [
+                'slug' => 'report',
+                'name' => 'Report'
+            ],
+            [
+                'slug' => 'audit',
+                'name' => 'Audit'
+            ],
+            [
+                'slug' => 'settings',
+                'name' => 'Settings'
+            ],
         ]
         @endphp
 

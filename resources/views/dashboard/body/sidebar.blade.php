@@ -277,6 +277,32 @@
 
                 <hr>
 
+                @if (auth()->user()->can('report.menu'))
+                    <li class="{{ Request::is('reports*') ? 'active' : '' }}">
+                        <a href="{{ route('reports.index') }}" class="svg-icon">
+                            <x-heroicon-o-chart-bar class="w-6 h-6" />
+                            <span class="ml-3">Laporan</span>
+                        </a>
+                    </li>
+                @endif
+
+                @if (auth()->user()->can('audit.menu'))
+                    <li class="{{ Request::is('audit-logs*') ? 'active' : '' }}">
+                        <a href="{{ route('audit-logs.index') }}" class="svg-icon">
+                            <x-heroicon-o-clipboard-document-list class="w-6 h-6" />
+                            <span class="ml-3">Audit Log</span>
+                        </a>
+                    </li>
+                @endif
+
+                @if (auth()->user()->can('settings.menu'))
+                    <li class="{{ Request::is('settings/store*') ? 'active' : '' }}">
+                        <a href="{{ route('settings.store.edit') }}" class="svg-icon">
+                            <x-heroicon-o-cog-6-tooth class="w-6 h-6" />
+                            <span class="ml-3">Pengaturan Toko</span>
+                        </a>
+                    </li>
+                @endif
 
                 @if (auth()->user()->can('roles.menu'))
                     <li>

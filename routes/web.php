@@ -28,6 +28,9 @@ use App\Http\Controllers\Dashboard\SalesReturnController;
 use App\Http\Controllers\Dashboard\CashShiftController;
 use App\Http\Controllers\Dashboard\CashClosingController;
 use App\Http\Controllers\Dashboard\VoucherController;
+use App\Http\Controllers\Dashboard\ReportController;
+use App\Http\Controllers\Dashboard\AuditLogController;
+use App\Http\Controllers\Dashboard\StoreSettingController;
 use App\Http\Controllers\BarcodeController;
 
 /*
@@ -243,11 +246,31 @@ Route::middleware(['permission:database.menu'])->group(function () {
     Route::get('/database/backup/now', [DatabaseBackupController::class, 'create'])->name('backup.create');
     Route::get('/database/backup/download/{getFileName}', [DatabaseBackupController::class, 'download'])->name('backup.download');
     Route::get('/database/backup/delete/{getFileName}', [DatabaseBackupController::class, 'delete'])->name('backup.delete');
+    Route::post('/database/backup/restore', [DatabaseBackupController::class, 'restore'])->middleware(['permission:restore-database'])->name('backup.restore');
 });
 
 // ====== HELP ======
 Route::middleware('auth')->group(function () {
     Route::get('/help', [HelpController::class, 'index'])->name('help.index');
+});
+
+// ====== REPORTS ======
+Route::middleware(['permission:report.menu'])->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
+    Route::get('/reports/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
+});
+
+// ====== AUDIT LOGS ======
+Route::middleware(['permission:audit.menu'])->group(function () {
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+});
+
+// ====== STORE SETTINGS ======
+Route::middleware(['permission:settings.menu'])->group(function () {
+    Route::get('/settings/store', [StoreSettingController::class, 'edit'])->name('settings.store.edit');
+    Route::put('/settings/store', [StoreSettingController::class, 'update'])->name('settings.store.update');
 });
 
 // ====== ROLE CONTROLLER ======

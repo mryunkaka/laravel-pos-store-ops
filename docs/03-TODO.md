@@ -223,20 +223,20 @@ Kriteria penerimaan Phase 7:
 - Ekspor Excel/PDF menghasilkan data yang sama dengan tampilan.
 - Penampil audit log tidak boleh mengizinkan edit log.
 
-- [ ] Laporan penjualan per tanggal.
-- [ ] Laporan penjualan per kasir.
-- [ ] Laporan penjualan per produk.
-- [ ] Laporan metode pembayaran.
-- [ ] Laporan piutang.
-- [ ] Laporan laba kotor berdasarkan harga beli vs harga jual.
-- [ ] Laporan stok minimum/pesan ulang.
-- [ ] Notifikasi produk kedaluwarsa/dekat kedaluwarsa.
-- [ ] Ekspor laporan ke Excel.
-- [ ] Ekspor laporan ke PDF.
-- [ ] Penampil audit log dengan filter pengguna, tanggal, modul, dan aksi.
-- [ ] Pulihkan database dari backup lewat UI dengan permission khusus.
-- [ ] Pengaturan toko: nama toko, alamat, logo, pajak default, mata uang.
-- [ ] Pengaturan role kasir lebih detail: diskon, void, edit harga, akses laporan.
+- [x] Laporan penjualan per tanggal.
+- [x] Laporan penjualan per kasir.
+- [x] Laporan penjualan per produk.
+- [x] Laporan metode pembayaran.
+- [x] Laporan piutang.
+- [x] Laporan laba kotor berdasarkan harga beli vs harga jual.
+- [x] Laporan stok minimum/pesan ulang.
+- [x] Notifikasi produk kedaluwarsa/dekat kedaluwarsa.
+- [x] Ekspor laporan ke Excel.
+- [x] Ekspor laporan ke PDF.
+- [x] Penampil audit log dengan filter pengguna, tanggal, modul, dan aksi.
+- [x] Pulihkan database dari backup lewat UI dengan permission khusus.
+- [x] Pengaturan toko: nama toko, alamat, logo, pajak default, mata uang.
+- [x] Pengaturan role kasir lebih detail: diskon, void, edit harga, akses laporan.
 
 ## Phase 8 - Migrasi Bahasa Tampilan ke Indonesia
 

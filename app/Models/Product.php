@@ -15,6 +15,7 @@ class Product extends Model
         'code',
         'category_id',
         'stock',
+        'minimum_stock',
         'buying_price',
         'selling_price',
         'discount',
@@ -31,6 +32,7 @@ class Product extends Model
 
     protected $casts = [
         'buying_price' => 'float',
+        'minimum_stock' => 'integer',
         'selling_price' => 'float',
         'discount' => 'float',
         'discount_type' => 'string',

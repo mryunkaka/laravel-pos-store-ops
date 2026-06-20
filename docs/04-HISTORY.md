@@ -2,6 +2,38 @@
 
 ## 2026-06-20
 
+### Phase 7 - Laporan, Audit, dan Administrasi Lanjutan (Clear)
+
+#### Migration yang Dibuat/Dijalankan
+- `2026_06_20_010000_add_phase7_reporting_fields` - Tambah `orders.user_id`, `order_details.buying_price`, dan `products.minimum_stock`
+- `2026_06_20_010001_create_store_settings_table` - Tabel pengaturan toko
+
+#### Seeder yang Dibuat/Dijalankan
+- `Phase7PermissionSeeder` - Permission `report.menu`, `settings.menu`, `restore-database`, `discount.order`, dan `edit-price.order`
+
+#### Fitur yang Diimplementasikan
+- Laporan penjualan per tanggal, kasir, produk, metode pembayaran, piutang, laba kotor, stok minimum, dan produk dekat kedaluwarsa
+- Export laporan ke Excel memakai PhpSpreadsheet
+- Export PDF memakai halaman print browser dengan dataset sama seperti tampilan
+- Audit log viewer read-only dengan filter pengguna, tanggal, modul, dan aksi
+- Restore database dari file `.sql` atau `.zip` lewat UI backup dengan permission `restore-database`
+- Pengaturan toko untuk nama, alamat, telepon, logo, pajak default, dan mata uang
+- Permission role kasir lebih detail untuk diskon invoice, edit harga, void, dan akses laporan
+
+#### Controller dan View yang Ditambahkan/Diupdate
+- `ReportController` dan view `reports/*`
+- `AuditLogController` dan view `audit-logs/*`
+- `StoreSettingController` dan view `settings/store`
+- `DatabaseBackupController` dan view `database/index`
+- Sidebar ditambah menu Laporan, Audit Log, dan Pengaturan Toko
+
+#### Catatan
+- Order baru menyimpan `user_id` sebagai kasir dan `buying_price` di detail order untuk laporan laba kotor.
+- Transaksi lama yang belum punya snapshot harga beli memakai fallback harga beli produk saat laporan dibuat.
+- Restore database adalah aksi destruktif dan dikunci permission khusus.
+- View Phase 7 divalidasi dengan `php artisan view:cache`.
+- Route Phase 7 divalidasi dengan `php artisan route:list`.
+
 ### Phase 6 - Harga, Promo, Pajak, dan Barcode (Clear)
 
 #### Migration yang Dibuat/Dijalankan

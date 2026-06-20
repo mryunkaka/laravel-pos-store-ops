@@ -11,6 +11,7 @@ class Order extends Model
 
     protected $fillable = [
         'customer_id',
+        'user_id',
         'order_date',
         'order_status',
         'cancel_reason',
@@ -85,6 +86,11 @@ class Order extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function cashier()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function details()

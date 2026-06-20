@@ -74,6 +74,7 @@ class ProductController extends Controller
         $validatedData['discount'] = $validatedData['discount'] ?? 0;
         $validatedData['discount_type'] = $validatedData['discount_type'] ?? 'fixed';
         $validatedData['tax_rate'] = $validatedData['tax_rate'] ?? 0;
+        $validatedData['minimum_stock'] = $validatedData['minimum_stock'] ?? 0;
         $validatedData['wholesale_price'] = $validatedData['wholesale_price'] ?? null;
         $validatedData['wholesale_qty'] = $validatedData['wholesale_qty'] ?? null;
 
@@ -149,6 +150,7 @@ class ProductController extends Controller
         $validatedData['discount'] = $validatedData['discount'] ?? 0;
         $validatedData['discount_type'] = $validatedData['discount_type'] ?? 'fixed';
         $validatedData['tax_rate'] = $validatedData['tax_rate'] ?? 0;
+        $validatedData['minimum_stock'] = $validatedData['minimum_stock'] ?? 0;
         $validatedData['wholesale_price'] = $validatedData['wholesale_price'] ?? null;
         $validatedData['wholesale_qty'] = $validatedData['wholesale_qty'] ?? null;
         $validatedData['slug'] = Str::slug($validatedData['name']);

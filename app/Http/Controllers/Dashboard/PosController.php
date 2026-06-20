@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\CashShift;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
@@ -120,7 +121,7 @@ class PosController extends Controller
                 'size' => 'large',
                 'discount' => $discount,
                 'discount_type' => $product->discount_type ?? 'fixed',
-                'tax_rate' => $product->tax_rate > 0 ? $product->tax_rate : ($product->category->tax_rate ?? 0),
+                'tax_rate' => $product->tax_rate > 0 ? $product->tax_rate : (($product->category->tax_rate ?? 0) ?: StoreSetting::current()->default_tax_rate),
             ],
         ];
 
@@ -190,7 +191,7 @@ class PosController extends Controller
                 'options' => [
                     'discount' => $discount,
                     'discount_type' => $product->discount_type ?? 'fixed',
-                    'tax_rate' => $product->tax_rate > 0 ? $product->tax_rate : ($product->category->tax_rate ?? 0),
+                    'tax_rate' => $product->tax_rate > 0 ? $product->tax_rate : (($product->category->tax_rate ?? 0) ?: StoreSetting::current()->default_tax_rate),
                 ]
             ]);
         } else {

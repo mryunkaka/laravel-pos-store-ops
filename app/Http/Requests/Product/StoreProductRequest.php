@@ -27,6 +27,7 @@ class StoreProductRequest extends FormRequest
             'code' => 'nullable|string|unique:products,code|max:50',
             'category_id' => 'required|integer|exists:categories,id',
             'stock' => 'required|integer',
+            'minimum_stock' => 'nullable|integer|min:0',
             'buying_price' => 'required|integer',
             'selling_price' => 'required|integer',
             'discount' => 'nullable|numeric|min:0',

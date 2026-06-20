@@ -108,6 +108,17 @@
                                     </div>
 
                                 <div class="form-group col-md-6">
+                                    <label for="minimum_stock">Stok Minimum</label>
+                                    <input type="number" class="form-control @error('minimum_stock') is-invalid @enderror" id="minimum_stock" name="minimum_stock"
+                                        value="{{ old('minimum_stock', 0) }}" min="0">
+                                    @error('minimum_stock')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                    </div>
+
+                                <div class="form-group col-md-6">
                                     <label for="buying_price">Harga Beli <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control @error('buying_price') is-invalid @enderror" id="buying_price"
                                         name="buying_price" value="{{ old('buying_price') }}" required>

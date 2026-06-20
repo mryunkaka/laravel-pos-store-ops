@@ -313,7 +313,7 @@
 - Modul stock opname batch sudah tersedia sampai import Excel dan approval.
 - Modul retur penjualan sudah tersedia.
 - Modul harga, promo, pajak, biaya layanan, barcode scanner, label barcode, dan struk thermal sudah tersedia.
-- Belum ada laporan lanjutan.
+- Modul laporan lanjutan, audit viewer, restore database, dan pengaturan toko sudah tersedia.
 
 ## Phase 6 - Progress (2026-06-20)
 
@@ -327,15 +327,29 @@
 - Struk thermal sudah memakai layout khusus 80mm dan auto-print setelah order selesai.
 - Validasi: `php -l` file Phase 6, `php artisan migrate`, `php artisan route:list`, dan `php artisan view:cache`.
 
+## Phase 7 - Progress (2026-06-20)
+
+### Status Phase 7
+- Phase 7 sudah clear berdasarkan checklist `03-TODO.md`.
+- Modul laporan terpadu tersedia untuk penjualan per tanggal, kasir, produk, metode pembayaran, piutang, laba kotor, stok minimum, dan produk dekat kedaluwarsa.
+- Laporan memakai order `complete`; laporan penjualan tanggal memperhitungkan retur selesai sebagai pengurang netto.
+- Laba kotor memakai snapshot `order_details.buying_price`; transaksi lama yang belum punya snapshot memakai fallback `products.buying_price`.
+- Export Excel memakai PhpSpreadsheet; export PDF memakai halaman print browser dengan dataset yang sama.
+- Audit log viewer tersedia read-only dengan filter pengguna, tanggal, modul, dan aksi.
+- Restore database tersedia dari UI backup dengan permission khusus `restore-database`.
+- Pengaturan toko tersedia: nama, alamat, telepon, logo, pajak default, dan mata uang.
+- Permission kasir lebih detail tersedia: `discount.order`, `edit-price.order`, `void.order`, dan `report.menu`.
+- Validasi: `php -l` file Phase 7, `php artisan migrate`, `php artisan db:seed --class=Phase7PermissionSeeder`, `php artisan route:list`, dan `php artisan view:cache`.
+
 ## Risiko Saat Ini
 
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
-- Penampil audit log belum tersedia (direncanakan di Phase 7).
 - Stok yang sudah pernah di-void dan diselesaikan ulang belum diuji skenario kompleks.
+- Export PDF memakai print browser, bukan generator PDF server-side.
 
 ### Langkah Selanjutnya
 
-Lanjut ke Phase 7 di `03-TODO.md`: laporan, audit, dan administrasi lanjutan.
+Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari pekerjaan sebelumnya.
 
 ## Instruksi Untuk Sesi Lanjutan
 
