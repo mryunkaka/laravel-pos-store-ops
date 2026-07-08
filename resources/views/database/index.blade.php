@@ -20,17 +20,21 @@
                     @endif
 
                     @can('restore-database')
-                        <form method="POST" action="{{ route('backup.restore') }}" enctype="multipart/form-data" class="inventory-filter mb-4">
-                            @csrf
-                            <div class="form-group">
-                                <label>File Restore (.sql/.zip)</label>
-                                <input type="file" name="backup_file" class="form-control @error('backup_file') is-invalid @enderror" accept=".sql,.txt,.zip" required>
-                                @error('backup_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="inventory-actions">
-                                <button type="submit" class="btn btn-warning" onclick="return confirm('Restore akan menimpa data database saat ini. Lanjutkan?')">Restore Database</button>
-                            </div>
-                        </form>
+                        <div class="border rounded p-3 mb-4 bg-light">
+                            <form method="POST" action="{{ route('backup.restore') }}" enctype="multipart/form-data">
+                                @csrf
+                                <div class="row align-items-end">
+                                    <div class="form-group col-lg-8 mb-lg-0">
+                                        <label>File Restore (.sql/.zip)</label>
+                                        <input type="file" name="backup_file" class="form-control @error('backup_file') is-invalid @enderror" accept=".sql,.txt,.zip" required>
+                                        @error('backup_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="form-group col-lg-4 mb-0 d-flex justify-content-lg-end">
+                                        <button type="submit" class="btn btn-warning" onclick="return confirm('Restore akan menimpa data database saat ini. Lanjutkan?')">Restore Database</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     @endcan
 
                     <div class="table-responsive">

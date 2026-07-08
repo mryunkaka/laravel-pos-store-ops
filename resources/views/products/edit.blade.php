@@ -63,6 +63,30 @@
                                     @enderror
                                     </div>
 
+                                <div class="form-group col-md-4">
+                                    <label for="material">Bahan</label>
+                                    <input type="text" class="form-control @error('material') is-invalid @enderror" id="material" name="material" value="{{ old('material', $product->material) }}">
+                                    @error('material')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label for="print_size">Ukuran</label>
+                                    <input type="text" class="form-control @error('print_size') is-invalid @enderror" id="print_size" name="print_size" value="{{ old('print_size', $product->print_size) }}" placeholder="Contoh: 3 X 1 M">
+                                    @error('print_size')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label for="print_notes">Keterangan Cetak</label>
+                                    <input type="text" class="form-control @error('print_notes') is-invalid @enderror" id="print_notes" name="print_notes" value="{{ old('print_notes', $product->print_notes) }}">
+                                    @error('print_notes')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <div class="form-group col-md-6">
                                     <label for="code">Kode Produk</label>
                                     <input type="text" class="form-control @error('code') is-invalid @enderror" id="code" name="code"

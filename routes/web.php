@@ -32,6 +32,7 @@ use App\Http\Controllers\Dashboard\ReportController;
 use App\Http\Controllers\Dashboard\AuditLogController;
 use App\Http\Controllers\Dashboard\StoreSettingController;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\InvoiceMobileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/e-invoice-mobile/{token}', [InvoiceMobileController::class, 'show'])->name('invoice.mobile');
 
 // DEFAULT DASHBOARD & PROFILE
 Route::middleware('auth')->group(function () {
@@ -271,6 +273,7 @@ Route::middleware(['permission:audit.menu'])->group(function () {
 Route::middleware(['permission:settings.menu'])->group(function () {
     Route::get('/settings/store', [StoreSettingController::class, 'edit'])->name('settings.store.edit');
     Route::put('/settings/store', [StoreSettingController::class, 'update'])->name('settings.store.update');
+    Route::post('/settings/store/whatsapp-test', [StoreSettingController::class, 'testWhatsapp'])->name('settings.store.whatsappTest');
 });
 
 // ====== ROLE CONTROLLER ======

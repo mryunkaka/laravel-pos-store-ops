@@ -2,6 +2,26 @@
 
 ## 2026-06-20
 
+### Tambahan - WhatsApp Invoice Otomatis
+
+#### Migration yang Dibuat/Dijalankan
+- `2026_06_20_020000_add_whatsapp_settings_and_product_print_fields` - Tambah konfigurasi WhatsApp di store_settings dan field bahan/ukuran/keterangan cetak di products
+- `2026_06_20_020001_create_whatsapp_message_logs_table` - Log pengiriman WhatsApp
+
+#### Fitur yang Diimplementasikan
+- WhatsApp bot bisa diaktifkan dari Pengaturan Toko.
+- Konfigurasi WhatsApp Cloud API tersedia: API version, Phone Number ID, access token, base URL invoice, dan instruksi transfer.
+- Order yang berhasil tersimpan mengirim ringkasan invoice otomatis ke nomor customer setelah commit database.
+- Link invoice mobile publik memakai token terenkripsi: `/e-invoice-mobile/{token}`.
+- Produk punya data pendukung untuk pesan: bahan, ukuran, dan keterangan cetak.
+- Pengiriman WhatsApp non-blocking terhadap checkout; gagal kirim dicatat di log.
+
+#### File Utama
+- `WhatsappNotificationService`
+- `InvoiceMobileController`
+- `resources/views/invoices/mobile.blade.php`
+- `whatsapp_message_logs`
+
 ### Phase 7 - Laporan, Audit, dan Administrasi Lanjutan (Clear)
 
 #### Migration yang Dibuat/Dijalankan

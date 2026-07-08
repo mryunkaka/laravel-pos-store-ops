@@ -346,10 +346,21 @@
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
 - Stok yang sudah pernah di-void dan diselesaikan ulang belum diuji skenario kompleks.
 - Export PDF memakai print browser, bukan generator PDF server-side.
+- WhatsApp otomatis membutuhkan WhatsApp Business Cloud API aktif dari Meta: `Phone Number ID`, permanent access token, nomor customer valid, dan domain publik untuk link invoice mobile.
 
 ### Langkah Selanjutnya
 
-Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari pekerjaan sebelumnya.
+Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari pekerjaan sebelumnya. Tambahan WhatsApp invoice otomatis juga sudah tersedia dan bisa diaktifkan dari Pengaturan Toko.
+
+## Tambahan WhatsApp Invoice Otomatis (2026-06-20)
+
+- Pengaturan Toko sekarang punya konfigurasi WhatsApp bot: aktif/nonaktif, API version, Phone Number ID, access token, base URL invoice, dan instruksi transfer.
+- Order sukses akan menjadwalkan pengiriman WhatsApp setelah transaksi database commit.
+- Pesan WhatsApp berisi salam, nomor pesanan, tanggal, daftar produk, bahan, qty, harga, ukuran, keterangan, total order, total bayar, sisa pembayaran, status pembayaran, link invoice mobile, dan instruksi transfer.
+- Link invoice mobile tersedia di `/e-invoice-mobile/{token}` dengan token terenkripsi.
+- Produk punya field pendukung `material`, `print_size`, dan `print_notes`.
+- Pengiriman dicatat di tabel `whatsapp_message_logs`.
+- Jika WhatsApp belum aktif atau nomor customer kosong, checkout tetap berhasil; pengiriman akan dilewati/dicatat.
 
 ## Instruksi Untuk Sesi Lanjutan
 

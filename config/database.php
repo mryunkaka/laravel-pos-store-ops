@@ -59,7 +59,7 @@ return [
             'strict' => true,
             'engine' => null,
             'dump' => [
-                'dump_binary_path' => 'C:/xampp/mysql/bin', // only the path, so without `mysqldump` or `pg_dump`
+                'dump_binary_path' => env('DB_DUMP_BINARY_PATH', 'C:/Program Files/MySQL/MySQL Server 8.0/bin'), // path only, without `mysqldump`
                 'use_single_transaction',
                 'timeout' => 60 * 5, // 5 minute timeout
             ],

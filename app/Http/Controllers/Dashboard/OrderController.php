@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\AuditService;
+use App\Services\WhatsappNotificationService;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Redirect;
@@ -247,6 +248,10 @@ class OrderController extends Controller
 
             // Audit log
             AuditService::log('order', 'create', $order, null, $order->toArray(), "Order {$invoice_no} created");
+
+            DB::afterCommit(function () use ($order) {
+                app(WhatsappNotificationService::class)->sendOrderPaid($order);
+            });
 
             // Clear Cart
             Cart::destroy();

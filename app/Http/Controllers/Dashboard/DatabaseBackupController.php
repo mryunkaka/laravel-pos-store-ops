@@ -6,39 +6,45 @@ use File;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use ZipArchive;
 
 class DatabaseBackupController extends Controller
-{    public function index()
+{
+    public function index()
     {
-        File::ensureDirectoryExists(storage_path('/app/POS'));
+        File::ensureDirectoryExists($this->backupDirectory());
 
         return view('database.index', [
-            'files' => File::allFiles(storage_path('/app/POS'))
+            'files' => File::allFiles($this->backupDirectory())
         ]);
     }
 
-    // Backup database is not working, and you need to enter manually in terminal with command php artisan backup:run.
-    public function create(){
-        \Artisan::call('backup:run');
+    public function create()
+    {
+        try {
+            Artisan::call('backup:run', ['--disable-notifications' => true]);
+        } catch (\Throwable $exception) {
+            return Redirect::route('backup.index')->with('error', 'Backup gagal: ' . $exception->getMessage());
+        }
 
-        return Redirect::route('backup.index')->with('success', 'Database Backup Successfully!');
+        return Redirect::route('backup.index')->with('success', 'Backup database berhasil dibuat.');
     }
 
     public function download(String $getFileName)
     {
-        $path = storage_path('app\POS/' . $getFileName);
+        $path = $this->backupDirectory() . DIRECTORY_SEPARATOR . $getFileName;
 
         return response()->download($path);
     }
 
     public function delete(String $getFileName)
     {
-        Storage::delete('POS/' . $getFileName);
+        Storage::delete($this->backupFolderName() . '/' . $getFileName);
 
-        return Redirect::route('backup.index')->with('success', 'Database Deleted Successfully!');
+        return Redirect::route('backup.index')->with('success', 'Backup database berhasil dihapus.');
     }
 
     public function restore(Request $request)
@@ -82,5 +88,15 @@ class DatabaseBackupController extends Controller
         File::deleteDirectory($tempDirectory);
 
         return Redirect::route('backup.index')->with('success', 'Database berhasil dipulihkan dari backup.');
+    }
+
+    private function backupFolderName(): string
+    {
+        return config('backup.backup.name', config('app.name', 'Laravel'));
+    }
+
+    private function backupDirectory(): string
+    {
+        return storage_path('app/' . $this->backupFolderName());
     }
 }

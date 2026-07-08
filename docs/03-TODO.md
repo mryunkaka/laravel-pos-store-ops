@@ -270,6 +270,18 @@ Kriteria penerimaan Phase 8:
 - [x] Profil: semua halaman profil diterjemahkan.
 - [x] Footer dan layout utama diterjemahkan.
 
+## Tambahan Setelah Phase 7 - WhatsApp Invoice Otomatis
+
+Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otomatis berisi ringkasan order, status pembayaran, link invoice mobile, dan instruksi transfer.
+
+- [x] Setting WhatsApp bot di Pengaturan Toko.
+- [x] Konfigurasi WhatsApp Cloud API: status aktif, API version, phone number id, access token.
+- [x] Link invoice mobile publik dengan token terenkripsi.
+- [x] Template pesan WhatsApp mengikuti format ringkasan order.
+- [x] Data pendukung produk untuk pesan: bahan, ukuran, dan keterangan cetak.
+- [x] Log pengiriman WhatsApp.
+- [x] Pengiriman otomatis setelah order berhasil tersimpan.
+
 ## Daftar 20 Fitur Tambahan Utama
 
 Daftar ini adalah ringkasan fitur peningkatan utama yang tersebar dari phase 2 sampai phase 7:
