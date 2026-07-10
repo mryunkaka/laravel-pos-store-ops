@@ -1,5 +1,15 @@
 ﻿# 04 - Riwayat
 
+## 2026-07-10
+
+### Deployment Hosting Rumahweb - POS3
+
+- Investigasi hosting `pos.fourhz.com` via FTP/HTTP menemukan project Laravel berada langsung di `public_html/pos3`, sementara web root domain membuka folder tersebut sehingga sebelumnya menampilkan directory listing dan bukan `public/index.php`.
+- Composer di hosting berhasil dipakai dengan PHP 8.4 karena dependency `phpoffice/phpspreadsheet 1.30.1` membatasi PHP `<8.5`; default PHP 8.5 tidak cocok untuk dependency tersebut.
+- Root cause HTTP 500 setelah rewrite adalah `.env` production tidak valid: `APP_NAME=Laravel POS Store Ops` harus diberi kutip karena mengandung spasi.
+- Dibuat template `public_html_pos3_root.htaccess` untuk rewrite request root ke folder `public/`, memblokir akses langsung ke folder/file Laravel sensitif, dan memaksa handler PHP 8.4 khusus POS3.
+- Catatan: file `.env` tetap tidak dilacak Git dan harus diperbaiki langsung di hosting/cPanel.
+
 ## 2026-06-20
 
 ### Tambahan - WhatsApp Invoice Otomatis

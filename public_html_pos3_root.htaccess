@@ -1,0 +1,30 @@
+<IfModule mime_module>
+    AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_URI} !^/(app|bootstrap|config|database|docs|lang|resources|routes|storage|tests|vendor)(/|$) [NC]
+    RewriteCond %{REQUEST_URI} !^/(artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|vite\.config\.js|tailwind\.config\.js|postcss\.config\.js|README\.md|LICENSE|\.env) [NC]
+    RewriteRule ^$ public/ [L]
+    RewriteCond %{REQUEST_URI} !^/public/ [NC]
+    RewriteRule (.*) public/$1 [L]
+
+    RewriteRule ^ - [F]
+</IfModule>
+
+# BEGIN cPanel-generated php ini directives, do not edit
+<IfModule php7_module>
+   php_value error_log "/home/fouf9972/logs/php.error.log"
+   php_flag log_errors On
+</IfModule>
+<IfModule lsapi_module>
+   php_value error_log "/home/fouf9972/logs/php.error.log"
+   php_flag log_errors On
+</IfModule>
+# END cPanel-generated php ini directives, do not edit
