@@ -9,6 +9,7 @@
 - Root cause HTTP 500 setelah rewrite adalah `.env` production tidak valid: `APP_NAME=Laravel POS Store Ops` harus diberi kutip karena mengandung spasi.
 - Dibuat template `public_html_pos3_root.htaccess` untuk rewrite request root ke folder `public/`, memblokir akses langsung ke folder/file Laravel sensitif, dan memaksa handler PHP 8.4 khusus POS3.
 - Catatan: file `.env` tetap tidak dilacak Git dan harus diperbaiki langsung di hosting/cPanel.
+- `UserSeeder` diubah agar tidak memakai factory/Faker, sehingga `db:seed --class=UserSeeder --force` bisa berjalan di hosting production dengan Composer `--no-dev`.
 
 ## 2026-06-20
 

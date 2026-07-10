@@ -346,6 +346,7 @@
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
 - Hosting `pos.fourhz.com` menjalankan project di `public_html/pos3`; document root belum diarahkan ke folder Laravel `public`, sehingga perlu `.htaccess` root untuk rewrite ke `public/` dan handler PHP 8.4 khusus POS3.
 - File `.env` production harus memakai nilai ber-spasi dalam tanda kutip, misalnya `APP_NAME="Laravel POS Store Ops"`; tanpa kutip Laravel gagal bootstrap dengan `Dotenv\\Exception\\InvalidFileException`.
+- Seeder production tidak boleh bergantung pada `fakerphp/faker` karena hosting memakai Composer `--no-dev`; `UserSeeder` sudah disesuaikan agar membuat admin/user eksplisit tanpa factory.
 - Stok yang sudah pernah di-void dan diselesaikan ulang belum diuji skenario kompleks.
 - Export PDF memakai print browser, bukan generator PDF server-side.
 - WhatsApp otomatis membutuhkan WhatsApp Business Cloud API aktif dari Meta: `Phone Number ID`, permanent access token, nomor customer valid, dan domain publik untuk link invoice mobile.
