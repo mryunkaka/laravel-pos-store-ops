@@ -293,6 +293,7 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Kurang bayar POS masuk ke piutang dan pembayaran piutang `/update/due` tidak error method.
 - [x] Riwayat pembayaran piutang tampil di daftar order, detail order, faktur, dan struk.
 - [x] Halaman Update Web lokal 1 klik dengan log proses update.
+- [x] README instalasi lokal Windows lengkap untuk PC konsumen.
 - [x] Halaman hapus akun profil bisa dibuka tanpa error missing partial.
 
 ## Daftar 20 Fitur Tambahan Utama

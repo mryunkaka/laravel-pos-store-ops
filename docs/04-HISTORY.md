@@ -48,6 +48,11 @@
 - Tombol update menjalankan PowerShell background yang memanggil `git pull --ff-only`, Composer install, NPM install/build, Laravel optimize clear, migrate force, dan view cache.
 - Halaman menampilkan status berjalan/siap dan log file dari `storage/app/system-update/update.log`.
 
+### Dokumentasi - Instalasi PC Konsumen
+
+- `README.md` ditulis ulang sebagai panduan singkat-lengkap instalasi lokal Windows untuk PC konsumen.
+- Panduan mencakup download NSSM, Nginx, PHP 8.4.22, MySQL, HeidiSQL, Git, Composer, Node.js, konfigurasi PHP/Nginx, runner PowerShell, service NSSM, Git pull, update web, dan troubleshooting.
+
 ## 2026-07-10
 
 ### Deployment Hosting Rumahweb - POS3
