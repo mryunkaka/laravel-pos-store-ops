@@ -60,7 +60,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $adjustment->adjustment_date }}</td>
-                                        <td>{{ $adjustment->product->name }}</td>
+                                        <td>{{ $adjustment->product->name ?? '-' }}</td>
                                         <td>
                                             <span class="badge bg-{{ 
                                                 $adjustment->adjustment_type == 'increase' ? 'success' : 'danger'

@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Customer;
 use App\Models\CashShift;
 use App\Models\StoreSetting;
+use App\Models\Voucher;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
@@ -38,8 +39,18 @@ class PosController extends Controller
             abort(400, 'The per-page parameter must be an integer between 1 and 100.');
         }
 
+        $defaultCustomer = Customer::firstOrCreate(
+            ['name' => 'Walk-in Customer'],
+            [
+                'email' => 'walkin@store.com',
+                'phone' => '0000000000',
+                'address' => 'Store Location',
+            ]
+        );
+
         return view('pos.index', [
             'categories' => Category::orderBy('name')->get(),
+            'defaultCustomer' => $defaultCustomer,
             'productItem' => Cart::content(),
             'products' => QueryBuilder::for(Product::class)
                 ->where('expire_date', '>', $todayDate)
@@ -231,6 +242,58 @@ class PosController extends Controller
         }
 
         return Redirect::back()->with('success', 'Cart has been deleted!');
+    }
+
+    /**
+     * Preview voucher discount for current cart (AJAX).
+     */
+    public function voucherPreview(Request $request)
+    {
+        $voucherCode = strtoupper(trim((string) $request->input('voucher_code', '')));
+        $baseTotal = max((float) $request->input('base_total', 0), 0);
+
+        if ($voucherCode === '') {
+            return response()->json([
+                'success' => true,
+                'discount' => 0,
+                'message' => '',
+            ]);
+        }
+
+        $voucher = Voucher::where('code', $voucherCode)->first();
+
+        if (!$voucher || !$voucher->canUse()) {
+            return response()->json([
+                'success' => false,
+                'discount' => 0,
+                'message' => 'Voucher tidak valid atau sudah tidak aktif.',
+            ], 422);
+        }
+
+        if ($baseTotal < $voucher->min_purchase) {
+            return response()->json([
+                'success' => false,
+                'discount' => 0,
+                'message' => 'Minimal belanja untuk voucher belum terpenuhi.',
+            ], 422);
+        }
+
+        if ($voucher->type === 'percentage') {
+            $discount = $baseTotal * ($voucher->discount / 100);
+            if ($voucher->max_discount) {
+                $discount = min($discount, $voucher->max_discount);
+            }
+        } else {
+            $discount = $voucher->discount;
+        }
+
+        $discount = min($discount, $baseTotal);
+
+        return response()->json([
+            'success' => true,
+            'discount' => $discount,
+            'message' => 'Voucher diterapkan: -Rp ' . number_format($discount, 0, ',', '.'),
+        ]);
     }
 
     /**

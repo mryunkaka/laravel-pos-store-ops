@@ -282,6 +282,19 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Log pengiriman WhatsApp.
 - [x] Pengiriman otomatis setelah order berhasil tersimpan.
 
+## Bugfix Tambahan - Produk
+
+- [x] Hapus produk memakai soft delete agar produk yang sudah punya riwayat transaksi tidak gagal karena foreign key.
+- [x] Bulk pilih produk di halaman index: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, dan tampilkan jumlah terpilih.
+- [x] POS memakai pelanggan default `Walk-in Customer` untuk checkout cepat.
+- [x] Audit 61 halaman menu utama dan perbaiki error histori inventaris setelah produk soft delete.
+- [x] Sidebar auto fokus ke menu aktif setelah refresh dan pencarian menu sticky.
+- [x] Voucher POS dihitung realtime sebelum checkout dan total pembayaran langsung berubah.
+- [x] Kurang bayar POS masuk ke piutang dan pembayaran piutang `/update/due` tidak error method.
+- [x] Riwayat pembayaran piutang tampil di daftar order, detail order, faktur, dan struk.
+- [x] Halaman Update Web lokal 1 klik dengan log proses update.
+- [x] Halaman hapus akun profil bisa dibuka tanpa error missing partial.
+
 ## Daftar 20 Fitur Tambahan Utama
 
 Daftar ini adalah ringkasan fitur peningkatan utama yang tersebar dari phase 2 sampai phase 7:

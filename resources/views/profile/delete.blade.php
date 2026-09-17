@@ -2,8 +2,6 @@
 
 @section('container')
 <div class="container-fluid">
-    @include('profile.partials.background-profile')
-
     <div class="row px-3">
         @include('profile.partials.left-profile')
 

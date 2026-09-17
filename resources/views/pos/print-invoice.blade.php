@@ -38,7 +38,7 @@
                                 <h6 class="text-uppercase text-muted font-weight-bold letter-spacing-2 mb-2">Faktur</h6>
                                 <h4 class="font-weight-bold text-dark mb-0">{{ $order->invoice_no }}</h4>
                                 <p class="text-muted small mb-0">{{ $order->created_at->format('d M Y, H:i') }}</p>
-                                <span class="badge badge-success mt-1 px-3 py-1">LUNAS</span>
+                                <span class="badge {{ $order->due_amount > 0 ? 'badge-warning' : 'badge-success' }} mt-1 px-3 py-1">{{ $order->due_amount > 0 ? 'BELUM LUNAS' : 'LUNAS' }}</span>
                             </div>
                         </div>
 
@@ -100,12 +100,16 @@
                                         <td class="text-primary font-weight-bold text-right pt-3 h5">{{ number_format($order->total, 2) }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Dibayar</td>
+                                        <td class="text-muted">Pembayaran</td>
+                                        <td class="text-success text-right font-weight-bold">{{ $order->paymentHistoryText() }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Total Dibayar</td>
                                         <td class="text-success text-right font-weight-bold">{{ number_format($order->pay_amount, 2) }}</td>
                                     </tr>
                                      <tr>
-                                        <td class="text-muted">Kembalian</td>
-                                        <td class="text-dark text-right font-weight-bold">{{ number_format($order->due_amount < 0 ? abs($order->due_amount) : 0, 2) }}</td>
+                                        <td class="text-muted">{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}</td>
+                                        <td class="text-dark text-right font-weight-bold">{{ number_format($order->due_amount > 0 ? $order->due_amount : abs(min($order->due_amount, 0)), 2) }}</td>
                                     </tr>
                                 </table>
                             </div>

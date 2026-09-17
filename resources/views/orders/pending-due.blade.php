@@ -30,6 +30,15 @@
                     </div>
                 @endif
 
+                @if (session()->has('error'))
+                    <div class="alert text-white bg-danger" role="alert">
+                        <div class="iq-alert-text">{{ session('error') }}</div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <x-heroicon-o-x-mark class="w-6 h-6" />
+                        </button>
+                    </div>
+                @endif
+
                 <!-- Header: Page Title and Clear Search -->
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                     <div>
@@ -107,7 +116,7 @@
                                             <td>{{ $order->invoice_no }}</td>
                                             <td>{{ $order->customer->name }}</td>
                                             <td>{{ $order->order_date->format('Y-m-d') }}</td>
-                                            <td>{{ $order->payment_type }}</td>
+                                            <td>{{ $order->paymentHistoryText() }}</td>
                                             <td>{{ number_format($order->pay_amount, 2) }}</td>
                                             <td>
                                                 <span class="badge badge-warning">{{ number_format($order->due_amount, 2) }}</span>

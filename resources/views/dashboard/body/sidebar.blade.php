@@ -1,3 +1,9 @@
+@php
+    $ordersActive = Request::is('orders/pending*') || Request::is('orders/complete*') || Request::is('pending/due*');
+    $salaryActive = Request::is('advance-salary*') || Request::is('pay-salary*');
+    $attendanceActive = Request::is('attendance*');
+    $roleActive = Request::is('permission*') || Request::is('role*');
+@endphp
 
 <div class="iq-sidebar sidebar-default ">
     <div class="iq-sidebar-logo d-flex align-items-center justify-content-between">
@@ -8,7 +14,33 @@
             <x-heroicon-o-bars-3 class="wrapper-menu w-8 h-8" />
         </div>
     </div>
-    <div class="data-scrollbar" data-scroll="1">
+    <style>
+        .sidebar-search-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: 12px 16px 8px;
+            background: #ffffff;
+        }
+
+        .sidebar-search-input {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .sidebar-search-input:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.12);
+        }
+    </style>
+    <div class="data-scrollbar" data-scroll="1" id="sidebar-scroll-area">
+        <div class="sidebar-search-wrap">
+            <input type="search" id="sidebar-menu-search" class="sidebar-search-input" placeholder="Cari menu..." autocomplete="off">
+        </div>
         <nav class="iq-sidebar-menu">
             <ul id="iq-sidebar-toggle" class="iq-menu">
                 <li class="{{ Request::is('dashboard') ? 'active' : '' }}">
@@ -31,12 +63,12 @@
 
                 @if (auth()->user()->can('orders.menu'))
                     <li>
-                        <a href="#orders" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <a href="#orders" class="{{ $ordersActive ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ $ordersActive ? 'true' : 'false' }}">
                             <x-heroicon-o-shopping-bag class="w-6 h-6" />
                             <span class="ml-3">Order</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
-                            <ul id="orders" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                            <ul id="orders" class="iq-submenu collapse {{ $ordersActive ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
 
                             <li class="{{ Request::is('orders/pending*') ? 'active' : '' }}">
                                 <a href="{{ route('order.pendingOrders') }}">
@@ -221,12 +253,12 @@
 
                 @if (auth()->user()->can('salary.menu'))
                     <li>
-                        <a href="#advance-salary" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <a href="#advance-salary" class="{{ $salaryActive ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ $salaryActive ? 'true' : 'false' }}">
                         <x-heroicon-o-banknotes class="w-6 h-6" />
                         <span class="ml-3">Gaji</span>
                         <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                         </a>
-                        <ul id="advance-salary" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                        <ul id="advance-salary" class="iq-submenu collapse {{ $salaryActive ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
 
                             <li class="{{ Request::is(['advance-salary', 'advance-salary/*/edit']) ? 'active' : '' }}">
                                 <a href="{{ route('advance-salary.index') }}">
@@ -254,12 +286,12 @@
 
                 @if (auth()->user()->can('attendance.menu'))
                     <li>
-                        <a href="#attendance" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <a href="#attendance" class="{{ $attendanceActive ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ $attendanceActive ? 'true' : 'false' }}">
                             <x-heroicon-o-calendar-days class="w-6 h-6" />
                             <span class="ml-3">Absensi</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
-                            <ul id="attendance" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                            <ul id="attendance" class="iq-submenu collapse {{ $attendanceActive ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
 
                                 <li class="{{ Request::is(['attendance']) ? 'active' : '' }}">
                                     <a href="{{ route('attendance.index') }}">
@@ -302,16 +334,22 @@
                             <span class="ml-3">Pengaturan Toko</span>
                         </a>
                     </li>
+                    <li class="{{ Request::is('settings/update-web*') ? 'active' : '' }}">
+                        <a href="{{ route('system-update.index') }}" class="svg-icon">
+                            <x-heroicon-o-arrow-path class="w-6 h-6" />
+                            <span class="ml-3">Update Web</span>
+                        </a>
+                    </li>
                 @endif
 
                 @if (auth()->user()->can('roles.menu'))
                     <li>
-                        <a href="#permission" class="collapsed" data-toggle="collapse" aria-expanded="false">
+                        <a href="#permission" class="{{ $roleActive ? '' : 'collapsed' }}" data-toggle="collapse" aria-expanded="{{ $roleActive ? 'true' : 'false' }}">
                             <x-heroicon-o-key class="w-6 h-6" />
                             <span class="ml-3">Role & Permission</span>
                             <x-heroicon-o-chevron-right class="w-4 h-4 iq-arrow-right arrow-active" />
                             </a>
-                            <ul id="permission" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+                            <ul id="permission" class="iq-submenu collapse {{ $roleActive ? 'show' : '' }}" data-parent="#iq-sidebar-toggle">
                                 <li class="{{ Request::is(['permission', 'permission/create', 'permission/edit/*']) ? 'active' : '' }}">
                                     <a href="{{ route('permission.index') }}">
                                         <x-heroicon-o-arrow-right class="w-4 h-4" /><span>Permission</span>
@@ -360,3 +398,93 @@
         <div class="p-3"></div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var sidebar = document.getElementById('sidebar-scroll-area');
+    var menu = document.getElementById('iq-sidebar-toggle');
+    var search = document.getElementById('sidebar-menu-search');
+
+    if (!sidebar || !menu || !search) {
+        return;
+    }
+
+    var activeItem = menu.querySelector('li.active');
+
+    function scrollToActiveItem() {
+        if (!activeItem) {
+            return;
+        }
+
+        var openMenu = activeItem.closest('.iq-submenu');
+        if (openMenu) {
+            openMenu.classList.add('show');
+            var toggle = menu.querySelector('a[href="#' + openMenu.id + '"]');
+            if (toggle) {
+                toggle.classList.remove('collapsed');
+                toggle.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        var targetTop = Math.max(activeItem.offsetTop - search.offsetHeight - 100, 0);
+        var scrollbar = window.Scrollbar && window.Scrollbar.get ? window.Scrollbar.get(sidebar) : null;
+
+        if (scrollbar) {
+            scrollbar.scrollTo(0, targetTop, 250);
+            return;
+        }
+
+        sidebar.scrollTop = targetTop;
+        var scrollContent = sidebar.querySelector('.scroll-content, .simplebar-content-wrapper');
+        if (scrollContent) {
+            scrollContent.scrollTop = targetTop;
+        }
+    }
+
+    scrollToActiveItem();
+    window.addEventListener('load', function () {
+        scrollToActiveItem();
+        window.setTimeout(scrollToActiveItem, 150);
+        window.setTimeout(scrollToActiveItem, 500);
+    });
+
+    search.addEventListener('input', function () {
+        var keyword = search.value.trim().toLowerCase();
+        var topItems = Array.prototype.slice.call(menu.children).filter(function (item) {
+            return item.tagName && item.tagName.toLowerCase() === 'li';
+        });
+
+        topItems.forEach(function (item) {
+            var submenu = item.querySelector('.iq-submenu');
+            var toggle = submenu ? item.querySelector('a[data-toggle="collapse"]') : null;
+            var childItems = submenu ? Array.prototype.slice.call(submenu.querySelectorAll('li')) : [];
+            var childMatch = false;
+
+            childItems.forEach(function (child) {
+                var match = !keyword || child.textContent.toLowerCase().indexOf(keyword) !== -1;
+                child.style.display = match ? '' : 'none';
+                childMatch = childMatch || match;
+            });
+
+            var ownText = item.firstElementChild ? item.firstElementChild.textContent.toLowerCase() : item.textContent.toLowerCase();
+            var match = !keyword || ownText.indexOf(keyword) !== -1 || childMatch;
+            item.style.display = match ? '' : 'none';
+
+            if (submenu && keyword) {
+                submenu.classList.toggle('show', match);
+                if (toggle) {
+                    toggle.classList.toggle('collapsed', !match);
+                    toggle.setAttribute('aria-expanded', match ? 'true' : 'false');
+                }
+            } else if (submenu && !keyword) {
+                var hasActive = submenu.querySelector('li.active');
+                submenu.classList.toggle('show', !!hasActive);
+                if (toggle) {
+                    toggle.classList.toggle('collapsed', !hasActive);
+                    toggle.setAttribute('aria-expanded', hasActive ? 'true' : 'false');
+                }
+            }
+        });
+    });
+});
+</script>

@@ -72,7 +72,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Tipe Pembayaran</label>
-                                            <input class="form-control bg-white" value="{{ $order->payment_type }}" readonly />
+                                            <input class="form-control bg-white" value="{{ $order->paymentHistoryText() }}" readonly />
                                         </div>
                                     </div>
                                     <div class="col-md-6">

@@ -48,7 +48,7 @@ class OrderController extends Controller
                         ->select('orders.*');
                 })
             ])
-            ->with('customer')
+            ->with(['customer', 'payments'])
             ->paginate($row);
 
         return view('orders.pending-orders', [
@@ -78,7 +78,7 @@ class OrderController extends Controller
                         ->select('orders.*');
                 })
             ])
-            ->with('customer')
+            ->with(['customer', 'payments'])
             ->paginate($row);
 
         return view('orders.complete-orders', [
@@ -276,7 +276,7 @@ class OrderController extends Controller
      */
     public function orderDetails(int $order_id)
     {
-        $order = Order::with('customer')->findOrFail($order_id);
+        $order = Order::with(['customer', 'payments'])->findOrFail($order_id);
         $orderDetails = OrderDetails::with('product')
                         ->where('order_id', $order_id)
                         ->orderBy('id', 'DESC')
@@ -446,7 +446,7 @@ class OrderController extends Controller
 
     public function invoiceDownload(int $order_id)
     {
-        $order = Order::with('customer')->findOrFail($order_id);
+        $order = Order::with(['customer', 'payments'])->findOrFail($order_id);
         $orderDetails = OrderDetails::with('product')
             ->where('order_id', $order_id)
             ->orderBy('id', 'DESC')
@@ -460,7 +460,7 @@ class OrderController extends Controller
 
     public function printReceipt(int $order_id)
     {
-        $order = Order::with('customer')->findOrFail($order_id);
+        $order = Order::with(['customer', 'payments'])->findOrFail($order_id);
         $orderDetails = OrderDetails::with('product')
                         ->where('order_id', $order_id)
                         ->orderBy('id', 'DESC')
@@ -490,7 +490,7 @@ class OrderController extends Controller
                     $query->join('customers', 'orders.customer_id', '=', 'customers.id')->orderBy('customers.name', $descending ? 'DESC' : 'ASC')->select('orders.*');
                 })
             ])
-            ->with('customer')
+            ->with(['customer', 'payments'])
             ->paginate($row);
 
         return view('orders.pending-due', [
@@ -512,32 +512,56 @@ class OrderController extends Controller
             'due_amount' => 'required|numeric',
         ]);
 
-        $order = Order::findOrFail($request->order_id);
-        $mainPay = $order->pay_amount;
-        $mainDue = $order->due_amount;
+        return DB::transaction(function () use ($request) {
+            $order = Order::lockForUpdate()->findOrFail($request->order_id);
+            $mainPay = $order->pay_amount;
+            $mainDue = $order->due_amount;
+            $amount = (float) $request->due_amount;
 
-        // Check if order is locked by cash closing
-        if ($this->isOrderLocked($order)) {
-            return Redirect::back()->with('error', 'Piutang tidak bisa dibayar karena order sudah masuk tutup kasir.');
-        }
+            if ($this->isOrderLocked($order)) {
+                return Redirect::back()->with('error', 'Piutang tidak bisa dibayar karena order sudah masuk tutup kasir.');
+            }
 
-        $paid_due = $mainDue - $request->due_amount;
-        $paid_pay = $mainPay + $request->due_amount;
+            $activeShift = CashShift::where('user_id', auth()->id())
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
 
-        // Prevent negative due
-        if ($paid_due < 0) {
-            return Redirect::back()->with('error', 'Jumlah bayar melebihi sisa piutang!');
-        }
+            if (!$activeShift) {
+                return Redirect::route('cash-shifts.create')->with('error', 'Anda harus membuka shift kasir terlebih dahulu sebelum membayar piutang.');
+            }
 
-        $oldValues = ['pay_amount' => $mainPay, 'due_amount' => $mainDue];
-        $order->update([
-            'due_amount' => $paid_due,
-            'pay_amount' => $paid_pay,
-        ]);
-        // Audit log
-        AuditService::log('order', 'update_due', $order, $oldValues, ['pay_amount' => $paid_pay, 'due_amount' => $paid_due], "Due payment for {$order->invoice_no}");
+            $paid_due = $mainDue - $amount;
+            $paid_pay = $mainPay + $amount;
 
-        return Redirect::route('order.pendingDue')->with('success', 'Due Amount Updated Successfully!');
+            if ($paid_due < 0) {
+                return Redirect::back()->with('error', 'Jumlah bayar melebihi sisa piutang!');
+            }
+
+            $oldValues = ['pay_amount' => $mainPay, 'due_amount' => $mainDue];
+            $order->update([
+                'due_amount' => $paid_due,
+                'pay_amount' => $paid_pay,
+            ]);
+
+            CashShiftDetail::create([
+                'cash_shift_id' => $activeShift->id,
+                'order_id' => $order->id,
+                'transaction_type' => 'sale',
+                'amount' => $amount,
+                'payment_type' => 'cash',
+                'description' => "Pembayaran piutang {$order->invoice_no}",
+                'transaction_time' => now(),
+            ]);
+
+            $order->refresh();
+            $order->load('payments');
+            $order->update(['payment_type' => $order->paymentHistoryText()]);
+
+            AuditService::log('order', 'update_due', $order, $oldValues, ['pay_amount' => $paid_pay, 'due_amount' => $paid_due], "Due payment for {$order->invoice_no}");
+
+            return Redirect::route('order.pendingDue')->with('success', 'Piutang berhasil dibayar.');
+        });
     }
 
     /**

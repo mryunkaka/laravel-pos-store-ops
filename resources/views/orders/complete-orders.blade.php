@@ -119,7 +119,7 @@
                                             <td>{{ $order->invoice_no }}</td>
                                             <td>{{ $order->customer->name }}</td>
                                             <td>{{ $order->order_date->format('Y-m-d') }}</td>
-                                            <td>{{ $order->payment_type }}</td>
+                                            <td>{{ $order->paymentHistoryText() }}</td>
                                             <td>{{ number_format($order->total, 2) }}</td>
                                             <td>
                                                 @if($order->order_status == 'complete')

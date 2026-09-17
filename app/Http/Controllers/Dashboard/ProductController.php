@@ -20,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
+use App\Http\Requests\Product\BulkDestroyProductRequest;
 
 class ProductController extends Controller
 {
@@ -50,8 +51,15 @@ class ProductController extends Controller
             ->paginate($row)
             ->appends(request()->query());
 
+        $allProductIds = Product::query()
+            ->filter(request(['search']))
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->values();
+
         return view('products.index', [
             'products' => $products,
+            'allProductIds' => $allProductIds,
         ]);
     }
 
@@ -186,16 +194,20 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        /**
-         * Delete photo if exists.
-         */
-        if ($product->image) {
-            Storage::delete('public/products/' . $product->image);
-        }
-
-        Product::destroy($product->id);
+        $product->delete();
 
         return Redirect::route('products.index')->with('success', 'Product has been deleted!');
+    }
+
+    public function bulkDestroy(BulkDestroyProductRequest $request)
+    {
+        $products = Product::whereIn('id', $request->validated('product_ids'))->get();
+
+        foreach ($products as $product) {
+            $product->delete();
+        }
+
+        return Redirect::route('products.index')->with('success', $products->count() . ' produk berhasil ditandai dihapus.');
     }
 
     /**

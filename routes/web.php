@@ -31,6 +31,7 @@ use App\Http\Controllers\Dashboard\VoucherController;
 use App\Http\Controllers\Dashboard\ReportController;
 use App\Http\Controllers\Dashboard\AuditLogController;
 use App\Http\Controllers\Dashboard\StoreSettingController;
+use App\Http\Controllers\Dashboard\SystemUpdateController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\InvoiceMobileController;
 
@@ -109,6 +110,7 @@ Route::middleware(['permission:product.menu'])->group(function () {
     Route::post('/products/import', [ProductController::class, 'importStore'])->name('products.importStore');
     Route::get('/products/export', [ProductController::class, 'exportData'])->name('products.exportData');
     Route::get('/products/{product}/barcode-label', [ProductController::class, 'barcodeLabel'])->name('products.barcodeLabel');
+    Route::delete('/products', [ProductController::class, 'bulkDestroy'])->name('products.bulkDestroy');
     Route::resource('/products', ProductController::class);
     Route::resource('/vouchers', VoucherController::class)->except(['show']);
 });
@@ -125,6 +127,7 @@ Route::middleware(['permission:pos.menu'])->group(function () {
     Route::post('/pos/update/{rowId}', [PosController::class, 'updateCart'])->name('pos.updateCart');
     Route::get('/pos/delete/{rowId}', [PosController::class, 'deleteCart'])->name('pos.deleteCart');
     Route::post('/pos/customer', [PosController::class, 'storeCustomer'])->name('pos.storeCustomer');
+    Route::post('/pos/voucher-preview', [PosController::class, 'voucherPreview'])->name('pos.voucher.preview');
     Route::get('/pos/customers-ajax', [PosController::class, 'searchCustomers'])->name('pos.customers.search');
 
     Route::post('/pos/invoice/print', [PosController::class, 'printInvoice'])->name('pos.printInvoice');
@@ -149,7 +152,7 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     // Pending Due
     Route::get('/pending/due', [OrderController::class, 'pendingDue'])->name('order.pendingDue');
     Route::get('/order/due/{id}', [OrderController::class, 'orderDueAjax'])->name('order.orderDueAjax');
-    Route::post('/update/due', [OrderController::class, 'updateDue'])->name('order.updateDue');
+    Route::match(['post', 'put'], '/update/due', [OrderController::class, 'updateDue'])->name('order.updateDue');
 
     // Cancel & Void
     Route::post('/orders/cancel', [OrderController::class, 'cancelOrder'])->name('order.cancel');
@@ -274,6 +277,8 @@ Route::middleware(['permission:settings.menu'])->group(function () {
     Route::get('/settings/store', [StoreSettingController::class, 'edit'])->name('settings.store.edit');
     Route::put('/settings/store', [StoreSettingController::class, 'update'])->name('settings.store.update');
     Route::post('/settings/store/whatsapp-test', [StoreSettingController::class, 'testWhatsapp'])->name('settings.store.whatsappTest');
+    Route::get('/settings/update-web', [SystemUpdateController::class, 'index'])->name('system-update.index');
+    Route::post('/settings/update-web/run', [SystemUpdateController::class, 'run'])->name('system-update.run');
 });
 
 // ====== ROLE CONTROLLER ======

@@ -343,6 +343,18 @@
 
 ## Risiko Saat Ini
 
+- Produk kini memakai soft delete agar produk yang sudah punya riwayat transaksi bisa ditandai hapus tanpa memutus data order, stock movement, purchase order, dan retur.
+- Halaman `products.index` punya bulk selection: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, dan badge jumlah produk terpilih.
+- POS memakai pelanggan default `Walk-in Customer` agar checkout kasir tidak wajib memilih pelanggan manual.
+- Relasi histori inventaris yang menyimpan `product_id` memakai `withTrashed()` agar halaman lama tetap bisa dibuka setelah produk ditandai hapus.
+- Audit menu lokal 2026-09-17: 61 halaman GET utama berhasil dirender tanpa HTTP 500 memakai harness Laravel.
+- Validasi lokal 2026-09-17: `npm run build`, `git diff --check`, `php artisan view:cache`, dan audit 61 halaman menu berhasil.
+- Sidebar sekarang otomatis scroll ke menu aktif setelah refresh dan memiliki pencarian sticky untuk menemukan menu cepat.
+- POS sekarang mengecek voucher secara realtime dari input kode, menampilkan diskon voucher, feedback valid/invalid, dan total pembayaran langsung berubah sebelum struk dicetak.
+- POS sekarang mengizinkan kurang bayar sebagai piutang, menampilkan `Sisa Piutang`, dan route bayar piutang menerima method `POST|PUT`.
+- Riwayat pembayaran order sekarang menampilkan pembayaran awal dan pembayaran piutang bertahap di daftar order, detail order, faktur, dan struk.
+- Halaman `settings/update-web` tersedia untuk update lokal 1 klik: `git pull --ff-only`, `composer install`, `npm install`, `npm run build`, `migrate --force`, dan `view:cache` dengan log proses.
+- Halaman `profile/delete` diperbaiki karena masih memanggil partial `profile.partials.background-profile` yang tidak ada.
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
 - Hosting `pos.fourhz.com` menjalankan project di `public_html/pos3`; document root belum diarahkan ke folder Laravel `public`, sehingga perlu `.htaccess` root untuk rewrite ke `public/` dan handler PHP 8.4 khusus POS3.
 - File `.env` production harus memakai nilai ber-spasi dalam tanda kutip, misalnya `APP_NAME="Laravel POS Store Ops"`; tanpa kutip Laravel gagal bootstrap dengan `Dotenv\\Exception\\InvalidFileException`.

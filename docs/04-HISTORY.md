@@ -1,5 +1,53 @@
 ﻿# 04 - Riwayat
 
+## 2026-09-17
+
+### Bugfix Produk - Soft Delete dan Bulk Selection
+
+- Root cause hapus produk: hard delete pada `products` berisiko gagal saat produk sudah direferensikan oleh transaksi/riwayat stok/pembelian/retur.
+- Produk diubah memakai soft delete dengan migration `2026_09_17_070000_add_deleted_at_to_products_table.php`.
+- Relasi produk di `OrderDetails`, `PurchaseOrderDetail`, `PurchaseReceivingDetail`, `PurchaseReturnDetail`, `StockAdjustment`, `StockMovement`, `StockOpnameDetail`, `StockTransferDetail`, dan `SalesReturnDetail` memakai `withTrashed()` agar riwayat lama tetap bisa membaca produk yang ditandai hapus.
+- Halaman `products.index` ditambah bulk selection: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, badge jumlah terpilih, dan tombol `Tandai Hapus Terpilih`.
+- Ditambah route `products.bulkDestroy` dan request validasi `BulkDestroyProductRequest`.
+- POS memakai pelanggan default `Walk-in Customer` agar checkout kasir bisa langsung berjalan tanpa memilih pelanggan manual.
+- `stock-adjustments.index` diperbaiki agar produk yang sudah dihapus tidak membuat error relasi null.
+- Audit 61 halaman menu utama berhasil tanpa HTTP 500 memakai harness Laravel.
+- Validasi berjalan: `npm run build`, `git diff --check`, `php artisan view:cache`, dan audit halaman menu.
+
+### UI Sidebar - Auto Fokus dan Pencarian
+
+- Sidebar membuka submenu yang cocok dengan halaman aktif, termasuk Order, Gaji, Absensi, Role & Permission, Produk, Inventaris, dan Kasir.
+- Setelah refresh halaman, sidebar otomatis scroll ke item menu aktif agar posisi menu tidak kembali tersembunyi di atas.
+- Ditambah kolom `Cari menu...` yang sticky di bagian atas area scroll sidebar.
+- Pencarian sidebar berjalan client-side tanpa request server dan membuka submenu yang memiliki item cocok.
+
+### Bugfix Profil - Halaman Hapus Akun
+
+- `profile/delete` tidak lagi memanggil partial `profile.partials.background-profile` yang tidak tersedia.
+- Halaman hapus akun memakai layout yang sama dengan profil/edit/change-password.
+
+### Bugfix POS - Voucher Realtime
+
+- Ditambah endpoint `pos.voucher.preview` untuk menghitung diskon voucher sebelum checkout.
+- Input voucher di POS melakukan preview AJAX dengan debounce, menampilkan pesan valid/invalid, dan mengisi `voucher_discount` tersembunyi.
+- Total POS, kembalian, dan modal pembayaran memakai diskon voucher secara realtime.
+- Format nominal realtime POS diseragamkan memakai format Indonesia.
+
+### Bugfix POS - Piutang Tertunda
+
+- POS tidak lagi menolak pembayaran kurang dari total; selisih ditampilkan sebagai `Sisa Piutang` dan disimpan di `due_amount`.
+- Modal konfirmasi pembayaran menampilkan `Sisa Piutang` saat pembayaran kurang dan `Kembalian` saat pembayaran cukup/lebih.
+- Route `/update/due` menerima `POST|PUT` agar form bayar piutang dengan method spoofing Laravel tidak error.
+- Halaman `pending/due` menampilkan pesan error session untuk kasus piutang terkunci atau bayar melebihi sisa.
+- Pembayaran piutang dicatat sebagai detail shift order sehingga riwayat bisa menampilkan contoh `Tunai Rp 5.000, Piutang 1 Rp 2.000, Piutang 2 Rp 3.000 (Lunas)`.
+- Daftar pending/complete/pending due, detail order, faktur, dan struk memakai ringkasan riwayat pembayaran yang sama.
+
+### Fitur Admin - Update Web Lokal
+
+- Ditambah halaman `settings/update-web` untuk menjalankan update lokal dari browser.
+- Tombol update menjalankan PowerShell background yang memanggil `git pull --ff-only`, Composer install, NPM install/build, Laravel optimize clear, migrate force, dan view cache.
+- Halaman menampilkan status berjalan/siap dan log file dari `storage/app/system-update/update.log`.
+
 ## 2026-07-10
 
 ### Deployment Hosting Rumahweb - POS3

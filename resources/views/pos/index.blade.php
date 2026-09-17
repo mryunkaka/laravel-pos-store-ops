@@ -164,7 +164,7 @@
                                 <label class="font-weight-bold mb-1">Pelanggan</label>
                                 <div class="input-group">
                                     <select class="form-control select2" id="customer_id" name="customer_id" style="width: 85%;">
-                                        <option value="" selected disabled>-- Cari Pelanggan --</option>
+                                        <option value="{{ $defaultCustomer->id }}" selected>{{ $defaultCustomer->name }} ({{ $defaultCustomer->phone ?? 'N/A' }})</option>
                                     </select>
                                     <div class="input-group-append" style="width: 15%;">
                                         <button type="button" class="btn btn-outline-primary btn-block" title="Tambah Pelanggan Baru" data-toggle="modal"
@@ -220,7 +220,7 @@
                                     </td>
                                 </tr>
                                 <tr class="border-top">
-                                    <td class="text-muted font-weight-bold">Kembalian:</td>
+                                    <td class="text-muted font-weight-bold" id="modal_change_label">Kembalian:</td>
                                     <td class="text-right font-weight-bold h5 text-danger" id="modal_change_amount">0.00
                                     </td>
                                 </tr>
@@ -458,18 +458,87 @@
             return parseFloat(String(value || '0').replace(/,/g, '').replace(/\./g, '')) || 0;
         }
 
+        function formatRupiah(value) {
+            const number = Math.round(Number(value) || 0);
+            const prefix = number < 0 ? '-' : '';
+            return prefix + Math.abs(number).toLocaleString('id-ID');
+        }
+
+        function getVoucherDiscount() {
+            return parseFloat(document.getElementById('voucher_discount')?.value || 0);
+        }
+
+        function setVoucherFeedback(success, message, discount) {
+            const messageElement = document.getElementById('voucher-message');
+            const discountElement = document.getElementById('voucher_discount');
+            const rowElement = document.getElementById('voucher-discount-row');
+            const displayElement = document.getElementById('voucher-discount-display');
+            const discountValue = Number(discount) || 0;
+
+            if (discountElement) discountElement.value = discountValue;
+            if (displayElement) displayElement.innerText = '-' + formatRupiah(discountValue);
+            if (rowElement) rowElement.style.setProperty('display', discountValue > 0 ? 'flex' : 'none', 'important');
+            if (messageElement) {
+                messageElement.innerText = message || '';
+                messageElement.classList.toggle('text-success', !!success && discountValue > 0);
+                messageElement.classList.toggle('text-danger', !success && !!message);
+                messageElement.classList.toggle('text-muted', !message);
+            }
+            calculateChange();
+        }
+
+        let voucherPreviewTimer;
+        async function previewVoucherDiscount() {
+            const codeElement = document.getElementById('voucher_code');
+            const totalElement = document.getElementById('cart-total');
+            const code = codeElement ? codeElement.value.trim() : '';
+            const baseTotal = totalElement ? parseFloat(totalElement.dataset.baseTotal || 0) : 0;
+
+            if (!code) {
+                setVoucherFeedback(true, '', 0);
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ route('pos.voucher.preview') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        voucher_code: code,
+                        base_total: baseTotal
+                    })
+                });
+                const data = await response.json();
+                setVoucherFeedback(data.success, data.message, data.success ? data.discount : 0);
+            } catch (error) {
+                console.error('Voucher preview error:', error);
+                setVoucherFeedback(false, 'Gagal mengecek voucher.', 0);
+            }
+        }
+
+        function scheduleVoucherPreview() {
+            window.clearTimeout(voucherPreviewTimer);
+            voucherPreviewTimer = window.setTimeout(previewVoucherDiscount, 300);
+            calculateChange();
+        }
+
         function getOrderTotalAmount() {
             const totalElement = document.getElementById('cart-total');
             const baseTotal = totalElement ? parseFloat(totalElement.dataset.baseTotal || 0) : 0;
             const invoiceDiscount = parseFloat(document.getElementById('invoice_discount')?.value || 0);
+            const voucherDiscount = getVoucherDiscount();
             const serviceCharge = parseFloat(document.getElementById('service_charge')?.value || 0);
-            return Math.max(baseTotal - invoiceDiscount + serviceCharge, 0);
+            return Math.max(baseTotal - invoiceDiscount - voucherDiscount + serviceCharge, 0);
         }
 
         function refreshOrderTotalDisplay() {
             const totalElement = document.getElementById('cart-total');
             if (!totalElement) return;
-            totalElement.innerText = getOrderTotalAmount().toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            totalElement.innerText = formatRupiah(getOrderTotalAmount());
         }
 
         function getPaymentSummary() {
@@ -482,7 +551,7 @@
             };
 
             return getPaymentRows().map(function(payment) {
-                return (labels[payment.payment_type] || payment.payment_type) + ' ' + payment.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                return (labels[payment.payment_type] || payment.payment_type) + ' ' + formatRupiah(payment.amount);
             }).join(', ');
         }
 
@@ -526,20 +595,24 @@
             const totalAmount = getOrderTotalAmount();
             const payInput = getPaymentTotal();
             const changeElement = document.getElementById('change_amount');
+            const changeLabel = document.getElementById('change_label');
 
             if (!isNaN(payInput) && payInput >= 0) {
                 const change = payInput - totalAmount;
-                changeElement.innerText = change.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                changeElement.innerText = formatRupiah(Math.abs(change));
 
                 if (change < 0) {
+                    if (changeLabel) changeLabel.innerText = 'Sisa Piutang';
                     changeElement.classList.add('text-danger');
                     changeElement.classList.remove('text-success');
                 } else {
+                    if (changeLabel) changeLabel.innerText = 'Kembalian';
                     changeElement.classList.remove('text-danger');
                     changeElement.classList.add('text-success');
                 }
             } else {
                 changeElement.innerText = "0.00";
+                if (changeLabel) changeLabel.innerText = 'Kembalian';
                 changeElement.classList.remove('text-success', 'text-danger');
             }
         }
@@ -566,20 +639,17 @@
                 return;
             }
 
-            if (payAmount < totalAmount) {
-                alert('Pembayaran kurang! Total tagihan ' + totalText);
-                return;
-            }
-
             // 3. Update Modal UI
             document.getElementById('modal_total_display').innerText = totalText;
             document.getElementById('modal_payment_method').innerText = method;
-            document.getElementById('modal_pay_amount').innerText = payAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,
-                ",");
+            document.getElementById('modal_pay_amount').innerText = formatRupiah(payAmount);
 
             const change = payAmount - totalAmount;
-            document.getElementById('modal_change_amount').innerText = change.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,
-                ",");
+            document.getElementById('modal_change_label').innerText = change < 0 ? 'Sisa Piutang:' : 'Kembalian:';
+            const modalChangeAmount = document.getElementById('modal_change_amount');
+            modalChangeAmount.innerText = formatRupiah(Math.abs(change));
+            modalChangeAmount.classList.toggle('text-danger', change < 0);
+            modalChangeAmount.classList.toggle('text-success', change >= 0);
 
             // 4. Show Modal
             $('#paymentModal').modal('show');

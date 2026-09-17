@@ -85,14 +85,20 @@
         <span class="text-secondary small">Diskon Item</span>
         <span class="font-weight-bold text-danger">-{{ number_format($cartItemDiscount, 0, ',', '.') }}</span>
     </div>
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between mb-2">
         <span class="text-secondary small">Pajak</span>
         <span class="font-weight-bold">{{ number_format($cartTax, 0, ',', '.') }}</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3" id="voucher-discount-row" style="display: none !important;">
+        <span class="text-secondary small">Diskon Voucher</span>
+        <span class="font-weight-bold text-danger" id="voucher-discount-display">-0</span>
     </div>
     @if (Cart::count() > 0)
         <div class="form-group mb-2">
             <label class="small font-weight-bold text-muted mb-1">Voucher</label>
-            <input type="text" class="form-control form-control-sm" id="voucher_code" placeholder="Kode voucher" oninput="calculateChange()">
+            <input type="text" class="form-control form-control-sm" id="voucher_code" placeholder="Kode voucher" oninput="scheduleVoucherPreview()">
+            <small id="voucher-message" class="form-text text-muted"></small>
+            <input type="hidden" id="voucher_discount" value="0">
         </div>
         <div class="row">
             <div class="col-6 pr-1">
@@ -151,7 +157,7 @@
 
         <!-- Change Display -->
         <div class="d-flex justify-content-between align-items-center mb-3 px-2 py-2 bg-light rounded">
-            <span class="small font-weight-bold text-muted">Kembalian</span>
+            <span class="small font-weight-bold text-muted" id="change_label">Kembalian</span>
             <span class="font-weight-bold text-success" id="change_amount">0.00</span>
         </div>
 

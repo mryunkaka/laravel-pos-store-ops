@@ -102,4 +102,50 @@ class Order extends Model
     {
         return $this->hasMany(SalesReturn::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(CashShiftDetail::class)
+            ->where('transaction_type', 'sale')
+            ->orderBy('transaction_time')
+            ->orderBy('id');
+    }
+
+    public function paymentHistoryText(): string
+    {
+        $payments = $this->relationLoaded('payments')
+            ? $this->payments
+            : $this->payments()->get();
+
+        if ($payments->isEmpty()) {
+            return $this->payment_type ?? '-';
+        }
+
+        $labels = [
+            'cash' => 'Tunai',
+            'qris' => 'QRIS',
+            'debit' => 'Debit',
+            'transfer' => 'Transfer',
+            'ewallet' => 'E-Wallet',
+        ];
+        $dueIndex = 0;
+        $lastDueId = $payments
+            ->filter(fn ($payment) => str_contains(strtolower($payment->description ?? ''), 'piutang'))
+            ->last()?->id;
+
+        $parts = $payments->map(function ($payment) use ($labels, &$dueIndex, $lastDueId) {
+            $isDuePayment = str_contains(strtolower($payment->description ?? ''), 'piutang');
+            $label = $isDuePayment ? 'Piutang ' . (++$dueIndex) : ($labels[$payment->payment_type] ?? ucfirst($payment->payment_type));
+            $suffix = $isDuePayment && $payment->id === $lastDueId && $this->due_amount <= 0 ? ' (Lunas)' : '';
+
+            return $label . ' Rp ' . number_format((float) $payment->amount, 0, ',', '.') . $suffix;
+        });
+
+        $missingPaidHistory = max((float) $this->pay_amount - (float) $payments->sum('amount'), 0);
+        if ($missingPaidHistory > 0) {
+            $parts->push('Piutang ' . (++$dueIndex) . ' Rp ' . number_format($missingPaidHistory, 0, ',', '.') . ($this->due_amount <= 0 ? ' (Lunas)' : ''));
+        }
+
+        return $parts->implode(', ');
+    }
 }

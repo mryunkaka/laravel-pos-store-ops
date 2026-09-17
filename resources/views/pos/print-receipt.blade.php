@@ -193,12 +193,16 @@
             </div>
 
             <div class="d-flex justify-between mt-2 mb-1">
-                <span>Bayar ({{ $order->payment_type ?? 'Tunai' }})</span>
+                <span>Pembayaran</span>
+                <span>{{ $order->paymentHistoryText() }}</span>
+            </div>
+            <div class="d-flex justify-between mb-1">
+                <span>Total Dibayar</span>
                 <span>{{ number_format($order->pay_amount, 0, ',', '.') }}</span>
             </div>
-             <div class="d-flex justify-between">
-                <span>Kembalian</span>
-                <span>{{ number_format($order->due_amount < 0 ? abs($order->due_amount) : 0, 0, ',', '.') }}</span>
+            <div class="d-flex justify-between">
+                <span>{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}</span>
+                <span>{{ number_format($order->due_amount > 0 ? $order->due_amount : abs(min($order->due_amount, 0)), 0, ',', '.') }}</span>
             </div>
         </div>
 
