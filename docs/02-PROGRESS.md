@@ -355,6 +355,7 @@
 - Riwayat pembayaran order sekarang menampilkan pembayaran awal dan pembayaran piutang bertahap di daftar order, detail order, faktur, dan struk.
 - Halaman `settings/update-web` tersedia untuk update lokal 1 klik: `git pull --ff-only`, `composer install`, `npm install`, `npm run build`, `migrate --force`, dan `view:cache` dengan log proses.
 - `README.md` diperbarui menjadi panduan instalasi lokal Windows dari awal: NSSM, Nginx, PHP 8.4.22, MySQL, HeidiSQL, Git pull, service, update web, dan troubleshooting.
+- `composer.lock` diperbarui agar `phpoffice/phpspreadsheet` tidak memblokir PHP 8.5, dan README memakai path `D:\Project\Web\pos3` serta `npm.cmd` untuk PowerShell.
 - Halaman `profile/delete` diperbaiki karena masih memanggil partial `profile.partials.background-profile` yang tidak ada.
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
 - Hosting `pos.fourhz.com` menjalankan project di `public_html/pos3`; document root belum diarahkan ke folder Laravel `public`, sehingga perlu `.htaccess` root untuk rewrite ke `public/` dan handler PHP 8.4 khusus POS3.

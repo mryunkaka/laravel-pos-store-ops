@@ -52,6 +52,8 @@
 
 - `README.md` ditulis ulang sebagai panduan singkat-lengkap instalasi lokal Windows untuk PC konsumen.
 - Panduan mencakup download NSSM, Nginx, PHP 8.4.22, MySQL, HeidiSQL, Git, Composer, Node.js, konfigurasi PHP/Nginx, runner PowerShell, service NSSM, Git pull, update web, dan troubleshooting.
+- Path contoh disederhanakan ke `D:\Project\Web\pos3` tanpa nama user, dan perintah NPM PowerShell memakai `npm.cmd` supaya tidak terkena Execution Policy.
+- `phpoffice/phpspreadsheet` di-lock ke versi yang menerima PHP 8.5 sehingga `composer install` tidak gagal pada PHP 8.5.10.
 
 ## 2026-07-10
 

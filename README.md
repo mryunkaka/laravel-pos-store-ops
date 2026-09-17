@@ -5,7 +5,7 @@ Panduan ini untuk memasang POS3 di PC lokal konsumen sampai bisa dibuka dari bro
 Target akhir:
 
 ```text
-Project     : D:\Adam\Project\Web\pos3
+Project     : D:\Project\Web\pos3
 URL         : http://localhost:8082
 Nginx       : C:\Server\nginx-1.28.3\nginx-1.28.3
 PHP         : C:\Server\php-8.4.22-nts-Win32-vs17-x64
@@ -130,16 +130,16 @@ php -m | findstr /i "pdo_mysql mbstring openssl fileinfo gd zip intl"
 Buka PowerShell biasa:
 
 ```powershell
-mkdir D:\Adam\Project\Web
-cd D:\Adam\Project\Web
+mkdir D:\Project\Web
+cd D:\Project\Web
 git clone https://github.com/mryunkaka/laravel-pos-store-ops.git pos3
-cd D:\Adam\Project\Web\pos3
+cd D:\Project\Web\pos3
 ```
 
 Kalau folder sudah ada, cukup:
 
 ```powershell
-cd D:\Adam\Project\Web\pos3
+cd D:\Project\Web\pos3
 git pull --ff-only
 ```
 
@@ -148,10 +148,10 @@ git pull --ff-only
 Masuk folder project:
 
 ```powershell
-cd D:\Adam\Project\Web\pos3
+cd D:\Project\Web\pos3
 composer install --no-interaction --prefer-dist --optimize-autoloader
-npm install
-npm run build
+npm.cmd install
+npm.cmd run build
 ```
 
 Kalau Composer global tidak terbaca, pakai Composer PHAR:
@@ -159,6 +159,10 @@ Kalau Composer global tidak terbaca, pakai Composer PHAR:
 ```powershell
 php C:\ProgramData\ComposerSetup\bin\composer.phar install --no-interaction --prefer-dist --optimize-autoloader
 ```
+
+Jika PowerShell menolak `npm` karena `running scripts is disabled`, pakai `npm.cmd` seperti contoh di atas. Jangan pakai `npm` tanpa `.cmd`.
+
+Jika PC memakai PHP 8.5 dan Composer menolak `phpoffice/phpspreadsheet 1.30.1 requires php <8.5`, lakukan `git pull` terbaru dulu. Versi dependency sudah diperbarui agar compatible dengan PHP 8.5.
 
 ## 6. Buat file `.env`
 
@@ -237,7 +241,7 @@ http {
     server {
         listen 8082;
         server_name localhost;
-        root D:/Adam/Project/Web/pos3/public;
+        root D:/Project/Web/pos3/public;
         index index.php index.html;
 
         client_max_body_size 64M;
@@ -391,11 +395,11 @@ Jika login tidak cocok, cek `database/seeders/UserSeeder.php` atau buat user dar
 Di PC konsumen, buka PowerShell:
 
 ```powershell
-cd D:\Adam\Project\Web\pos3
+cd D:\Project\Web\pos3
 git pull --ff-only
 composer install --no-interaction --prefer-dist --optimize-autoloader
-npm install
-npm run build
+npm.cmd install
+npm.cmd run build
 php artisan optimize:clear
 php artisan migrate --force
 php artisan view:cache
@@ -432,8 +436,8 @@ Halaman itu menjalankan:
 ```text
 git pull --ff-only
 composer install
-npm install
-npm run build
+npm.cmd install
+npm.cmd run build
 php artisan optimize:clear
 php artisan migrate --force
 php artisan view:cache
@@ -442,7 +446,7 @@ php artisan view:cache
 Log muncul di halaman dan tersimpan di:
 
 ```text
-D:\Adam\Project\Web\pos3\storage\app\system-update\update.log
+D:\Project\Web\pos3\storage\app\system-update\update.log
 ```
 
 Catatan:
@@ -497,7 +501,7 @@ Restart-Service pos3-web
 ### Halaman 500 Laravel
 
 ```powershell
-cd D:\Adam\Project\Web\pos3
+cd D:\Project\Web\pos3
 php artisan optimize:clear
 php artisan view:cache
 Get-Content storage\logs\laravel.log -Tail 80
@@ -545,9 +549,9 @@ Ganti `listen 8082;` di Nginx jika perlu, lalu restart service.
 ## 17. Struktur folder penting
 
 ```text
-D:\Adam\Project\Web\pos3                  Project Laravel
-D:\Adam\Project\Web\pos3\.env             Konfigurasi lokal, jangan upload
-D:\Adam\Project\Web\pos3\storage\logs     Log Laravel
+D:\Project\Web\pos3                  Project Laravel
+D:\Project\Web\pos3\.env             Konfigurasi lokal, jangan upload
+D:\Project\Web\pos3\storage\logs     Log Laravel
 C:\Server\pos3_runner.ps1                  Runner service
 C:\Server\logs                             Log runner/PHP
 C:\Server\nginx-1.28.3\nginx-1.28.3\logs  Log Nginx
