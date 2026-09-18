@@ -303,6 +303,7 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Menu sidebar Update Web tampil untuk admin meski `settings.menu` belum tersinkron.
 - [x] Halaman Update Web menampilkan progress bar/persentase dan status langkah.
 - [x] Log Update Web realtime dan halaman reload otomatis setelah sukses.
+- [x] Dokumentasi aturan aman data Update Web dicatat di `docs/06-UPDATE_WEB.md`.
 - [x] Halaman hapus akun profil bisa dibuka tanpa error missing partial.
 
 ## Daftar 20 Fitur Tambahan Utama

@@ -41,6 +41,14 @@
                         Link darurat jika GUI/sidebar tidak bisa dibuka: <a href="{{ route('system-update.test') }}" target="_blank">{{ url('/update-web.test') }}</a>
                     </div>
 
+                    <div id="update-notice" class="alert {{ $updateInfo['available'] ? 'alert-danger' : 'alert-secondary' }}" role="alert">
+                        {{ $updateInfo['message'] }}
+                    </div>
+
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Aturan aman data:</strong> update web tidak boleh menghapus/mengubah isi data transaksi, piutang, produk, pelanggan, atau riwayat. Perubahan database hanya boleh tambah tabel, tambah kolom, tambah index, atau tambah permission. Jika butuh perubahan data lama, wajib backup dan konfirmasi manual dulu.
+                    </div>
+
                     <form action="{{ route('system-update.run') }}" method="POST" onsubmit="return confirm('Jalankan update web sekarang?');">
                         @csrf
                         <button type="submit" class="btn btn-primary" {{ $isRunning ? 'disabled' : '' }}>
@@ -65,9 +73,12 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h5 class="mb-0">Log Update</h5>
-                        @if ($doneAt)
-                            <small class="text-muted">Selesai terakhir: {{ $doneAt }}</small>
-                        @endif
+                        <div>
+                            @if ($doneAt)
+                                <small class="text-muted mr-2">Selesai terakhir: {{ $doneAt }}</small>
+                            @endif
+                            <button type="button" id="copy-update-log" class="btn btn-sm btn-outline-secondary">Copy Log Update</button>
+                        </div>
                     </div>
 
                     <pre id="update-log" class="bg-dark text-white p-3 rounded" style="min-height: 320px; max-height: 520px; overflow: auto; white-space: pre-wrap;">{{ $log }}</pre>
@@ -85,6 +96,8 @@
         var percentEl = document.getElementById('update-progress-percent');
         var barEl = document.getElementById('update-progress-bar');
         var noteEl = document.getElementById('update-progress-note');
+        var noticeEl = document.getElementById('update-notice');
+        var copyLogBtn = document.getElementById('copy-update-log');
         var wasRunning = @json($isRunning);
 
         function setProgress(progress, running) {
@@ -103,6 +116,10 @@
                     logEl.textContent = data.log;
                     logEl.scrollTop = logEl.scrollHeight;
                     setProgress(data.progress, data.running);
+                    if (data.update_info) {
+                        noticeEl.textContent = data.update_info.message;
+                        noticeEl.className = 'alert ' + (data.update_info.available ? 'alert-danger' : 'alert-secondary');
+                    }
                     noteEl.textContent = data.running ? 'Proses berjalan. Log diperbarui realtime.' : (data.error ? 'Update gagal. Cek log.' : 'Selesai atau siap.');
 
                     if (wasRunning && data.done && !data.error) {
@@ -116,6 +133,16 @@
                     noteEl.textContent = 'Gagal membaca status update. Halaman akan mencoba lagi.';
                 });
         }
+
+        copyLogBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(logEl.textContent).then(function () {
+                copyLogBtn.textContent = 'Log Disalin';
+                setTimeout(function () { copyLogBtn.textContent = 'Copy Log Update'; }, 1500);
+            }).catch(function () {
+                copyLogBtn.textContent = 'Gagal Copy';
+                setTimeout(function () { copyLogBtn.textContent = 'Copy Log Update'; }, 1500);
+            });
+        });
 
         pollStatus();
         setInterval(pollStatus, 1000);

@@ -29,6 +29,7 @@ class SystemUpdateController extends Controller
             'log' => $log,
             'doneAt' => File::exists(storage_path(self::DONE_FILE)) ? trim(File::get(storage_path(self::DONE_FILE))) : null,
             'progress' => $this->progressFromLog($log, $isRunning),
+            'updateInfo' => $this->updateInfo(),
         ]);
     }
 
@@ -59,6 +60,7 @@ class SystemUpdateController extends Controller
             'done_at' => $doneAt,
             'progress' => $progress,
             'log' => $log,
+            'update_info' => $this->updateInfo(),
         ]);
     }
 
@@ -155,6 +157,29 @@ HTML);
     private function abortUnlessLocal(Request $request): void
     {
         abort_unless(in_array($request->ip(), ['127.0.0.1', '::1'], true), 403);
+    }
+
+    private function updateInfo(): array
+    {
+        $behind = 0;
+        $message = 'Status update belum dicek.';
+        $available = false;
+
+        @exec('git -C ' . escapeshellarg(base_path()) . ' rev-list --count HEAD..@{u} 2>NUL', $output, $code);
+
+        if ($code === 0 && isset($output[0])) {
+            $behind = max(0, (int) trim($output[0]));
+            $available = $behind > 0;
+            $message = $available
+                ? "Ada {$behind} update baru. Jalankan Update Web."
+                : 'Belum ada update baru.';
+        }
+
+        return [
+            'available' => $available,
+            'behind' => $behind,
+            'message' => $message,
+        ];
     }
 
     private function progressFromLog(string $log, bool $isRunning): array

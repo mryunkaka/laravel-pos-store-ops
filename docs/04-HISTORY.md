@@ -62,6 +62,7 @@
 - Menu sidebar `Update Web` tidak lagi bergantung hanya pada `settings.menu`; user dengan `roles.menu` atau `database.menu` juga bisa melihat menu, sementara route GUI cukup memakai middleware login.
 - Progress Update Web diperjelas dengan persentase berbasis langkah log, progress bar animasi, status langkah berjalan, dan catatan bahwa PowerShell update sudah dipanggil agar tidak terlihat stuck.
 - Halaman `settings/update-web` memakai polling realtime ke endpoint status JSON setiap 1 detik untuk memperbarui log/progress tanpa reload penuh, lalu reload otomatis saat proses selesai sukses.
+- Ditambah tombol `Copy Log Update`, notifikasi update baru dari Git, pesan aturan aman data di UI, dan `docs/06-UPDATE_WEB.md` yang menegaskan update otomatis tidak boleh menghapus/mengubah data operasional lama.
 
 ## 2026-07-10
 
