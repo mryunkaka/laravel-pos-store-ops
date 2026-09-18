@@ -13,28 +13,36 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create Permissions
-        Permission::create(['name' => 'pos.menu', 'group_name' => 'pos']);
-        Permission::create(['name' => 'employee.menu', 'group_name' => 'employee']);
-        Permission::create(['name' => 'customer.menu', 'group_name' => 'customer']);
-        Permission::create(['name' => 'supplier.menu', 'group_name' => 'supplier']);
-        Permission::create(['name' => 'salary.menu', 'group_name' => 'salary']);
-        Permission::create(['name' => 'attendance.menu', 'group_name' => 'attendance']);
-        Permission::create(['name' => 'category.menu', 'group_name' => 'category']);
-        Permission::create(['name' => 'product.menu', 'group_name' => 'product']);
-        Permission::create(['name' => 'orders.menu', 'group_name' => 'orders']);
-        Permission::create(['name' => 'stock.menu', 'group_name' => 'stock']);
-        Permission::create(['name' => 'roles.menu', 'group_name' => 'roles']);
-        Permission::create(['name' => 'user.menu', 'group_name' => 'user']);
-        Permission::create(['name' => 'database.menu', 'group_name' => 'database']);
-        Permission::create(['name' => 'void.order', 'group_name' => 'orders']);
-        Permission::create(['name' => 'allow-negative-stock', 'group_name' => 'stock']);
-        Permission::create(['name' => 'audit.menu', 'group_name' => 'audit']);
+        $permissions = [
+            ['name' => 'pos.menu', 'group_name' => 'pos'],
+            ['name' => 'employee.menu', 'group_name' => 'employee'],
+            ['name' => 'customer.menu', 'group_name' => 'customer'],
+            ['name' => 'supplier.menu', 'group_name' => 'supplier'],
+            ['name' => 'salary.menu', 'group_name' => 'salary'],
+            ['name' => 'attendance.menu', 'group_name' => 'attendance'],
+            ['name' => 'category.menu', 'group_name' => 'category'],
+            ['name' => 'product.menu', 'group_name' => 'product'],
+            ['name' => 'orders.menu', 'group_name' => 'orders'],
+            ['name' => 'stock.menu', 'group_name' => 'stock'],
+            ['name' => 'roles.menu', 'group_name' => 'roles'],
+            ['name' => 'user.menu', 'group_name' => 'user'],
+            ['name' => 'database.menu', 'group_name' => 'database'],
+            ['name' => 'void.order', 'group_name' => 'orders'],
+            ['name' => 'allow-negative-stock', 'group_name' => 'stock'],
+            ['name' => 'audit.menu', 'group_name' => 'audit'],
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(
+                ['name' => $permission['name']],
+                ['group_name' => $permission['group_name']]
+            );
+        }
 
         // Create Roles and Assign Permissions
-        Role::create(['name' => 'SuperAdmin'])->givePermissionTo(Permission::all());
-        Role::create(['name' => 'Admin'])->givePermissionTo(['customer.menu', 'user.menu', 'supplier.menu', 'attendance.menu']);
-        Role::create(['name' => 'Account'])->givePermissionTo(['customer.menu', 'user.menu', 'supplier.menu']);
-        Role::create(['name' => 'Manager'])->givePermissionTo(['stock.menu', 'orders.menu', 'product.menu', 'salary.menu', 'employee.menu', 'attendance.menu', 'void.order']);
+        Role::firstOrCreate(['name' => 'SuperAdmin'])->syncPermissions(Permission::all());
+        Role::firstOrCreate(['name' => 'Admin'])->syncPermissions(['customer.menu', 'user.menu', 'supplier.menu', 'attendance.menu']);
+        Role::firstOrCreate(['name' => 'Account'])->syncPermissions(['customer.menu', 'user.menu', 'supplier.menu']);
+        Role::firstOrCreate(['name' => 'Manager'])->syncPermissions(['stock.menu', 'orders.menu', 'product.menu', 'salary.menu', 'employee.menu', 'attendance.menu', 'void.order']);
     }
 }
