@@ -2,22 +2,32 @@
 
 Panduan ini untuk memasang POS3 di PC lokal konsumen sampai bisa dibuka dari browser, otomatis jalan saat Windows menyala, dan bisa update lewat Git.
 
-Target akhir:
+Target folder:
 
 ```text
+Installer   : C:\Server\Installer
+Server      : C:\Server
 Project     : D:\Project\Web\pos3
 URL         : http://localhost:8082
-Nginx       : C:\Server\nginx-1.28.3\nginx-1.28.3
+Nginx       : C:\Server\nginx-1.28.3
 PHP         : C:\Server\php-8.4.22-nts-Win32-vs17-x64
-NSSM        : C:\Server\nssm-2.24\nssm-2.24
+NSSM        : C:\Server\nssm-2.24
 MySQL       : 127.0.0.1:3306
 Database    : point_of_sale
 Service     : pos3-web
 ```
 
+Aturan folder:
+
+```text
+C:\Server\Installer    Simpan installer Git, Composer, Node.js, HeidiSQL, VC++ Redistributable, MySQL Server
+C:\Server              Simpan hasil extract Nginx, NSSM, PHP, runner, log
+D:\Project\Web\pos3   Simpan project Laravel POS3
+```
+
 ## 1. Download installer
 
-Download dulu semua file ini, simpan misalnya di `D:\Installer`.
+Download dulu semua file ini, simpan di `C:\Server\Installer`.
 
 | Aplikasi | Link resmi |
 | --- | --- |
@@ -44,8 +54,8 @@ Extract ZIP:
 
 ```text
 C:\Server\php-8.4.22-nts-Win32-vs17-x64
-C:\Server\nginx-1.28.3\nginx-1.28.3
-C:\Server\nssm-2.24\nssm-2.24
+C:\Server\nginx-1.28.3
+C:\Server\nssm-2.24
 ```
 
 ## 2. Setting MySQL Server
@@ -220,7 +230,7 @@ php artisan view:cache
 Edit file:
 
 ```text
-C:\Server\nginx-1.28.3\nginx-1.28.3\conf\nginx.conf
+C:\Server\nginx-1.28.3\conf\nginx.conf
 ```
 
 Isi minimal:
@@ -272,8 +282,8 @@ http {
 Test config:
 
 ```powershell
-cd C:\Server\nginx-1.28.3\nginx-1.28.3
-.\nginx.exe -t -p C:\Server\nginx-1.28.3\nginx-1.28.3 -c conf\nginx.conf
+cd C:\Server\nginx-1.28.3
+.\nginx.exe -t -p C:\Server\nginx-1.28.3 -c conf\nginx.conf
 ```
 
 Harus muncul:
@@ -298,7 +308,7 @@ $ErrorActionPreference = 'Stop'
 
 $phpCgi = 'C:\Server\php-8.4.22-nts-Win32-vs17-x64\php-cgi.exe'
 $phpIni = 'C:\Server\php-8.4.22-nts-Win32-vs17-x64\php.ini'
-$nginxDir = 'C:\Server\nginx-1.28.3\nginx-1.28.3'
+$nginxDir = 'C:\Server\nginx-1.28.3'
 $nginxExe = Join-Path $nginxDir 'nginx.exe'
 $logDir = 'C:\Server\logs'
 
@@ -334,7 +344,7 @@ while ($true) {
 Buka PowerShell **Run as Administrator**.
 
 ```powershell
-$nssm = 'C:\Server\nssm-2.24\nssm-2.24\win64\nssm.exe'
+$nssm = 'C:\Server\nssm-2.24\win64\nssm.exe'
 
 & $nssm install pos3-web powershell.exe
 & $nssm set pos3-web AppParameters '-NoProfile -ExecutionPolicy Bypass -File "C:\Server\pos3_runner.ps1"'
@@ -469,15 +479,15 @@ sc.exe query pos3-web
 NSSM:
 
 ```powershell
-C:\Server\nssm-2.24\nssm-2.24\win64\nssm.exe edit pos3-web
-C:\Server\nssm-2.24\nssm-2.24\win64\nssm.exe remove pos3-web confirm
+C:\Server\nssm-2.24\win64\nssm.exe edit pos3-web
+C:\Server\nssm-2.24\win64\nssm.exe remove pos3-web confirm
 ```
 
 Reload Nginx manual:
 
 ```powershell
-cd C:\Server\nginx-1.28.3\nginx-1.28.3
-.\nginx.exe -s reload -p C:\Server\nginx-1.28.3\nginx-1.28.3 -c conf\nginx.conf
+cd C:\Server\nginx-1.28.3
+.\nginx.exe -s reload -p C:\Server\nginx-1.28.3 -c conf\nginx.conf
 ```
 
 ## 15. Troubleshooting cepat
@@ -489,7 +499,7 @@ Cek PHP-CGI:
 ```powershell
 netstat -ano | findstr ":9000"
 Get-Content C:\Server\logs\php-cgi.err.log -Tail 50
-Get-Content C:\Server\nginx-1.28.3\nginx-1.28.3\logs\error.log -Tail 50
+Get-Content C:\Server\nginx-1.28.3\logs\error.log -Tail 50
 ```
 
 Restart:
@@ -554,7 +564,7 @@ D:\Project\Web\pos3\.env             Konfigurasi lokal, jangan upload
 D:\Project\Web\pos3\storage\logs     Log Laravel
 C:\Server\pos3_runner.ps1                  Runner service
 C:\Server\logs                             Log runner/PHP
-C:\Server\nginx-1.28.3\nginx-1.28.3\logs  Log Nginx
+C:\Server\nginx-1.28.3\logs  Log Nginx
 ```
 
 ## 18. Catatan keamanan

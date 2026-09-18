@@ -356,6 +356,8 @@
 - Halaman `settings/update-web` tersedia untuk update lokal 1 klik: `git pull --ff-only`, `composer install`, `npm install`, `npm run build`, `migrate --force`, dan `view:cache` dengan log proses.
 - `README.md` diperbarui menjadi panduan instalasi lokal Windows dari awal: NSSM, Nginx, PHP 8.4.22, MySQL, HeidiSQL, Git pull, service, update web, dan troubleshooting.
 - `composer.lock` diperbarui agar `phpoffice/phpspreadsheet` tidak memblokir PHP 8.5, dan README memakai path `D:\Project\Web\pos3` serta `npm.cmd` untuk PowerShell.
+- `config/database.php` memakai konstanta `Pdo\Mysql::ATTR_SSL_CA` saat tersedia supaya PHP 8.5 tidak menampilkan deprecated notice pada perintah Artisan.
+- README folder instalasi diseragamkan: installer di `C:\Server\Installer`, server stack di `C:\Server`, dan project di `D:\Project\Web\pos3`.
 - Halaman `profile/delete` diperbaiki karena masih memanggil partial `profile.partials.background-profile` yang tidak ada.
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
 - Hosting `pos.fourhz.com` menjalankan project di `public_html/pos3`; document root belum diarahkan ke folder Laravel `public`, sehingga perlu `.htaccess` root untuk rewrite ke `public/` dan handler PHP 8.4 khusus POS3.
