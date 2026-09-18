@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-    [string] $NginxDir = 'C:\Server\nginx-1.31.6',
-    [string] $ServiceName = 'nginx',
+    [string] $NginxDir = 'C:\Server\nginx',
+    [string] $ServiceName = '',
     [int] $Port = 8082,
     [switch] $WhatIf
 )
@@ -170,18 +170,49 @@ try {
     Remove-Item -LiteralPath $stdoutPath, $stderrPath -Force -ErrorAction SilentlyContinue
 }
 
-Restart-Service -Name $ServiceName -Force -ErrorAction Stop
-$deadline = (Get-Date).AddSeconds(30)
-do {
-    Start-Sleep -Seconds 1
-    $state = (Get-Service -Name $ServiceName).Status
-} while ($state -ne 'Running' -and (Get-Date) -lt $deadline)
-
-if ($state -ne 'Running') {
-    throw "Service $ServiceName tidak berjalan. Status: $state"
+$service = $null
+if ($ServiceName) {
+    $service = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
 }
 
-Write-Output "Service $ServiceName berjalan."
+if ($null -ne $service) {
+    Restart-Service -Name $ServiceName -Force -ErrorAction Stop
+    $deadline = (Get-Date).AddSeconds(30)
+    do {
+        Start-Sleep -Seconds 1
+        $state = (Get-Service -Name $ServiceName).Status
+    } while ($state -ne 'Running' -and (Get-Date) -lt $deadline)
+
+    if ($state -ne 'Running') {
+        throw "Service $ServiceName tidak berjalan. Status: $state"
+    }
+
+    Write-Output "Service $ServiceName berjalan."
+} else {
+    $nginxProcesses = @(Get-Process -Name nginx -ErrorAction SilentlyContinue)
+    $reloadStdout = [System.IO.Path]::GetTempFileName()
+    $reloadStderr = [System.IO.Path]::GetTempFileName()
+    try {
+        if ($nginxProcesses.Count -gt 0) {
+            Write-Output 'Service Nginx tidak terdaftar. Reload proses Nginx aktif.'
+            $actionArguments = @('-s', 'reload', '-p', $prefixPath, '-c', 'conf\nginx.conf')
+        } else {
+            Write-Output 'Service Nginx tidak terdaftar dan proses Nginx tidak aktif. Menjalankan Nginx.'
+            $actionArguments = @('-p', $prefixPath, '-c', 'conf\nginx.conf')
+        }
+
+        $actionProcess = Start-Process -FilePath $nginxPath -ArgumentList $actionArguments -Wait -PassThru -WindowStyle Hidden -RedirectStandardOutput $reloadStdout -RedirectStandardError $reloadStderr
+        Get-Content -LiteralPath $reloadStdout -ErrorAction SilentlyContinue | ForEach-Object { Write-Output $_ }
+        Get-Content -LiteralPath $reloadStderr -ErrorAction SilentlyContinue | ForEach-Object { Write-Output $_ }
+        if ($actionProcess.ExitCode -ne 0) {
+            throw "Reload/start Nginx gagal dengan exit code $($actionProcess.ExitCode)."
+        }
+    } finally {
+        Remove-Item -LiteralPath $reloadStdout, $reloadStderr -Force -ErrorAction SilentlyContinue
+    }
+}
+
+Start-Sleep -Seconds 2
 
 try {
     $response = Invoke-WebRequest -Uri "http://localhost:$Port/database/backup" -UseBasicParsing -MaximumRedirection 0 -ErrorAction Stop

@@ -281,7 +281,7 @@ try {
 
     Run-Step 'Git pull' 'git.exe' @('pull', '--ff-only')
 
-    $php = 'C:\Server\php-8.5.10-nts-Win32-vs17-x64\php.exe';
+    $php = 'C:\Server\php\php.exe';
     if (-not (Test-Path $php)) { $php = 'php.exe' }
 
     $composerPhar = 'C:\ProgramData\ComposerSetup\bin\composer.phar'

@@ -358,7 +358,7 @@
 - `composer.lock` diperbarui agar `phpoffice/phpspreadsheet` tidak memblokir PHP 8.5, dan README memakai path `D:\Project\Web\pos3` serta `npm.cmd` untuk PowerShell.
 - `config/database.php` memakai konstanta `Pdo\Mysql::ATTR_SSL_CA` saat tersedia supaya PHP 8.5 tidak menampilkan deprecated notice pada perintah Artisan.
 - README folder instalasi diseragamkan: installer di `C:\Server\Installer`, server stack di `C:\Server`, dan project di `D:\Project\Web\pos3`.
-- Runtime Windows diperbarui dan service aktif memakai folder berversi: `C:\Server\nginx-1.31.6`, `C:\Server\nssm-2.24\nssm-2.24\win64`, dan `C:\Server\php-8.5.10-nts-Win32-vs17-x64`.
+- PC konsumen memakai folder runtime tanpa versi: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
 - Seeder permission dan migration additive sekarang memastikan permission `settings.menu` dibuat dan diberikan ke SuperAdmin/Manager, sehingga menu `Update Web` terlihat setelah `migrate --force` atau `db:seed`.
 - Ditambah link darurat update lokal `http://localhost:8082/update-web.test` dan starter `http://localhost:8082/update-web.start` untuk menjalankan update saat GUI/sidebar tidak bisa dibuka.
 - Menu `Update Web` di sidebar sekarang tampil untuk user admin yang punya `settings.menu`, `roles.menu`, atau `database.menu`; halaman GUI cukup memakai middleware login.

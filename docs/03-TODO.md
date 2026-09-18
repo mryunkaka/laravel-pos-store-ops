@@ -299,7 +299,7 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Composer install compatible PHP 8.5 dan instruksi NPM PowerShell memakai `npm.cmd`.
 - [x] Deprecated notice `PDO::MYSQL_ATTR_SSL_CA` pada PHP 8.5 dihilangkan.
 - [x] README memakai folder baku `C:\Server\Installer`, `C:\Server`, dan `D:\Project\Web\pos3`.
-- [x] Runtime Windows memakai folder berversi: Nginx `1.31.6`, NSSM `2.24`, dan PHP `8.5.10`.
+- [x] Runtime PC konsumen memakai folder tetap tanpa versi: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
 - [x] Permission `settings.menu` ikut dibuat oleh migration/db:seed agar menu Update Web tampil.
 - [x] Link darurat update web tanpa sidebar: `/update-web.test` dan `/update-web.start`.
 - [x] Menu sidebar Update Web tampil untuk admin meski `settings.menu` belum tersinkron.
