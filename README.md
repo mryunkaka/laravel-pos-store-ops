@@ -9,9 +9,9 @@ Installer   : C:\Server\Installer
 Server      : C:\Server
 Project     : D:\Project\Web\pos3
 URL         : http://localhost:8082
-Nginx       : C:\Server\nginx
-PHP         : C:\Server\php
-NSSM        : C:\Server\nssm
+Nginx       : C:\Server\nginx-1.31.6
+PHP         : C:\Server\php-8.5.10-nts-Win32-vs17-x64
+NSSM        : C:\Server\nssm-2.24\nssm-2.24\win64
 MySQL       : 127.0.0.1:3306
 Database    : point_of_sale
 Service     : pos3-web
@@ -32,8 +32,8 @@ Download dulu semua file ini, simpan di `C:\Server\Installer`.
 | Aplikasi | Link resmi |
 | --- | --- |
 | Git for Windows | https://git-scm.com/download/win |
-| PHP 8.4.22 NTS VS17 x64 | https://windows.php.net/download/ |
-| Nginx 1.28.3 | https://nginx.org/en/download.html |
+| PHP 8.5.10 NTS VS17 x64 | https://windows.php.net/download/ |
+| Nginx 1.31.6 | https://nginx.org/en/download.html |
 | NSSM 2.24 | https://nssm.cc/download |
 | Composer Windows | https://getcomposer.org/download/ |
 | Node.js LTS | https://nodejs.org/en/download |
@@ -53,9 +53,9 @@ Install biasa:
 Extract ZIP:
 
 ```text
-C:\Server\php
-C:\Server\nginx
-C:\Server\nssm
+C:\Server\php-8.5.10-nts-Win32-vs17-x64
+C:\Server\nginx-1.31.6
+C:\Server\nssm-2.24\nssm-2.24\win64
 ```
 
 ## 2. Setting MySQL Server
@@ -87,18 +87,18 @@ Buat database:
 CREATE DATABASE point_of_sale CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-## 3. Setting PHP 8.4.22
+## 3. Setting PHP 8.5.10
 
 Copy file:
 
 ```text
-C:\Server\php\php.ini-development
+C:\Server\php-8.5.10-nts-Win32-vs17-x64\php.ini-development
 ```
 
 Rename jadi:
 
 ```text
-C:\Server\php\php.ini
+C:\Server\php-8.5.10-nts-Win32-vs17-x64\php.ini
 ```
 
 Edit `php.ini`, pastikan baris ini aktif:
@@ -125,7 +125,7 @@ date.timezone=Asia/Jakarta
 Tambah PHP ke PATH Windows:
 
 ```text
-C:\Server\php
+C:\Server\php-8.5.10-nts-Win32-vs17-x64
 ```
 
 Cek di PowerShell baru:
@@ -230,7 +230,7 @@ php artisan view:cache
 Edit file:
 
 ```text
-C:\Server\nginx\conf\nginx.conf
+C:\Server\nginx-1.31.6\conf\nginx.conf
 ```
 
 Isi minimal:
@@ -272,18 +272,17 @@ http {
             deny all;
         }
 
-        location ~ /(app|bootstrap|config|database|resources|routes|storage|tests|vendor)/ {
-            deny all;
-        }
     }
 }
 ```
 
+Jangan menambahkan blok `deny` untuk URI `/database/`, `/storage/`, `/config/`, atau folder Laravel lain pada virtual host POS3. `root` sudah menunjuk ke folder `public`; blok tersebut akan ikut memblokir route Laravel `/database/backup` dan menghasilkan `403 Forbidden nginx/1.31.6`.
+
 Test config:
 
 ```powershell
-cd C:\Server\nginx
-.\nginx.exe -t -p C:\Server\nginx -c conf\nginx.conf
+cd C:\Server\nginx-1.31.6
+.\nginx.exe -t -p C:\Server\nginx-1.31.6 -c conf\nginx.conf
 ```
 
 Harus muncul:
@@ -306,9 +305,9 @@ Isi:
 ```powershell
 $ErrorActionPreference = 'Stop'
 
-$phpCgi = 'C:\Server\php\php-cgi.exe'
-$phpIni = 'C:\Server\php\php.ini'
-$nginxDir = 'C:\Server\nginx'
+$phpCgi = 'C:\Server\php-8.5.10-nts-Win32-vs17-x64\php-cgi.exe'
+$phpIni = 'C:\Server\php-8.5.10-nts-Win32-vs17-x64\php.ini'
+$nginxDir = 'C:\Server\nginx-1.31.6'
 $nginxExe = Join-Path $nginxDir 'nginx.exe'
 $logDir = 'C:\Server\logs'
 
@@ -344,7 +343,7 @@ while ($true) {
 Buka PowerShell **Run as Administrator**.
 
 ```powershell
-$nssm = 'C:\Server\nssm\win64\nssm.exe'
+$nssm = 'C:\Server\nssm-2.24\nssm-2.24\win64\nssm.exe'
 
 & $nssm install pos3-web powershell.exe
 & $nssm set pos3-web AppParameters '-NoProfile -ExecutionPolicy Bypass -File "C:\Server\pos3_runner.ps1"'
@@ -485,15 +484,15 @@ sc.exe query pos3-web
 NSSM:
 
 ```powershell
-C:\Server\nssm\win64\nssm.exe edit pos3-web
-C:\Server\nssm\win64\nssm.exe remove pos3-web confirm
+C:\Server\nssm-2.24\nssm-2.24\win64\nssm.exe edit pos3-web
+C:\Server\nssm-2.24\nssm-2.24\win64\nssm.exe remove pos3-web confirm
 ```
 
 Reload Nginx manual:
 
 ```powershell
-cd C:\Server\nginx
-.\nginx.exe -s reload -p C:\Server\nginx -c conf\nginx.conf
+cd C:\Server\nginx-1.31.6
+.\nginx.exe -s reload -p C:\Server\nginx-1.31.6 -c conf\nginx.conf
 ```
 
 ## 15. Troubleshooting cepat
@@ -505,7 +504,7 @@ Cek PHP-CGI:
 ```powershell
 netstat -ano | findstr ":9000"
 Get-Content C:\Server\logs\php-cgi.err.log -Tail 50
-Get-Content C:\Server\nginx\logs\error.log -Tail 50
+Get-Content C:\Server\nginx-1.31.6\logs\error.log -Tail 50
 ```
 
 Restart:
@@ -541,6 +540,41 @@ Cek service MySQL:
 sc.exe query MySQL80
 ```
 
+### 403 Forbidden pada `/database/backup`
+
+Jika halaman menampilkan `403 Forbidden nginx/1.31.6`, buka:
+
+```text
+C:\Server\nginx-1.31.6\conf\nginx.conf
+```
+
+Hapus blok berikut jika masih ada pada server POS3:
+
+```nginx
+location ~ /(app|bootstrap|config|database|resources|routes|storage|tests|vendor)/ {
+    deny all;
+}
+```
+
+Pastikan `root` tetap mengarah ke folder `public`, lalu jalankan repair otomatis:
+
+```powershell
+cd D:\Project\Web\pos3
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\repair-consumer-backup-403.ps1
+```
+
+Jalankan PowerShell sebagai **Administrator**. Script hanya memproses server block Nginx port `8082`, membuat backup `nginx.conf`, menghapus blok deny yang salah, menjalankan `nginx -t`, restart service, dan mengecek URL. Script tidak menyentuh database atau file transaksi.
+
+Jika script tidak tersedia, perbaiki manual lalu uji dan restart Nginx:
+
+```powershell
+cd C:\Server\nginx-1.31.6
+.\nginx.exe -t -p C:\Server\nginx-1.31.6 -c conf\nginx.conf
+Restart-Service nginx
+```
+
+Setelah itu login dengan user yang memiliki permission `database.menu`. Jangan menghapus middleware permission dari route backup.
+
 ### Port 8082 dipakai aplikasi lain
 
 ```powershell
@@ -570,7 +604,7 @@ D:\Project\Web\pos3\.env             Konfigurasi lokal, jangan upload
 D:\Project\Web\pos3\storage\logs     Log Laravel
 C:\Server\pos3_runner.ps1                  Runner service
 C:\Server\logs                             Log runner/PHP
-C:\Server\nginx\logs  Log Nginx
+C:\Server\nginx-1.31.6\logs  Log Nginx
 ```
 
 ## 18. Catatan keamanan

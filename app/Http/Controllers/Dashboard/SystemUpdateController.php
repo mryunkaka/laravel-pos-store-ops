@@ -281,16 +281,16 @@ try {
 
     Run-Step 'Git pull' 'git.exe' @('pull', '--ff-only')
 
-    $php = 'C:\Server\php\php.exe'
+    $php = 'C:\Server\php-8.5.10-nts-Win32-vs17-x64\php.exe';
     if (-not (Test-Path $php)) { $php = 'php.exe' }
 
     $composerPhar = 'C:\ProgramData\ComposerSetup\bin\composer.phar'
     if (Test-Path $composerPhar) {
-        Run-Step 'Composer install' $php @($composerPhar, 'install', '--no-interaction', '--prefer-dist', '--optimize-autoloader', '--ignore-platform-req=php')
+        Run-Step 'Composer install' $php @($composerPhar, 'install', '--no-interaction', '--prefer-dist', '--optimize-autoloader')
     } elseif (Test-Path (Join-Path $ProjectPath 'composer.phar')) {
-        Run-Step 'Composer install' $php @('composer.phar', 'install', '--no-interaction', '--prefer-dist', '--optimize-autoloader', '--ignore-platform-req=php')
+        Run-Step 'Composer install' $php @('composer.phar', 'install', '--no-interaction', '--prefer-dist', '--optimize-autoloader')
     } else {
-        Run-Step 'Composer install' 'composer.exe' @('install', '--no-interaction', '--prefer-dist', '--optimize-autoloader', '--ignore-platform-req=php')
+        Run-Step 'Composer install' 'composer.exe' @('install', '--no-interaction', '--prefer-dist', '--optimize-autoloader')
     }
 
     Run-Step 'NPM install' 'npm.cmd' @('install')

@@ -41,8 +41,8 @@ class RolePermissionSeeder extends Seeder
 
         // Create Roles and Assign Permissions
         Role::firstOrCreate(['name' => 'SuperAdmin'])->syncPermissions(Permission::all());
-        Role::firstOrCreate(['name' => 'Admin'])->syncPermissions(['customer.menu', 'user.menu', 'supplier.menu', 'attendance.menu']);
+        Role::firstOrCreate(['name' => 'Admin'])->syncPermissions(['customer.menu', 'user.menu', 'supplier.menu', 'attendance.menu', 'database.menu']);
         Role::firstOrCreate(['name' => 'Account'])->syncPermissions(['customer.menu', 'user.menu', 'supplier.menu']);
-        Role::firstOrCreate(['name' => 'Manager'])->syncPermissions(['stock.menu', 'orders.menu', 'product.menu', 'salary.menu', 'employee.menu', 'attendance.menu', 'void.order']);
+        Role::firstOrCreate(['name' => 'Manager'])->syncPermissions(['stock.menu', 'orders.menu', 'product.menu', 'salary.menu', 'employee.menu', 'attendance.menu', 'void.order', 'database.menu']);
     }
 }

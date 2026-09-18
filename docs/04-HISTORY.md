@@ -55,14 +55,16 @@
 - Path contoh disederhanakan ke `D:\Project\Web\pos3` tanpa nama user, dan perintah NPM PowerShell memakai `npm.cmd` supaya tidak terkena Execution Policy.
 - `phpoffice/phpspreadsheet` di-lock ke versi yang menerima PHP 8.5 sehingga `composer install` tidak gagal pada PHP 8.5.10.
 - `config/database.php` dibuat kompatibel PHP 8.5 dengan konstanta `Pdo\Mysql::ATTR_SSL_CA` agar `composer install`, `key:generate`, `migrate`, `db:seed`, dan cache Artisan tidak memunculkan deprecated notice.
-- Struktur folder README diseragamkan: installer Git/Composer/Node/HeidiSQL/VC++/MySQL di `C:\Server\Installer`, Nginx/NSSM/PHP di `C:\Server`, dan project POS3 di `D:\Project\Web\pos3`.
-- Path server README dibuat tanpa nama versi folder agar setup konsumen lebih mudah: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
+- Struktur folder README diseragamkan: installer Git/Composer/Node/HeidiSQL/VC++/MySQL di `C:\Server\Installer`, runtime berversi di `C:\Server`, dan project POS3 di `D:\Project\Web\pos3`.
+- Runtime server kemudian dikunci ke folder berversi: `C:\Server\nginx-1.31.6`, `C:\Server\nssm-2.24\nssm-2.24\win64`, dan `C:\Server\php-8.5.10-nts-Win32-vs17-x64`; konfigurasi service tidak lagi memakai folder generik tanpa versi.
 - `DatabaseSeeder` sekarang memanggil `Phase7PermissionSeeder`, `RolePermissionSeeder` dibuat idempotent, dan migration additive menambahkan `settings.menu` untuk SuperAdmin/Manager supaya database yang sudah terlanjur di-seed tetap mendapat menu Update Web saat `migrate --force`.
 - Ditambah halaman tes/darurat update web di `/update-web.test` dan link langsung `/update-web.start`, dibatasi hanya localhost, supaya update tetap bisa dijalankan jika GUI utama rusak.
 - Menu sidebar `Update Web` tidak lagi bergantung hanya pada `settings.menu`; user dengan `roles.menu` atau `database.menu` juga bisa melihat menu, sementara route GUI cukup memakai middleware login.
 - Progress Update Web diperjelas dengan persentase berbasis langkah log, progress bar animasi, status langkah berjalan, dan catatan bahwa PowerShell update sudah dipanggil agar tidak terlihat stuck.
 - Halaman `settings/update-web` memakai polling realtime ke endpoint status JSON setiap 1 detik untuk memperbarui log/progress tanpa reload penuh, lalu reload otomatis saat proses selesai sukses.
 - Ditambah tombol `Copy Log Update`, notifikasi update baru dari Git, pesan aturan aman data di UI, dan `docs/06-UPDATE_WEB.md` yang menegaskan update otomatis tidak boleh menghapus/mengubah data operasional lama.
+- Panduan Nginx konsumen diperbaiki: contoh `deny` untuk URI `/database/` dihapus karena memblokir route Laravel `/database/backup` dengan `403 Forbidden nginx/1.31.6`; permission aplikasi tetap dipertahankan.
+- Ditambahkan migration additive `2026_09_18_000001_ensure_database_backup_menu_permission` untuk memberi `database.menu` ke `SuperAdmin`, `Admin`, dan `Manager`; `restore-database` tidak diberikan ke role biasa.
 
 ## 2026-07-10
 

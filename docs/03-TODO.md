@@ -84,6 +84,8 @@ Tujuan: memastikan fitur bawaan project tercatat, bisa dipakai, dan menjadi dasa
 - [x] Role & permission tersedia.
 - [x] Manajemen pengguna tersedia.
 - [x] Database backup tersedia.
+- [ ] Jalankan script repair pada PC konsumen dan verifikasi route `/database/backup` tidak diblokir aturan URI Nginx; akses tetap dijaga middleware `database.menu`.
+- [x] Migration additive memastikan role `SuperAdmin`, `Admin`, dan `Manager` mendapat `database.menu` tanpa membuka permission restore.
 - [x] Instalasi lokal, migration, seeder, storage link, dan server port `8084` selesai.
 
 ## Phase 2 - Prioritas Data Aman Untuk POS
@@ -297,7 +299,7 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Composer install compatible PHP 8.5 dan instruksi NPM PowerShell memakai `npm.cmd`.
 - [x] Deprecated notice `PDO::MYSQL_ATTR_SSL_CA` pada PHP 8.5 dihilangkan.
 - [x] README memakai folder baku `C:\Server\Installer`, `C:\Server`, dan `D:\Project\Web\pos3`.
-- [x] README memakai path server tanpa versi: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
+- [x] Runtime Windows memakai folder berversi: Nginx `1.31.6`, NSSM `2.24`, dan PHP `8.5.10`.
 - [x] Permission `settings.menu` ikut dibuat oleh migration/db:seed agar menu Update Web tampil.
 - [x] Link darurat update web tanpa sidebar: `/update-web.test` dan `/update-web.start`.
 - [x] Menu sidebar Update Web tampil untuk admin meski `settings.menu` belum tersinkron.
