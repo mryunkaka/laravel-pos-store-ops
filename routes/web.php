@@ -262,6 +262,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/help', [HelpController::class, 'index'])->name('help.index');
 });
 
+// ====== SYSTEM UPDATE ======
+Route::middleware('auth')->group(function () {
+    Route::get('/settings/update-web', [SystemUpdateController::class, 'index'])->name('system-update.index');
+    Route::post('/settings/update-web/run', [SystemUpdateController::class, 'run'])->name('system-update.run');
+});
+
 // ====== REPORTS ======
 Route::middleware(['permission:report.menu'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
@@ -280,8 +286,6 @@ Route::middleware(['permission:settings.menu'])->group(function () {
     Route::get('/settings/store', [StoreSettingController::class, 'edit'])->name('settings.store.edit');
     Route::put('/settings/store', [StoreSettingController::class, 'update'])->name('settings.store.update');
     Route::post('/settings/store/whatsapp-test', [StoreSettingController::class, 'testWhatsapp'])->name('settings.store.whatsappTest');
-    Route::get('/settings/update-web', [SystemUpdateController::class, 'index'])->name('system-update.index');
-    Route::post('/settings/update-web/run', [SystemUpdateController::class, 'run'])->name('system-update.run');
 });
 
 // ====== ROLE CONTROLLER ======

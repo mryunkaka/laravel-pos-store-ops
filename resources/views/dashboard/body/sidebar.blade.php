@@ -3,6 +3,7 @@
     $salaryActive = Request::is('advance-salary*') || Request::is('pay-salary*');
     $attendanceActive = Request::is('attendance*');
     $roleActive = Request::is('permission*') || Request::is('role*');
+    $canUpdateWeb = auth()->user()->can('settings.menu') || auth()->user()->can('roles.menu') || auth()->user()->can('database.menu');
 @endphp
 
 <div class="iq-sidebar sidebar-default ">
@@ -237,7 +238,7 @@
                     <li class="{{ Request::is('customers*') ? 'active' : '' }}">
                         <a href="{{ route('customers.index') }}" class="svg-icon">
                             <x-heroicon-o-user-group class="w-6 h-6" />
-                            <span class="ml-3">Pelanggan</span>
+                            <span class="ml-3">Pelangganan</span>
                             </a>
                             </li>
                 @endif
@@ -334,7 +335,10 @@
                             <span class="ml-3">Pengaturan Toko</span>
                         </a>
                     </li>
-                    <li class="{{ Request::is('settings/update-web*') ? 'active' : '' }}">
+                @endif
+
+                @if ($canUpdateWeb)
+                    <li class="{{ Request::is('settings/update-web*') || Request::is('update-web*') ? 'active' : '' }}">
                         <a href="{{ route('system-update.index') }}" class="svg-icon">
                             <x-heroicon-o-arrow-path class="w-6 h-6" />
                             <span class="ml-3">Update Web</span>
