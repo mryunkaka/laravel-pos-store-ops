@@ -364,6 +364,7 @@
 - Menu `Update Web` di sidebar sekarang tampil untuk user admin yang punya `settings.menu`, `roles.menu`, atau `database.menu`; halaman GUI cukup memakai middleware login.
 - Template Nginx POS3 tidak memblokir URI `/database/`; blok `deny` untuk URI `/database/` menyebabkan `403 Forbidden nginx/1.31.6` pada route Laravel `/database/backup` walaupun document root sudah benar di folder `public`.
 - Migration additive `2026_09_18_000001_ensure_database_backup_menu_permission` memastikan role `SuperAdmin`, `Admin`, dan `Manager` mendapat `database.menu`; permission `restore-database` tetap terpisah.
+- Script repair konsumen juga memperbaiki `try_files $uri $uri/ /index.php?$query_string;` menjadi fallback Laravel langsung, karena URI `/database/backup` dapat berhenti pada resolusi folder fisik sebelum masuk Laravel.
 - Halaman Update Web sekarang menampilkan progress bar persentase, label langkah berjalan, auto refresh, dan log awal saat PowerShell update dipanggil.
 - Log halaman `settings/update-web` sekarang realtime via endpoint JSON status tiap 1 detik dan otomatis reload saat update selesai berhasil.
 - `docs/06-UPDATE_WEB.md` ditambahkan untuk mencatat aturan aman data: update hanya boleh tambah tabel/kolom/index/permission dan tidak boleh menghapus atau mengubah riwayat transaksi/piutang/stok/data operasional.

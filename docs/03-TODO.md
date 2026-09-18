@@ -84,7 +84,7 @@ Tujuan: memastikan fitur bawaan project tercatat, bisa dipakai, dan menjadi dasa
 - [x] Role & permission tersedia.
 - [x] Manajemen pengguna tersedia.
 - [x] Database backup tersedia.
-- [ ] Jalankan script repair pada PC konsumen dan verifikasi route `/database/backup` tidak diblokir aturan URI Nginx; akses tetap dijaga middleware `database.menu`.
+- [ ] Jalankan script repair pada PC konsumen dan verifikasi route `/database/backup` tidak diblokir aturan URI Nginx atau `try_files`; akses tetap dijaga middleware `database.menu`.
 - [x] Migration additive memastikan role `SuperAdmin`, `Admin`, dan `Manager` mendapat `database.menu` tanpa membuka permission restore.
 - [x] Instalasi lokal, migration, seeder, storage link, dan server port `8084` selesai.
 

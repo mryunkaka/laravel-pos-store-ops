@@ -65,6 +65,7 @@
 - Ditambah tombol `Copy Log Update`, notifikasi update baru dari Git, pesan aturan aman data di UI, dan `docs/06-UPDATE_WEB.md` yang menegaskan update otomatis tidak boleh menghapus/mengubah data operasional lama.
 - Panduan Nginx konsumen diperbaiki: contoh `deny` untuk URI `/database/` dihapus karena memblokir route Laravel `/database/backup` dengan `403 Forbidden nginx/1.31.6`; permission aplikasi tetap dipertahankan.
 - Ditambahkan migration additive `2026_09_18_000001_ensure_database_backup_menu_permission` untuk memberi `database.menu` ke `SuperAdmin`, `Admin`, dan `Manager`; `restore-database` tidak diberikan ke role biasa.
+- Script repair konsumen diperkuat untuk menghapus rule `deny` yang salah dan mengubah `try_files` Laravel dari `$uri $uri/` ke fallback `/index.php`, sehingga route `/database/backup` selalu diproses Laravel.
 
 ## 2026-07-10
 

@@ -257,7 +257,7 @@ http {
         client_max_body_size 64M;
 
         location / {
-            try_files $uri $uri/ /index.php?$query_string;
+            try_files $uri /index.php?$query_string;
         }
 
         location ~ \.php$ {
@@ -276,7 +276,7 @@ http {
 }
 ```
 
-Jangan menambahkan blok `deny` untuk URI `/database/`, `/storage/`, `/config/`, atau folder Laravel lain pada virtual host POS3. `root` sudah menunjuk ke folder `public`; blok tersebut akan ikut memblokir route Laravel `/database/backup` dan menghasilkan `403 Forbidden nginx/1.31.6`.
+Jangan menambahkan blok `deny` untuk URI `/database/`, `/storage/`, `/config/`, atau folder Laravel lain pada virtual host POS3. `root` sudah menunjuk ke folder `public`; blok tersebut akan ikut memblokir route Laravel `/database/backup` dan menghasilkan `403 Forbidden nginx/1.31.6`. Untuk route Laravel, gunakan `try_files $uri /index.php?$query_string;`, bukan `try_files $uri $uri/ /index.php?$query_string;`, agar URI `/database/backup` tidak berhenti pada resolusi folder fisik.
 
 Test config:
 
@@ -563,7 +563,7 @@ cd D:\Project\Web\pos3
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\repair-consumer-backup-403.ps1
 ```
 
-Jalankan PowerShell sebagai **Administrator**. Script hanya memproses server block Nginx port `8082`, membuat backup `nginx.conf`, menghapus blok deny yang salah, menjalankan `nginx -t`, restart service, dan mengecek URL. Script tidak menyentuh database atau file transaksi.
+Jalankan PowerShell sebagai **Administrator**. Script hanya memproses server block Nginx port `8082`, membuat backup `nginx.conf`, menghapus blok deny yang salah, memperbaiki `try_files` Laravel jika masih memakai `$uri $uri/`, menjalankan `nginx -t`, restart service, dan mengecek URL. Script tidak menyentuh database atau file transaksi.
 
 Jika script tidak tersedia, perbaiki manual lalu uji dan restart Nginx:
 

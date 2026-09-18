@@ -93,16 +93,34 @@ $patterns = @(
 )
 
 $updatedServer = $server.Text
+$denyRemoved = $false
 foreach ($pattern in $patterns) {
-    $updatedServer = [regex]::Replace(
+    $nextServer = [regex]::Replace(
         $updatedServer,
         $pattern,
         [System.Text.RegularExpressions.MatchEvaluator] { param($match) "`r`n" }
     )
+    if ($nextServer -ne $updatedServer) {
+        $denyRemoved = $true
+    }
+    $updatedServer = $nextServer
 }
 
-if ($updatedServer -eq $server.Text) {
-    Write-Output 'Tidak ditemukan blok deny yang memblokir /database/. Konfigurasi tidak diubah.'
+$tryFilesPattern = '(?m)^([ \t]*)try_files[ \t]+\$uri[ \t]+\$uri/[ \t]+(/index\.php\?\$query_string;)[ \t]*$'
+$nextServer = [regex]::Replace(
+    $updatedServer,
+    $tryFilesPattern,
+    [System.Text.RegularExpressions.MatchEvaluator] {
+        param($match)
+        "$($match.Groups[1].Value)try_files `$uri $($match.Groups[2].Value)"
+    }
+)
+$tryFilesChanged = $nextServer -ne $updatedServer
+$updatedServer = $nextServer
+$configChanged = $updatedServer -ne $server.Text
+
+if (-not $configChanged) {
+    Write-Output 'Tidak ditemukan rule Nginx yang memblokir route /database/backup.'
     if ($WhatIf) {
         Write-Output 'WhatIf aktif. Konfigurasi dan service tidak diubah.'
         exit 0
@@ -110,7 +128,12 @@ if ($updatedServer -eq $server.Text) {
 } else {
     $updated = $content.Substring(0, $server.Index) + $updatedServer + $content.Substring($server.Index + $server.Length)
     if ($WhatIf) {
-        Write-Output 'Blok deny untuk /database/ ditemukan pada server block 8082.'
+        if ($denyRemoved) {
+            Write-Output 'Rule deny untuk /database/ ditemukan pada server block 8082.'
+        }
+        if ($tryFilesChanged) {
+            Write-Output 'Rule try_files Laravel diperbaiki agar route tidak berhenti pada folder fisik.'
+        }
         Write-Output 'WhatIf aktif. Konfigurasi dan service tidak diubah.'
         exit 0
     }
@@ -119,7 +142,12 @@ if ($updatedServer -eq $server.Text) {
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($configPath, $updated, $utf8NoBom)
     Write-Output "Backup konfigurasi: $backupPath"
-    Write-Output 'Blok deny untuk /database/ dihapus.'
+    if ($denyRemoved) {
+        Write-Output 'Rule deny untuk /database/ dihapus.'
+    }
+    if ($tryFilesChanged) {
+        Write-Output 'Rule try_files Laravel diperbaiki.'
+    }
 }
 
 $stdoutPath = [System.IO.Path]::GetTempFileName()
