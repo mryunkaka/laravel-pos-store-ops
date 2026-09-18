@@ -238,7 +238,7 @@
                     <li class="{{ Request::is('customers*') ? 'active' : '' }}">
                         <a href="{{ route('customers.index') }}" class="svg-icon">
                             <x-heroicon-o-user-group class="w-6 h-6" />
-                            <span class="ml-3">Pelangganan</span>
+                            <span class="ml-3">Pelanggan</span>
                             </a>
                             </li>
                 @endif
