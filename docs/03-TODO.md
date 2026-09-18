@@ -297,6 +297,7 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Composer install compatible PHP 8.5 dan instruksi NPM PowerShell memakai `npm.cmd`.
 - [x] Deprecated notice `PDO::MYSQL_ATTR_SSL_CA` pada PHP 8.5 dihilangkan.
 - [x] README memakai folder baku `C:\Server\Installer`, `C:\Server`, dan `D:\Project\Web\pos3`.
+- [x] README memakai path server tanpa versi: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
 - [x] Halaman hapus akun profil bisa dibuka tanpa error missing partial.
 
 ## Daftar 20 Fitur Tambahan Utama

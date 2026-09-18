@@ -56,6 +56,7 @@
 - `phpoffice/phpspreadsheet` di-lock ke versi yang menerima PHP 8.5 sehingga `composer install` tidak gagal pada PHP 8.5.10.
 - `config/database.php` dibuat kompatibel PHP 8.5 dengan konstanta `Pdo\Mysql::ATTR_SSL_CA` agar `composer install`, `key:generate`, `migrate`, `db:seed`, dan cache Artisan tidak memunculkan deprecated notice.
 - Struktur folder README diseragamkan: installer Git/Composer/Node/HeidiSQL/VC++/MySQL di `C:\Server\Installer`, Nginx/NSSM/PHP di `C:\Server`, dan project POS3 di `D:\Project\Web\pos3`.
+- Path server README dibuat tanpa nama versi folder agar setup konsumen lebih mudah: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
 
 ## 2026-07-10
 

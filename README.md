@@ -9,9 +9,9 @@ Installer   : C:\Server\Installer
 Server      : C:\Server
 Project     : D:\Project\Web\pos3
 URL         : http://localhost:8082
-Nginx       : C:\Server\nginx-1.28.3
-PHP         : C:\Server\php-8.4.22-nts-Win32-vs17-x64
-NSSM        : C:\Server\nssm-2.24
+Nginx       : C:\Server\nginx
+PHP         : C:\Server\php
+NSSM        : C:\Server\nssm
 MySQL       : 127.0.0.1:3306
 Database    : point_of_sale
 Service     : pos3-web
@@ -53,9 +53,9 @@ Install biasa:
 Extract ZIP:
 
 ```text
-C:\Server\php-8.4.22-nts-Win32-vs17-x64
-C:\Server\nginx-1.28.3
-C:\Server\nssm-2.24
+C:\Server\php
+C:\Server\nginx
+C:\Server\nssm
 ```
 
 ## 2. Setting MySQL Server
@@ -92,13 +92,13 @@ CREATE DATABASE point_of_sale CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 Copy file:
 
 ```text
-C:\Server\php-8.4.22-nts-Win32-vs17-x64\php.ini-development
+C:\Server\php\php.ini-development
 ```
 
 Rename jadi:
 
 ```text
-C:\Server\php-8.4.22-nts-Win32-vs17-x64\php.ini
+C:\Server\php\php.ini
 ```
 
 Edit `php.ini`, pastikan baris ini aktif:
@@ -125,7 +125,7 @@ date.timezone=Asia/Jakarta
 Tambah PHP ke PATH Windows:
 
 ```text
-C:\Server\php-8.4.22-nts-Win32-vs17-x64
+C:\Server\php
 ```
 
 Cek di PowerShell baru:
@@ -230,7 +230,7 @@ php artisan view:cache
 Edit file:
 
 ```text
-C:\Server\nginx-1.28.3\conf\nginx.conf
+C:\Server\nginx\conf\nginx.conf
 ```
 
 Isi minimal:
@@ -282,8 +282,8 @@ http {
 Test config:
 
 ```powershell
-cd C:\Server\nginx-1.28.3
-.\nginx.exe -t -p C:\Server\nginx-1.28.3 -c conf\nginx.conf
+cd C:\Server\nginx
+.\nginx.exe -t -p C:\Server\nginx -c conf\nginx.conf
 ```
 
 Harus muncul:
@@ -306,9 +306,9 @@ Isi:
 ```powershell
 $ErrorActionPreference = 'Stop'
 
-$phpCgi = 'C:\Server\php-8.4.22-nts-Win32-vs17-x64\php-cgi.exe'
-$phpIni = 'C:\Server\php-8.4.22-nts-Win32-vs17-x64\php.ini'
-$nginxDir = 'C:\Server\nginx-1.28.3'
+$phpCgi = 'C:\Server\php\php-cgi.exe'
+$phpIni = 'C:\Server\php\php.ini'
+$nginxDir = 'C:\Server\nginx'
 $nginxExe = Join-Path $nginxDir 'nginx.exe'
 $logDir = 'C:\Server\logs'
 
@@ -344,7 +344,7 @@ while ($true) {
 Buka PowerShell **Run as Administrator**.
 
 ```powershell
-$nssm = 'C:\Server\nssm-2.24\win64\nssm.exe'
+$nssm = 'C:\Server\nssm\win64\nssm.exe'
 
 & $nssm install pos3-web powershell.exe
 & $nssm set pos3-web AppParameters '-NoProfile -ExecutionPolicy Bypass -File "C:\Server\pos3_runner.ps1"'
@@ -479,15 +479,15 @@ sc.exe query pos3-web
 NSSM:
 
 ```powershell
-C:\Server\nssm-2.24\win64\nssm.exe edit pos3-web
-C:\Server\nssm-2.24\win64\nssm.exe remove pos3-web confirm
+C:\Server\nssm\win64\nssm.exe edit pos3-web
+C:\Server\nssm\win64\nssm.exe remove pos3-web confirm
 ```
 
 Reload Nginx manual:
 
 ```powershell
-cd C:\Server\nginx-1.28.3
-.\nginx.exe -s reload -p C:\Server\nginx-1.28.3 -c conf\nginx.conf
+cd C:\Server\nginx
+.\nginx.exe -s reload -p C:\Server\nginx -c conf\nginx.conf
 ```
 
 ## 15. Troubleshooting cepat
@@ -499,7 +499,7 @@ Cek PHP-CGI:
 ```powershell
 netstat -ano | findstr ":9000"
 Get-Content C:\Server\logs\php-cgi.err.log -Tail 50
-Get-Content C:\Server\nginx-1.28.3\logs\error.log -Tail 50
+Get-Content C:\Server\nginx\logs\error.log -Tail 50
 ```
 
 Restart:
@@ -564,7 +564,7 @@ D:\Project\Web\pos3\.env             Konfigurasi lokal, jangan upload
 D:\Project\Web\pos3\storage\logs     Log Laravel
 C:\Server\pos3_runner.ps1                  Runner service
 C:\Server\logs                             Log runner/PHP
-C:\Server\nginx-1.28.3\logs  Log Nginx
+C:\Server\nginx\logs  Log Nginx
 ```
 
 ## 18. Catatan keamanan
