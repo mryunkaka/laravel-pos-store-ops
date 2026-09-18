@@ -45,10 +45,6 @@
                         {{ $updateInfo['message'] }}
                     </div>
 
-                    <div class="alert alert-danger" role="alert">
-                        <strong>Aturan aman data:</strong> update web tidak boleh menghapus/mengubah isi data transaksi, piutang, produk, pelanggan, atau riwayat. Perubahan database hanya boleh tambah tabel, tambah kolom, tambah index, atau tambah permission. Jika butuh perubahan data lama, wajib backup dan konfirmasi manual dulu.
-                    </div>
-
                     <form action="{{ route('system-update.run') }}" method="POST" onsubmit="return confirm('Jalankan update web sekarang?');">
                         @csrf
                         <button type="submit" class="btn btn-primary" {{ $isRunning ? 'disabled' : '' }}>
