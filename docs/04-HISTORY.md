@@ -60,6 +60,8 @@
 - `DatabaseSeeder` sekarang memanggil `Phase7PermissionSeeder`, `RolePermissionSeeder` dibuat idempotent, dan migration additive menambahkan `settings.menu` untuk SuperAdmin/Manager supaya database yang sudah terlanjur di-seed tetap mendapat menu Update Web saat `migrate --force`.
 - Ditambah halaman tes/darurat update web di `/update-web.test` dan link langsung `/update-web.start`, dibatasi hanya localhost, supaya update tetap bisa dijalankan jika GUI utama rusak.
 - Menu sidebar `Update Web` tidak lagi bergantung hanya pada `settings.menu`; user dengan `roles.menu` atau `database.menu` juga bisa melihat menu, sementara route GUI cukup memakai middleware login.
+- Progress Update Web diperjelas dengan persentase berbasis langkah log, progress bar animasi, status langkah berjalan, dan catatan bahwa PowerShell update sudah dipanggil agar tidak terlihat stuck.
+- Halaman `settings/update-web` memakai polling realtime ke endpoint status JSON setiap 1 detik untuk memperbarui log/progress tanpa reload penuh, lalu reload otomatis saat proses selesai sukses.
 
 ## 2026-07-10
 

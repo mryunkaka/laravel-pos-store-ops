@@ -362,6 +362,8 @@
 - Seeder permission dan migration additive sekarang memastikan permission `settings.menu` dibuat dan diberikan ke SuperAdmin/Manager, sehingga menu `Update Web` terlihat setelah `migrate --force` atau `db:seed`.
 - Ditambah link darurat update lokal `http://localhost:8082/update-web.test` dan starter `http://localhost:8082/update-web.start` untuk menjalankan update saat GUI/sidebar tidak bisa dibuka.
 - Menu `Update Web` di sidebar sekarang tampil untuk user admin yang punya `settings.menu`, `roles.menu`, atau `database.menu`; halaman GUI cukup butuh login.
+- Halaman Update Web sekarang menampilkan progress bar persentase, label langkah berjalan, auto refresh, dan log awal saat PowerShell update dipanggil.
+- Log halaman `settings/update-web` sekarang realtime via endpoint JSON status tiap 1 detik dan otomatis reload saat update selesai berhasil.
 - Halaman `profile/delete` diperbaiki karena masih memanggil partial `profile.partials.background-profile` yang tidak ada.
 - `composer.phar` masih file lokal yang tidak terlacak, dipakai supaya tidak perlu Composer global.
 - Hosting `pos.fourhz.com` menjalankan project di `public_html/pos3`; document root belum diarahkan ke folder Laravel `public`, sehingga perlu `.htaccess` root untuk rewrite ke `public/` dan handler PHP 8.4 khusus POS3.

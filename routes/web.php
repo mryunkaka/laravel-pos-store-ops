@@ -265,6 +265,7 @@ Route::middleware('auth')->group(function () {
 // ====== SYSTEM UPDATE ======
 Route::middleware('auth')->group(function () {
     Route::get('/settings/update-web', [SystemUpdateController::class, 'index'])->name('system-update.index');
+    Route::get('/settings/update-web/status', [SystemUpdateController::class, 'status'])->name('system-update.status');
     Route::post('/settings/update-web/run', [SystemUpdateController::class, 'run'])->name('system-update.run');
 });
 

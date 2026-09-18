@@ -301,6 +301,8 @@ Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otom
 - [x] Permission `settings.menu` ikut dibuat oleh migration/db:seed agar menu Update Web tampil.
 - [x] Link darurat update web tanpa sidebar: `/update-web.test` dan `/update-web.start`.
 - [x] Menu sidebar Update Web tampil untuk admin meski `settings.menu` belum tersinkron.
+- [x] Halaman Update Web menampilkan progress bar/persentase dan status langkah.
+- [x] Log Update Web realtime dan halaman reload otomatis setelah sukses.
 - [x] Halaman hapus akun profil bisa dibuka tanpa error missing partial.
 
 ## Daftar 20 Fitur Tambahan Utama

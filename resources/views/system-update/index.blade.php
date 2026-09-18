@@ -48,6 +48,19 @@
                         </button>
                     </form>
 
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong id="update-progress-label">{{ $progress['label'] }}</strong>
+                            <span id="update-progress-percent">{{ $progress['percent'] }}%</span>
+                        </div>
+                        <div class="progress" style="height: 24px;">
+                            <div id="update-progress-bar" class="progress-bar progress-bar-striped {{ $isRunning ? 'progress-bar-animated' : '' }}" role="progressbar" style="width: {{ $progress['percent'] }}%;" aria-valuenow="{{ $progress['percent'] }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ $progress['percent'] }}%
+                            </div>
+                        </div>
+                        <small id="update-progress-note" class="text-muted d-block mt-2">{{ $isRunning ? 'Proses berjalan. Log diperbarui realtime.' : 'Siap.' }}</small>
+                    </div>
+
                     <hr>
 
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -57,18 +70,55 @@
                         @endif
                     </div>
 
-                    <pre class="bg-dark text-white p-3 rounded" style="min-height: 320px; max-height: 520px; overflow: auto; white-space: pre-wrap;">{{ $log }}</pre>
+                    <pre id="update-log" class="bg-dark text-white p-3 rounded" style="min-height: 320px; max-height: 520px; overflow: auto; white-space: pre-wrap;">{{ $log }}</pre>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-@if ($isRunning)
-    <script>
-        setTimeout(function () {
-            window.location.reload();
-        }, 3000);
-    </script>
-@endif
+<script>
+    (function () {
+        var statusUrl = @json(route('system-update.status'));
+        var logEl = document.getElementById('update-log');
+        var labelEl = document.getElementById('update-progress-label');
+        var percentEl = document.getElementById('update-progress-percent');
+        var barEl = document.getElementById('update-progress-bar');
+        var noteEl = document.getElementById('update-progress-note');
+        var wasRunning = @json($isRunning);
+
+        function setProgress(progress, running) {
+            labelEl.textContent = progress.label;
+            percentEl.textContent = progress.percent + '%';
+            barEl.style.width = progress.percent + '%';
+            barEl.setAttribute('aria-valuenow', progress.percent);
+            barEl.textContent = progress.percent + '%';
+            barEl.classList.toggle('progress-bar-animated', running);
+        }
+
+        function pollStatus() {
+            fetch(statusUrl, { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    logEl.textContent = data.log;
+                    logEl.scrollTop = logEl.scrollHeight;
+                    setProgress(data.progress, data.running);
+                    noteEl.textContent = data.running ? 'Proses berjalan. Log diperbarui realtime.' : (data.error ? 'Update gagal. Cek log.' : 'Selesai atau siap.');
+
+                    if (wasRunning && data.done && !data.error) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    wasRunning = data.running || wasRunning;
+                })
+                .catch(function () {
+                    noteEl.textContent = 'Gagal membaca status update. Halaman akan mencoba lagi.';
+                });
+        }
+
+        pollStatus();
+        setInterval(pollStatus, 1000);
+    })();
+</script>
 @endsection

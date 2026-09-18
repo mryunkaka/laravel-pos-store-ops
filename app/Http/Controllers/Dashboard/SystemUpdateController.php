@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -20,11 +21,14 @@ class SystemUpdateController extends Controller
     public function index(): View
     {
         $logPath = storage_path(self::LOG_FILE);
+        $log = File::exists($logPath) ? File::get($logPath) : 'Belum ada update dijalankan.';
+        $isRunning = $this->isRunning();
 
         return view('system-update.index', [
-            'isRunning' => $this->isRunning(),
-            'log' => File::exists($logPath) ? File::get($logPath) : 'Belum ada update dijalankan.',
+            'isRunning' => $isRunning,
+            'log' => $log,
             'doneAt' => File::exists(storage_path(self::DONE_FILE)) ? trim(File::get(storage_path(self::DONE_FILE))) : null,
+            'progress' => $this->progressFromLog($log, $isRunning),
         ]);
     }
 
@@ -36,7 +40,26 @@ class SystemUpdateController extends Controller
             return redirect()->route('system-update.index')->with('error', 'Update masih berjalan. Tunggu sampai selesai.');
         }
 
-        return redirect()->route('system-update.index')->with('success', 'Update dimulai. Halaman log akan refresh otomatis.');
+        return redirect()->route('system-update.index')->with('success', 'Update dimulai. Log akan berjalan realtime.');
+    }
+
+    public function status(): JsonResponse
+    {
+        $logPath = storage_path(self::LOG_FILE);
+        $log = File::exists($logPath) ? File::get($logPath) : 'Belum ada update dijalankan.';
+        $isRunning = $this->isRunning();
+        $progress = $this->progressFromLog($log, $isRunning);
+        $doneAt = File::exists(storage_path(self::DONE_FILE)) ? trim(File::get(storage_path(self::DONE_FILE))) : null;
+        $hasError = str_contains($log, 'ERROR:');
+
+        return response()->json([
+            'running' => $isRunning,
+            'done' => $doneAt !== null && ! $isRunning,
+            'error' => $hasError,
+            'done_at' => $doneAt,
+            'progress' => $progress,
+            'log' => $log,
+        ]);
     }
 
     public function test(Request $request): Response
@@ -44,8 +67,11 @@ class SystemUpdateController extends Controller
         $this->abortUnlessLocal($request);
 
         $logPath = storage_path(self::LOG_FILE);
-        $log = File::exists($logPath) ? e(File::get($logPath)) : 'Belum ada update dijalankan.';
-        $status = $this->isRunning() ? 'Sedang berjalan' : 'Siap';
+        $rawLog = File::exists($logPath) ? File::get($logPath) : 'Belum ada update dijalankan.';
+        $isRunning = $this->isRunning();
+        $progress = $this->progressFromLog($rawLog, $isRunning);
+        $log = e($rawLog);
+        $status = $isRunning ? 'Sedang berjalan' : 'Siap';
         $doneAt = File::exists(storage_path(self::DONE_FILE)) ? e(trim(File::get(storage_path(self::DONE_FILE)))) : '-';
 
         return response(<<<HTML
@@ -57,12 +83,14 @@ class SystemUpdateController extends Controller
     <meta http-equiv="refresh" content="5">
     <title>Update Web POS3</title>
     <style>
-        body{font-family:Arial,sans-serif;margin:24px;line-height:1.45;color:#111827}a.button{display:inline-block;background:#2563eb;color:white;padding:10px 14px;border-radius:6px;text-decoration:none}pre{background:#111827;color:#f9fafb;padding:16px;border-radius:8px;white-space:pre-wrap;max-height:520px;overflow:auto}.muted{color:#6b7280}
+        body{font-family:Arial,sans-serif;margin:24px;line-height:1.45;color:#111827}a.button{display:inline-block;background:#2563eb;color:white;padding:10px 14px;border-radius:6px;text-decoration:none}pre{background:#111827;color:#f9fafb;padding:16px;border-radius:8px;white-space:pre-wrap;max-height:520px;overflow:auto}.muted{color:#6b7280}.bar{height:22px;background:#e5e7eb;border-radius:999px;overflow:hidden}.fill{height:100%;width:{$progress['percent']}%;background:#2563eb;color:white;text-align:center;font-size:13px;line-height:22px;transition:width .3s}.spin{display:inline-block;width:12px;height:12px;border:2px solid #93c5fd;border-top-color:#2563eb;border-radius:50%;animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
     </style>
 </head>
 <body>
     <h1>Update Web POS3</h1>
-    <p>Status: <strong>{$status}</strong></p>
+    <p>Status: <strong>{$status}</strong> <span class="spin"></span></p>
+    <p>Langkah: <strong>{$progress['label']}</strong></p>
+    <div class="bar"><div class="fill">{$progress['percent']}%</div></div>
     <p>Selesai terakhir: {$doneAt}</p>
     <p><a class="button" href="/update-web.start" onclick="return confirm('Jalankan update web sekarang?')">Jalankan Update Web</a></p>
     <p class="muted">Link darurat jika GUI/sidebar tidak bisa dibuka. Hanya berjalan dari localhost.</p>
@@ -112,13 +140,14 @@ HTML);
 
         $pidPath = storage_path(self::PID_FILE);
         $logPath = storage_path(self::LOG_FILE);
-        $command = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ' . escapeshellarg($scriptPath)
+        $command = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Normal -File ' . escapeshellarg($scriptPath)
             . ' -ProjectPath ' . escapeshellarg(base_path())
             . ' -LogPath ' . escapeshellarg($logPath)
             . ' -PidPath ' . escapeshellarg($pidPath)
             . ' -DonePath ' . escapeshellarg(storage_path(self::DONE_FILE));
 
-        pclose(popen('start /B "" ' . $command, 'r'));
+        pclose(popen('start "POS3 Update" ' . $command, 'r'));
+        File::append($logPath, '[' . now()->format('Y-m-d H:i:s') . "] PowerShell update dipanggil. Tunggu log langkah berikutnya...\r\n");
 
         return ['started' => true, 'message' => 'Update dimulai. Halaman log akan refresh otomatis.'];
     }
@@ -126,6 +155,48 @@ HTML);
     private function abortUnlessLocal(Request $request): void
     {
         abort_unless(in_array($request->ip(), ['127.0.0.1', '::1'], true), 403);
+    }
+
+    private function progressFromLog(string $log, bool $isRunning): array
+    {
+        $steps = [
+            'Git pull' => 'Tarik update Git',
+            'Composer install' => 'Pasang vendor Composer',
+            'NPM install' => 'Pasang paket NPM',
+            'NPM build' => 'Build asset',
+            'Laravel optimize clear' => 'Bersihkan cache Laravel',
+            'Laravel migrate' => 'Migrasi database',
+            'Laravel view cache' => 'Cache tampilan',
+        ];
+
+        if (str_contains($log, 'ERROR:')) {
+            return ['percent' => 100, 'label' => 'Gagal. Cek log bawah.'];
+        }
+
+        if (str_contains($log, 'Update selesai.')) {
+            return ['percent' => 100, 'label' => 'Selesai'];
+        }
+
+        $done = 0;
+        $label = $isRunning ? 'Menyiapkan proses' : 'Siap';
+
+        foreach ($steps as $needle => $stepLabel) {
+            if (str_contains($log, '==> ' . $needle)) {
+                $done++;
+                $label = $stepLabel;
+            }
+        }
+
+        if (str_contains($log, 'PowerShell update dipanggil') && $done === 0) {
+            $label = 'Menunggu langkah pertama';
+        } elseif (str_contains($log, 'Mulai update') && $done === 0) {
+            $label = $isRunning ? 'Mulai update' : 'Menunggu proses PowerShell';
+        }
+
+        return [
+            'percent' => min(95, max(5, (int) round(($done / count($steps)) * 100))),
+            'label' => $label,
+        ];
     }
 
     private function isRunning(): bool
