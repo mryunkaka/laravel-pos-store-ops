@@ -66,6 +66,7 @@
 - Panduan Nginx konsumen diperbaiki: contoh `deny` untuk URI `/database/` dihapus karena memblokir route Laravel `/database/backup` dengan `403 Forbidden nginx/1.31.6`; permission aplikasi tetap dipertahankan.
 - Ditambahkan migration additive `2026_09_18_000001_ensure_database_backup_menu_permission` untuk memberi `database.menu` ke `SuperAdmin`, `Admin`, dan `Manager`; `restore-database` tidak diberikan ke role biasa.
 - Script repair konsumen diperkuat untuk menghapus rule `deny` yang salah dan mengubah `try_files` Laravel dari `$uri $uri/` ke fallback `/index.php`, sehingga route `/database/backup` selalu diproses Laravel.
+- Default repair memakai service `pos3-web`; fallback proses hanya dipakai jika service tersebut tidak terdaftar. Ini mencegah `nginx -s reload` gagal `Access is denied` ketika Nginx dijalankan oleh service runner.
 
 ## 2026-07-10
 

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string] $NginxDir = 'C:\Server\nginx',
-    [string] $ServiceName = '',
+    [string] $ServiceName = 'pos3-web',
     [int] $Port = 8082,
     [switch] $WhatIf
 )
@@ -189,7 +189,17 @@ if ($null -ne $service) {
 
     Write-Output "Service $ServiceName berjalan."
 } else {
-    $nginxProcesses = @(Get-Process -Name nginx -ErrorAction SilentlyContinue)
+    $nginxProcesses = @(
+        Get-CimInstance Win32_Process -Filter "Name = 'nginx.exe'" |
+            Where-Object {
+                $_.ExecutablePath -and
+                [string]::Equals(
+                    [System.IO.Path]::GetFullPath($_.ExecutablePath),
+                    [System.IO.Path]::GetFullPath($nginxPath),
+                    [System.StringComparison]::OrdinalIgnoreCase
+                )
+            }
+    )
     $reloadStdout = [System.IO.Path]::GetTempFileName()
     $reloadStderr = [System.IO.Path]::GetTempFileName()
     try {
@@ -205,7 +215,41 @@ if ($null -ne $service) {
         Get-Content -LiteralPath $reloadStdout -ErrorAction SilentlyContinue | ForEach-Object { Write-Output $_ }
         Get-Content -LiteralPath $reloadStderr -ErrorAction SilentlyContinue | ForEach-Object { Write-Output $_ }
         if ($actionProcess.ExitCode -ne 0) {
-            throw "Reload/start Nginx gagal dengan exit code $($actionProcess.ExitCode)."
+            if ($nginxProcesses.Count -eq 0) {
+                throw "Start Nginx gagal dengan exit code $($actionProcess.ExitCode)."
+            }
+
+            Write-Output 'Reload ditolak Windows. Restart proses Nginx target.'
+            foreach ($nginxProcess in $nginxProcesses) {
+                Stop-Process -Id $nginxProcess.ProcessId -Force -ErrorAction Stop
+            }
+
+            $deadline = (Get-Date).AddSeconds(15)
+            do {
+                Start-Sleep -Milliseconds 500
+                $remaining = @(
+                    Get-CimInstance Win32_Process -Filter "Name = 'nginx.exe'" |
+                        Where-Object {
+                            $_.ExecutablePath -and
+                            [string]::Equals(
+                                [System.IO.Path]::GetFullPath($_.ExecutablePath),
+                                [System.IO.Path]::GetFullPath($nginxPath),
+                                [System.StringComparison]::OrdinalIgnoreCase
+                            )
+                        }
+                )
+            } while ($remaining.Count -gt 0 -and (Get-Date) -lt $deadline)
+
+            if ($remaining.Count -gt 0) {
+                throw 'Proses Nginx target tidak berhenti. Jalankan PowerShell sebagai Administrator.'
+            }
+
+            $startProcess = Start-Process -FilePath $nginxPath -ArgumentList @('-p', $prefixPath, '-c', 'conf\nginx.conf') -WorkingDirectory $prefixPath -PassThru -WindowStyle Hidden
+            Start-Sleep -Seconds 2
+            if ($startProcess.HasExited -and $startProcess.ExitCode -ne 0) {
+                throw "Nginx gagal start setelah restart proses. Exit code $($startProcess.ExitCode)."
+            }
+            Write-Output 'Nginx berhasil start ulang dengan konfigurasi baru.'
         }
     } finally {
         Remove-Item -LiteralPath $reloadStdout, $reloadStderr -Force -ErrorAction SilentlyContinue
