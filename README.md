@@ -484,16 +484,19 @@ sc.exe query pos3-web
 NSSM:
 
 ```powershell
-C:\Server\nssm\nssm.exe edit pos3-web
-C:\Server\nssm\nssm.exe remove pos3-web confirm
+C:\Server\nssm\win64\nssm.exe edit pos3-web
+C:\Server\nssm\win64\nssm.exe remove pos3-web confirm
 ```
 
-Reload Nginx manual:
+Aktifkan konfigurasi Nginx manual melalui service POS3:
 
 ```powershell
 cd C:\Server\nginx
-.\nginx.exe -s reload -p C:\Server\nginx -c conf\nginx.conf
+.\nginx.exe -t -p C:\Server\nginx -c conf\nginx.conf
+Restart-Service pos3-web
 ```
+
+Jangan memakai `nginx -s reload` dari PowerShell biasa. Service `pos3-web` menjalankan Nginx dengan konteks yang benar.
 
 ## 15. Troubleshooting cepat
 
