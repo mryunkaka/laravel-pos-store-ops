@@ -37,6 +37,10 @@
                         <strong>Penting:</strong> jangan tutup server saat proses berjalan. Pastikan perubahan lokal sudah commit/stash agar `git pull --ff-only` tidak gagal.
                     </div>
 
+                    <div class="alert alert-info" role="alert">
+                        Link darurat jika GUI/sidebar tidak bisa dibuka: <a href="{{ route('system-update.test') }}" target="_blank">{{ url('/update-web.test') }}</a>
+                    </div>
+
                     <form action="{{ route('system-update.run') }}" method="POST" onsubmit="return confirm('Jalankan update web sekarang?');">
                         @csrf
                         <button type="submit" class="btn btn-primary" {{ $isRunning ? 'disabled' : '' }}>

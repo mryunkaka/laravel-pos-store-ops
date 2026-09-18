@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 
@@ -28,8 +30,77 @@ class SystemUpdateController extends Controller
 
     public function run(): RedirectResponse
     {
-        if ($this->isRunning()) {
+        $result = $this->startUpdate();
+
+        if (!$result['started']) {
             return redirect()->route('system-update.index')->with('error', 'Update masih berjalan. Tunggu sampai selesai.');
+        }
+
+        return redirect()->route('system-update.index')->with('success', 'Update dimulai. Halaman log akan refresh otomatis.');
+    }
+
+    public function test(Request $request): Response
+    {
+        $this->abortUnlessLocal($request);
+
+        $logPath = storage_path(self::LOG_FILE);
+        $log = File::exists($logPath) ? e(File::get($logPath)) : 'Belum ada update dijalankan.';
+        $status = $this->isRunning() ? 'Sedang berjalan' : 'Siap';
+        $doneAt = File::exists(storage_path(self::DONE_FILE)) ? e(trim(File::get(storage_path(self::DONE_FILE)))) : '-';
+
+        return response(<<<HTML
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="5">
+    <title>Update Web POS3</title>
+    <style>
+        body{font-family:Arial,sans-serif;margin:24px;line-height:1.45;color:#111827}a.button{display:inline-block;background:#2563eb;color:white;padding:10px 14px;border-radius:6px;text-decoration:none}pre{background:#111827;color:#f9fafb;padding:16px;border-radius:8px;white-space:pre-wrap;max-height:520px;overflow:auto}.muted{color:#6b7280}
+    </style>
+</head>
+<body>
+    <h1>Update Web POS3</h1>
+    <p>Status: <strong>{$status}</strong></p>
+    <p>Selesai terakhir: {$doneAt}</p>
+    <p><a class="button" href="/update-web.start" onclick="return confirm('Jalankan update web sekarang?')">Jalankan Update Web</a></p>
+    <p class="muted">Link darurat jika GUI/sidebar tidak bisa dibuka. Hanya berjalan dari localhost.</p>
+    <h2>Log</h2>
+    <pre>{$log}</pre>
+</body>
+</html>
+HTML);
+    }
+
+    public function startFromLink(Request $request): Response
+    {
+        $this->abortUnlessLocal($request);
+
+        $result = $this->startUpdate();
+        $message = $result['message'];
+
+        return response(<<<HTML
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="2;url=/update-web.test">
+    <title>Update Web POS3</title>
+</head>
+<body>
+    <h1>{$message}</h1>
+    <p>Log akan terbuka otomatis.</p>
+    <p><a href="/update-web.test">Buka log update</a></p>
+</body>
+</html>
+HTML);
+    }
+
+    private function startUpdate(): array
+    {
+        if ($this->isRunning()) {
+            return ['started' => false, 'message' => 'Update masih berjalan. Tunggu sampai selesai.'];
         }
 
         File::ensureDirectoryExists(storage_path(self::UPDATE_DIR));
@@ -49,7 +120,12 @@ class SystemUpdateController extends Controller
 
         pclose(popen('start /B "" ' . $command, 'r'));
 
-        return redirect()->route('system-update.index')->with('success', 'Update dimulai. Halaman log akan refresh otomatis.');
+        return ['started' => true, 'message' => 'Update dimulai. Halaman log akan refresh otomatis.'];
+    }
+
+    private function abortUnlessLocal(Request $request): void
+    {
+        abort_unless(in_array($request->ip(), ['127.0.0.1', '::1'], true), 403);
     }
 
     private function isRunning(): bool
@@ -109,7 +185,7 @@ try {
 
     Run-Step 'Git pull' 'git.exe' @('pull', '--ff-only')
 
-    $php = 'C:\Server\php-8.5.10-nts-Win32-vs17-x64\php.exe'
+    $php = 'C:\Server\php\php.exe'
     if (-not (Test-Path $php)) { $php = 'php.exe' }
 
     $composerPhar = 'C:\ProgramData\ComposerSetup\bin\composer.phar'

@@ -58,6 +58,7 @@
 - Struktur folder README diseragamkan: installer Git/Composer/Node/HeidiSQL/VC++/MySQL di `C:\Server\Installer`, Nginx/NSSM/PHP di `C:\Server`, dan project POS3 di `D:\Project\Web\pos3`.
 - Path server README dibuat tanpa nama versi folder agar setup konsumen lebih mudah: `C:\Server\nginx`, `C:\Server\nssm`, dan `C:\Server\php`.
 - `DatabaseSeeder` sekarang memanggil `Phase7PermissionSeeder`, `RolePermissionSeeder` dibuat idempotent, dan migration additive menambahkan `settings.menu` untuk SuperAdmin/Manager supaya database yang sudah terlanjur di-seed tetap mendapat menu Update Web saat `migrate --force`.
+- Ditambah halaman tes/darurat update web di `/update-web.test` dan link langsung `/update-web.start`, dibatasi hanya localhost, supaya update tetap bisa dijalankan jika GUI utama rusak.
 
 ## 2026-07-10
 

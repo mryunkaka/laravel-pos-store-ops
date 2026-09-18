@@ -52,6 +52,9 @@ Route::get('/', function () {
 
 Route::get('/e-invoice-mobile/{token}', [InvoiceMobileController::class, 'show'])->name('invoice.mobile');
 
+Route::get('/update-web.test', [SystemUpdateController::class, 'test'])->name('system-update.test');
+Route::get('/update-web.start', [SystemUpdateController::class, 'startFromLink'])->name('system-update.start-link');
+
 // DEFAULT DASHBOARD & PROFILE
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');

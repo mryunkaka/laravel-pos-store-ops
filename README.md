@@ -429,10 +429,16 @@ Restart-Service pos3-web
 
 ## 13. Cara update 1 klik dari web
 
-Aplikasi punya halaman:
+Aplikasi punya halaman GUI:
 
 ```text
 http://localhost:8082/settings/update-web
+```
+
+Jika GUI/sidebar tidak bisa dibuka, pakai link darurat lokal:
+
+```text
+http://localhost:8082/update-web.test
 ```
 
 Klik:
