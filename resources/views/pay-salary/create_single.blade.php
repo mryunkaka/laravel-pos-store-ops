@@ -39,7 +39,7 @@
                                         <option value="" disabled selected>Select Employee</option>
                                         @foreach($employees as $employee)
                                             <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
-                                                {{ $employee->name }} (Salary: {{ number_format($employee->salary) }})
+                                                {{ $employee->name }} (Gaji: {{ format_rupiah($employee->salary) }})
                                             </option>
                                         @endforeach
                                     </select>

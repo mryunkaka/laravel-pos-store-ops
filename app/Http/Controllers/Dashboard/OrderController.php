@@ -113,6 +113,15 @@ class OrderController extends Controller
             // Stock validation before creating order
             $insufficientStock = [];
             $contents = Cart::content();
+            if ($contents->isEmpty()) {
+                $message = 'Keranjang belanja masih kosong.';
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $message], 422);
+                }
+
+                return Redirect::back()->with('error', $message);
+            }
+
             $allowNegativeStock = $request->user()->can('allow-negative-stock');
 
             if (!$allowNegativeStock) {
@@ -465,6 +474,7 @@ class OrderController extends Controller
         return view('pos.print-invoice', [
             'order' => $order,
             'orderDetails' => $orderDetails,
+            'setting' => StoreSetting::current(),
         ]);
     }
 
@@ -479,6 +489,7 @@ class OrderController extends Controller
         return view('pos.print-receipt', [
             'order' => $order,
             'orderDetails' => $orderDetails,
+            'setting' => StoreSetting::current(),
         ]);
     }
 
@@ -519,7 +530,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'order_id' => 'required|numeric',
-            'due_amount' => 'required|numeric',
+            'due_amount' => 'required|numeric|min:0',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -705,7 +716,7 @@ class OrderController extends Controller
         return collect($payments)
             ->groupBy('payment_type')
             ->map(function ($items, $type) use ($labels) {
-                return ($labels[$type] ?? ucfirst($type)) . ' Rp ' . number_format($items->sum('amount'), 0, ',', '.');
+                return ($labels[$type] ?? ucfirst($type)) . ' ' . format_rupiah($items->sum('amount'));
             })
             ->implode(', ');
     }

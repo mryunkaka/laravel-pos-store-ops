@@ -51,7 +51,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $closing->closing_date }}</td>
                                         <td>{{ $closing->closing_time->format('H:i') }}</td>
-                                        <td>Rp {{ number_format($closing->total_sales, 0) }}</td>
+                                        <td>{{ format_rupiah($closing->total_sales) }}</td>
                                         <td>
                                             <span class="badge bg-{{ $closing->status == 'verified' ? 'success' : 'warning' }}">
                                                 {{ $closing->status == 'verified' ? 'Verified' : 'Tutup' }}

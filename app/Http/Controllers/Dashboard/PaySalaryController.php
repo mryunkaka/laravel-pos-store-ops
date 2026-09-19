@@ -9,6 +9,7 @@ use Spatie\QueryBuilder\AllowedSort;
 use Illuminate\Http\Request;
 use App\Models\AdvanceSalary;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PaySalary\StorePaySalaryRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\DB;
 
@@ -55,10 +56,14 @@ class PaySalaryController extends Controller
      */
     public function paySalary(String $id)
     {
+        $advanceSalary = AdvanceSalary::with(['employee'])
+            ->where('id', $id)
+            ->firstOrFail();
+
         return view('pay-salary.create', [
-            'advanceSalary' => AdvanceSalary::with(['employee'])
-                ->where('id', $id)
-                ->firstOrFail(), // Use findOrFail for safety
+            'advanceSalary' => $advanceSalary,
+            'advanceMonth' => date('m', strtotime($advanceSalary->date)),
+            'advanceYear' => date('Y', strtotime($advanceSalary->date)),
         ]);
     }
 
@@ -184,53 +189,73 @@ class PaySalaryController extends Controller
     /**
      * Store a newly created resource in storage (Single Payment).
      */
-    public function store(Request $request)
+    public function store(StorePaySalaryRequest $request)
     {
-        // Custom Manual Validation for flexible logic (Advance vs No Advance)
-        $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'month' => 'required',
-            'year' => 'required',
-            'date' => 'required|date',
-        ]);
+        $validated = $request->validated();
+        $salaryMonth = $validated['month'] . '-' . $validated['year'];
 
-        $employee = Employee::findOrFail($request->employee_id);
-        $salaryMonth = $request->month . '-' . $request->year;
-
-        // Check duplicate
-        $exists = PaySalary::where('employee_id', $employee->id)
-            ->where('salary_month', $salaryMonth)
-            ->exists();
-
-        if ($exists) {
-            return Redirect::back()->withErrors(['month' => 'Salary for this month has already been paid!']);
+        if (! empty($validated['id'])) {
+            $advance = AdvanceSalary::with('employee')->findOrFail($validated['id']);
+            $employee = $advance->employee;
+        } else {
+            $employee = Employee::findOrFail($validated['employee_id']);
+            $advance = AdvanceSalary::where('employee_id', $employee->id)
+                ->whereMonth('date', $validated['month'])
+                ->whereYear('date', $validated['year'])
+                ->where('is_deducted', false)
+                ->first();
         }
 
-        // Find Advance
-        $advance = AdvanceSalary::where('employee_id', $employee->id)
-            ->whereMonth('date', $request->month)
-            ->whereYear('date', $request->year)
-            ->first();
-
-        $advanceAmount = $advance ? $advance->advance_salary : 0;
-
-        DB::transaction(function () use ($request, $employee, $advanceAmount, $salaryMonth, $advance) {
-            PaySalary::create([
-                'employee_id' => $employee->id,
-                'date' => $request->date,
-                'paid_amount' => $employee->salary,
-                'advance_salary' => $advanceAmount,
-                'due_salary' => $employee->salary - $advanceAmount,
-                'salary_month' => $salaryMonth,
+        if (! $employee) {
+            return back()->withInput()->withErrors([
+                'payment' => 'Karyawan untuk pembayaran gaji tidak ditemukan.',
             ]);
+        }
 
-            if ($advance) {
-                $advance->update(['is_deducted' => true]);
-            }
-        });
+        if ($advance && ! $advance->is_deducted
+            && date('Y-m', strtotime($advance->date)) !== $validated['year'] . '-' . $validated['month']) {
+            return back()->withInput()->withErrors([
+                'month' => 'Bulan gaji harus sama dengan bulan gaji di muka.',
+            ]);
+        }
+
+        if (PaySalary::where('employee_id', $employee->id)
+            ->where('salary_month', $salaryMonth)
+            ->exists()) {
+            return back()->withInput()->withErrors([
+                'month' => 'Gaji untuk bulan tersebut sudah dibayar.',
+            ]);
+        }
+
+        try {
+            DB::transaction(function () use ($validated, $employee, $advance, $salaryMonth) {
+                $advanceAmount = $advance && ! $advance->is_deducted
+                    ? $advance->advance_salary
+                    : 0;
+
+                PaySalary::create([
+                    'employee_id' => $employee->id,
+                    'date' => $validated['date'],
+                    'paid_amount' => $employee->salary,
+                    'advance_salary' => $advanceAmount,
+                    'due_salary' => $employee->salary - $advanceAmount,
+                    'salary_month' => $salaryMonth,
+                ]);
+
+                if ($advance && ! $advance->is_deducted) {
+                    $advance->update(['is_deducted' => true]);
+                }
+            });
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withInput()->withErrors([
+                'payment' => 'Pembayaran gaji gagal disimpan. Periksa data dan coba lagi.',
+            ]);
+        }
 
         return Redirect::route('pay-salary.payHistory')
-            ->with('success', 'Employee Salary Paid Successfully!');
+            ->with('success', 'Pembayaran gaji berhasil disimpan.');
     }
 
     /**

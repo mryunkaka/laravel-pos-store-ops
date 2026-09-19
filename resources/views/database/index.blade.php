@@ -9,7 +9,10 @@
             <div class="card inventory-card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title mb-0">Backup Database</h5>
-                    <a href="{{ route('backup.create') }}" class="btn btn-primary">Buat Backup</a>
+                    <form method="POST" action="{{ route('backup.create') }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">Buat Backup</button>
+                    </form>
                 </div>
                 <div class="card-body">
                     @if (session('success'))
@@ -58,7 +61,11 @@
                                         <td>
                                             <div class="d-flex flex-wrap" style="gap: 8px;">
                                                 <a href="{{ route('backup.download', $file->getFilename()) }}" class="btn btn-sm btn-success">Download</a>
-                                                <a href="{{ route('backup.delete', $file->getFilename()) }}" class="btn btn-sm btn-danger" onclick="return confirm('Hapus backup ini?')">Hapus</a>
+                                                <form method="POST" action="{{ route('backup.delete', $file->getFilename()) }}" class="d-inline" onsubmit="return confirm('Hapus backup ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>

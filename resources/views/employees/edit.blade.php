@@ -100,15 +100,22 @@
 
                                 <div class="form-group col-md-6">
                                     <label for="experience">Pengalaman</label>
+                                    @php
+                                        $experienceOptions = \App\Models\Employee::EXPERIENCE_OPTIONS;
+                                        $currentExperience = old('experience', $employee->experience);
+                                        if ($currentExperience && !in_array($currentExperience, $experienceOptions, true)) {
+                                            $experienceOptions[] = $currentExperience;
+                                        }
+                                    @endphp
                                     <select class="form-control @error('experience') is-invalid @enderror" name="experience" id="experience">
-                                        <option value="" disabled>Pilih Tahun Pengalaman...</option>
-                                        @foreach (['1 Tahun', '2 Tahun', '3 Tahun', '4 Tahun', '5 Tahun', '5+ Tahun'] as $option)
-                                            <option value="{{ $option }}" {{ old('experience', $employee->experience) == $option ? 'selected' : '' }}>
+                                        <option value="" {{ $currentExperience ? '' : 'selected' }}>Pilih Pengalaman...</option>
+                                        @foreach ($experienceOptions as $option)
+                                            <option value="{{ $option }}" {{ $currentExperience === $option ? 'selected' : '' }}>
                                                 {{ $option }}
                                             </option>
                                         @endforeach
-                                        </select>
-                                        @error('experience')
+                                    </select>
+                                    @error('experience')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>

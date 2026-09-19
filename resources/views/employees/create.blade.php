@@ -102,19 +102,12 @@
                                     <label for="experience">Pengalaman</label>
                                     <select class="form-control @error('experience') is-invalid @enderror" name="experience"
                                         id="experience">
-                                        <option value="" disabled selected>Pilih Tahun Pengalaman...</option>
-                                        <option value="1 Tahun" {{ old('experience') == '1 Tahun' ? 'selected' : '' }}>1 Tahun
-                                        </option>
-                                        <option value="2 Tahun" {{ old('experience') == '2 Tahun' ? 'selected' : '' }}>2 Tahun
-                                        </option>
-                                        <option value="3 Tahun" {{ old('experience') == '3 Tahun' ? 'selected' : '' }}>3 Tahun
-                                        </option>
-                                        <option value="4 Tahun" {{ old('experience') == '4 Tahun' ? 'selected' : '' }}>4 Tahun
-                                        </option>
-                                        <option value="5 Tahun" {{ old('experience') == '5 Tahun' ? 'selected' : '' }}>5 Tahun
-                                        </option>
-                                        <option value="5+ Tahun" {{ old('experience') == '5+ Tahun' ? 'selected' : '' }}>5+
-                                            Tahun</option>
+                                        <option value="" {{ old('experience') ? '' : 'selected' }}>Pilih Pengalaman...</option>
+                                        @foreach (\App\Models\Employee::EXPERIENCE_OPTIONS as $option)
+                                            <option value="{{ $option }}" {{ old('experience') === $option ? 'selected' : '' }}>
+                                                {{ $option }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('experience')
                                         <div class="invalid-feedback">

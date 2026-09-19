@@ -35,13 +35,17 @@ class DatabaseBackupController extends Controller
 
     public function download(String $getFileName)
     {
+        abort_unless($this->isSafeFileName($getFileName), 404);
         $path = $this->backupDirectory() . DIRECTORY_SEPARATOR . $getFileName;
+
+        abort_unless(File::isFile($path), 404);
 
         return response()->download($path);
     }
 
     public function delete(String $getFileName)
     {
+        abort_unless($this->isSafeFileName($getFileName), 404);
         Storage::delete($this->backupFolderName() . '/' . $getFileName);
 
         return Redirect::route('backup.index')->with('success', 'Backup database berhasil dihapus.');
@@ -98,5 +102,10 @@ class DatabaseBackupController extends Controller
     private function backupDirectory(): string
     {
         return storage_path('app/' . $this->backupFolderName());
+    }
+
+    private function isSafeFileName(string $fileName): bool
+    {
+        return basename($fileName) === $fileName && $fileName !== '';
     }
 }

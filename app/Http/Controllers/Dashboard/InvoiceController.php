@@ -21,11 +21,10 @@ class InvoiceController extends Controller
         }
 
         try {
-            $invoice->generate($order);
-            $path = $invoice->localPath($order->refresh());
+            $path = $invoice->localPath($order);
             if ($path === null) {
                 return redirect()->route('order.orderDetails', $order->id)
-                    ->with('error', 'File PDF invoice belum tersedia.');
+                    ->with('error', 'File PDF invoice belum tersedia. Generate Invoice terlebih dahulu.');
             }
 
             return response()->file($path, [

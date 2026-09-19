@@ -47,7 +47,7 @@
                                     <td>{{ (($paySalaries->currentPage() * 10) - 10) + $loop->iteration }}</td>
                                     <td>{{ $history->employee->name }}</td>
                                     <td>{{ \Carbon\Carbon::parse($history->date)->format('Y-m-d') }}</td>
-                                    <td>{{ number_format($history->paid_amount, 2) }}</td>
+                                    <td>{{ format_rupiah($history->paid_amount) }}</td>
                                     <td><span class="badge badge-success">Full Paid</span></td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-center list-action">

@@ -2,12 +2,13 @@
     <div class="iq-navbar-custom">
         <nav class="navbar navbar-expand-lg navbar-light p-0">
             <div class="iq-navbar-logo d-flex align-items-center justify-content-between">
-                <div class="iq-menu-bt-sidebar">
-                    <x-heroicon-o-bars-3 class="wrapper-menu w-8 h-8" />
-                </div>
+                <button type="button" class="iq-menu-bt-sidebar wrapper-menu" aria-label="Buka atau tutup menu samping" aria-expanded="false">
+                    <x-heroicon-o-bars-3 class="w-8 h-8" aria-hidden="true" />
+                </button>
                 <a href="{{ route('dashboard') }}" class="header-logo">
-                    <img src="../assets/images/logo.png" class="img-fluid rounded-normal" alt="logo">
-                    <h5 class="logo-title ml-3">POSDash</h5>
+                    @php($storeSetting = \App\Models\StoreSetting::current())
+                    <img src="{{ $storeSetting->logo ? asset('storage/' . $storeSetting->logo) : asset('assets/images/logo.png') }}" class="img-fluid rounded-normal" alt="{{ $storeSetting->store_name }}">
+                    <h5 class="logo-title ml-3">{{ $storeSetting->store_name }}</h5>
                 </a>
             </div>
             <div class="iq-search-bar device-search">

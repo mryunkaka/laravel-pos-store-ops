@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 
@@ -83,6 +84,10 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer): RedirectResponse
     {
+        if (DB::table('orders')->where('customer_id', $customer->id)->exists()) {
+            return Redirect::route('customers.index')->with('error', 'Customer tidak dapat dihapus karena memiliki riwayat order.');
+        }
+
         $customer->delete();
 
         return Redirect::route('customers.index')->with('success', 'Customer has been deleted!');

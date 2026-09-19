@@ -50,7 +50,7 @@
                                         <td>{{ $receiving->receiving_date }}</td>
                                         <td>{{ $receiving->purchaseOrder->po_number ?? '-' }}</td>
                                         <td>{{ $receiving->supplier->name ?? '-' }}</td>
-                                        <td>Rp {{ number_format($receiving->total, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($receiving->total) }}</td>
                                         <td>
                                             <span class="badge bg-{{ 
                                                 $receiving->status == 'pending' ? 'warning' : 'success'

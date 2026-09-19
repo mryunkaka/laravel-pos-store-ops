@@ -90,9 +90,9 @@
                                             <label>Jumlah Dibayar</label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text">$</span>
+                                                    <span class="input-group-text">Rp</span>
                                                 </div>
-                                        <input type="text" class="form-control bg-white" value="{{ number_format($order->pay_amount, 2) }}" readonly>
+                                        <input type="text" class="form-control bg-white" value="{{ format_rupiah($order->pay_amount) }}" readonly>
                                         </div>
                                         </div>
                                         </div>
@@ -101,9 +101,9 @@
                                                 <label>Sisa Piutang</label>
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
-                                                        <span class="input-group-text">$</span>
+                                                        <span class="input-group-text">Rp</span>
                                                     </div>
-                                        <input type="text" class="form-control bg-white" value="{{ number_format($order->due_amount, 2) }}" readonly>
+                                        <input type="text" class="form-control bg-white" value="{{ format_rupiah(max($order->due_amount, 0)) }}" readonly>
                                         </div>
                                         </div>
                                         </div>
@@ -132,9 +132,10 @@
                                                         <button type="button" class="btn btn-outline-primary mr-2 mb-2 js-copy-invoice" data-invoice-url="{{ $order->invoice_url }}" aria-label="Salin link invoice">
                                                             Salin Link
                                                         </button>
-                                                        <a href="{{ route('order.invoiceWhatsapp', $order->id) }}" target="_blank" rel="noopener" class="btn btn-success mb-2">
-                                                            Kirim WhatsApp
-                                                        </a>
+                                                        <form action="{{ route('order.invoiceWhatsapp', $order->id) }}" method="POST" target="_blank" class="d-inline-block mb-2">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success">Kirim WhatsApp</button>
+                                                        </form>
                                                     </div>
                                                 @else
                                                     @if ($invoiceExpired)
@@ -160,9 +161,10 @@
                                                             @csrf
                                                             <button type="submit" class="btn btn-warning">Upload Invoice</button>
                                                         </form>
-                                                        <a href="{{ route('order.invoiceWhatsapp', $order->id) }}" target="_blank" rel="noopener" class="btn btn-success mb-2">
-                                                            Kirim WhatsApp + Invoice PDF
-                                                        </a>
+                                                        <form action="{{ route('order.invoiceWhatsapp', $order->id) }}" method="POST" target="_blank" class="d-inline-block mb-2">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success">Kirim WhatsApp + Invoice PDF</button>
+                                                        </form>
                                                     </div>
                                                 @endif
                                             </div>
@@ -322,25 +324,25 @@
                                             <td>{{ $item->product->name }}</td>
                                             <td>{{ $item->product->code }}</td>
                                             <td>{{ $item->quantity }}</td>
-                                            <td>{{ number_format($item->unit_price, 2) }}</td>
-                                            <td>{{ number_format($item->total, 2) }}</td>
+                                            <td>{{ format_rupiah($item->unit_price) }}</td>
+                                            <td>{{ format_rupiah($item->total) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot class="bg-light">
                                     <tr>
                                         <td colspan="6" class="text-right font-weight-bold">Subtotal</td>
-                                        <td class="font-weight-bold">{{ number_format($order->sub_total, 2) }}</td>
+                                        <td class="font-weight-bold">{{ format_rupiah($order->sub_total) }}</td>
                                     </tr>
                                     <tr>
                                         <td colspan="6" class="text-right font-weight-bold">PPN</td>
-                                        <td class="font-weight-bold">{{ number_format($order->vat, 2) }}</td>
+                                        <td class="font-weight-bold">{{ format_rupiah($order->vat) }}</td>
                                     </tr>
                                     <tr>
                                         <td colspan="6" class="text-right font-weight-bold text-primary" style="font-size: 1.1em;">
                                             Total</td>
                                         <td class="font-weight-bold text-primary" style="font-size: 1.1em;">
-                                            {{ number_format($order->total, 2) }}
+                                            {{ format_rupiah($order->total) }}
                                         </td>
                                         </tr>
                                         </tfoot>

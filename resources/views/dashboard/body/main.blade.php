@@ -4,13 +4,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>POS Dash</title>
+    <meta name="description" content="Sistem kasir dan manajemen toko.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0d6efd">
+    <title>{{ optional(\App\Models\StoreSetting::current())->store_name ?: config('app.name', 'POS Dash') }}</title>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}" />
+    <link rel="shortcut icon" href="{{ optional(\App\Models\StoreSetting::current())->logo ? asset('storage/' . \App\Models\StoreSetting::current()->logo) : asset('assets/images/favicon.ico') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/backend-plugin.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/backend.css?v=1.0.0') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/backend.css?v=1.0.1') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/custom.css?v=1.0.1') }}">
 
     @yield('specificpagestyles')
 </head>

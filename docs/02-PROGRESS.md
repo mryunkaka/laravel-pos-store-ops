@@ -378,7 +378,31 @@
 - Stok yang sudah pernah di-void dan diselesaikan ulang belum diuji skenario kompleks.
 - Export laporan PDF lama tetap memakai print browser; invoice elektronik baru memakai generator PDF server-side.
 - Invoice WhatsApp aktif memakai `api.whatsapp.com/send` manual; Cloud API Meta hanya tercatat sebagai implementasi historis yang tidak lagi dipanggil.
+- Full QA 2026-09-19: 100 test passed, 2 skipped, 322 assertions; menu harness 52/52 tanpa HTTP 500; migration status bersih; database integrity checks tidak menemukan orphan order/customer, order detail/order, atau order detail/product reference.
+- QA menemukan lalu memperbaiki tiga risiko data/security: barcode quick-add menolak produk expired, customer dengan riwayat order tidak dapat dihapus agar cascade tidak menghapus histori, dan token invoice publik invalid sekarang menghasilkan 404 tanpa stack trace.
+- QA menambahkan data regression test di `tests/Feature/DataIntegrityRegressionTest.php`; suite masih memakai DB MySQL lokal karena SQLite testing dikomentari di `phpunit.xml`. Test branding/barcode memakai `DatabaseTransactions`, sehingga full suite tidak meninggalkan user/record sementara. User Faker sementara dari QA sudah dibersihkan; user Admin/User, order, shift, permission, dan histori lama tetap dipertahankan.
+- Audit verb route menemukan aksi WhatsApp invoice/struk menulis log dan status invoice melalui `GET`; keduanya sekarang `POST` dengan form `@csrf`. Route `GET /orders/invoice/pdf/{order_id}` sekarang read-only dan hanya menyajikan PDF lokal yang sudah ada; generate tetap melalui route `POST`.
+- Regression invoice/security setelah hardening: 19 test passed, 57 assertions.
+- Bug bayar gaji diperbaiki: form `/pay-salary/{id}` mengirim ID `advance_salaries`, sedangkan controller sebelumnya mewajibkan `employee_id`, sehingga request selalu kembali tanpa proses. Flow sekarang menerima kedua mode, mencegah pembayaran ganda, menandai uang muka sudah dipotong, memilih bulan/tahun sesuai tanggal uang muka, dan menampilkan detail error di form.
+- Validasi bayar gaji memakai pesan Bahasa Indonesia dan nominal form memakai `format_rupiah()`.
 - Link tmp0.cc bersifat publik dan sementara selama 30 hari; PDF invoice tidak memakai password karena link harus langsung dapat dibuka customer. Hindari memasukkan data sensitif yang tidak diperlukan.
+
+## HTTPS Lokal dan Kamera Barcode (2026-09-20)
+
+- [x] Sertifikat lokal self-signed tersedia di `C:\Server\certs\pos3-local.crt.pem` dan `C:\Server\certs\pos3-local.key.pem`.
+- [x] SAN sertifikat mencakup `localhost`, `127.0.0.1`, dan `10.77.147.173`.
+- [x] Sertifikat publik di-install ke Current User Root store dengan `certutil.exe -user -addstore`.
+- [x] Nginx vhost HTTPS aktif pada port `8443` dan memakai root `D:/Adam/Project/Web/pos3/public`.
+- [x] Service `nginx` berstatus `RUNNING`; port `8082`, `8443`, dan FastCGI `9000` terdeteksi listen.
+- [x] `https://localhost:8443/` mengembalikan response Laravel `302` ke `/login`.
+- [x] HTTP `http://localhost:8082/` tetap tersedia sebagai redirect `301` ke HTTPS; URL utama untuk kamera adalah HTTPS.
+- [x] Browser berhasil membuka `https://localhost:8443/login` dengan `window.isSecureContext=true`, `navigator.mediaDevices=true`, dan `getUserMedia=true`.
+- [x] README menambahkan tutorial sertifikat lokal dan win-acme untuk domain publik.
+- [x] Test layout POS, status/error kamera, branding, invoice, build frontend, dan Blade cache lulus.
+- [x] Full suite terakhir setelah perubahan HTTPS: 110 passed, 2 skipped, 381 assertions.
+- [x] `php artisan migrate:status` bersih dan `git diff --check` lulus.
+- [ ] Uji browser authenticated, tampilan POS, dan izin kamera fisik masih BLOCKED karena credential vault localhost belum tersedia.
+- [ ] Handoff PC konsumen belum dijalankan; sertifikat lokal perlu di-trust pada setiap perangkat client.
 
 ### Langkah Selanjutnya
 
@@ -407,7 +431,7 @@ Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari peker
 - Validasi: PHP lint, `php artisan migrate`, `php artisan view:cache`, route invoice, dan unit test invoice/tmp0/WhatsApp.
 - Bug runtime diperbaiki: `Tmp0Service` memakai `$response` yang benar setelah request HTTP, bukan variabel `$client` yang tidak pernah dipakai.
 - CA bundle PHP aktif diverifikasi pada jalur Nginx `:8082` → PHP-CGI `:9000`; upload dummy PDF ke tmp0.cc berhasil dengan response `success=true` dan URL `/d/{id}`.
-- Receipt print memakai link aktif `Kirim WhatsApp + Invoice PDF` dengan route ID dinamis; saat diklik, route memastikan pembayaran sudah dikonfirmasi walau order masih pending, membuat/reuse PDF, upload ke tmp0.cc bila link belum valid/expired, lalu membuka `api.whatsapp.com/send` dengan link invoice. Kegagalan tidak kembali ke print receipt. Tombol `Kirim WhatsApp (Teks)` tetap tersedia tanpa invoice.
+- Receipt print memakai form POST aktif `Kirim WhatsApp + Invoice PDF` dengan route ID dinamis dan CSRF; saat dikirim, route memastikan pembayaran sudah dikonfirmasi walau order masih pending, membuat/reuse PDF, upload ke tmp0.cc bila link belum valid/expired, lalu membuka `api.whatsapp.com/send` dengan link invoice. Kegagalan tidak kembali ke print receipt. Tombol `Kirim WhatsApp (Teks)` juga memakai POST dan tetap tersedia tanpa invoice.
 - Checkout POS sesudah `Konfirmasi Pembayaran` menyimpan order dan membuka tab struk terlebih dahulu. Tombol `Kirim WhatsApp + Invoice PDF` pada halaman struk menjadi satu-satunya jalur generate PDF, upload tmp0.cc, dan membuka WhatsApp manual.
 
 ## Instruksi Untuk Sesi Lanjutan

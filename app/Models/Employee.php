@@ -10,6 +10,16 @@ class Employee extends Model
 {
     use HasFactory;
 
+    public const EXPERIENCE_OPTIONS = [
+        '0 Pengalaman',
+        '1 Tahun',
+        '2 Tahun',
+        '3 Tahun',
+        '4 Tahun',
+        '5 Tahun',
+        '5+ Tahun',
+    ];
+
     protected $fillable = [
         'name',
         'email',

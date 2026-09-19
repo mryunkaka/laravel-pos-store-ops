@@ -49,7 +49,7 @@
                                         <td>{{ $po->po_number }}</td>
                                         <td>{{ $po->po_date }}</td>
                                         <td>{{ $po->supplier->name ?? '-' }}</td>
-                                        <td>Rp {{ number_format($po->total, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($po->total) }}</td>
                                         <td>
                                             <span class="badge bg-{{ 
                                                 $po->status == 'pending' ? 'warning' : 

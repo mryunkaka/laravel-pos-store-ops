@@ -120,7 +120,7 @@
                                             <td>{{ $order->customer->name }}</td>
                                             <td>{{ $order->order_date->format('Y-m-d') }}</td>
                                             <td>{{ $order->paymentHistoryText() }}</td>
-                                            <td>{{ number_format($order->total, 2) }}</td>
+                                            <td>{{ format_rupiah($order->total) }}</td>
                                             <td>
                                                 @if($order->order_status == 'pending')
                                                     <span class="badge badge-warning">Tertunda</span>

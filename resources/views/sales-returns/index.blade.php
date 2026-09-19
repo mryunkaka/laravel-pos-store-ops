@@ -65,7 +65,7 @@
                                         <td>{{ $return->order->invoice_no ?? '-' }}</td>
                                         <td>{{ $return->return_date->format('Y-m-d') }}</td>
                                         <td>{{ $return->return_type === 'refund' ? 'Refund' : 'Tukar Barang' }}</td>
-                                        <td>Rp {{ number_format($return->refund_amount, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($return->refund_amount) }}</td>
                                         <td>
                                             <span class="badge bg-{{ $return->status == 'completed' ? 'success' : ($return->status == 'cancelled' ? 'danger' : 'warning') }}">
                                                 {{ ucfirst($return->status) }}

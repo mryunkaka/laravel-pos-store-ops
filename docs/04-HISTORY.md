@@ -1,5 +1,47 @@
 ﻿# 04 - Riwayat
 
+## 2026-09-20
+
+### HTTPS Lokal, Kamera Barcode, dan Layout POS
+
+- Nginx vhost HTTPS POS3 aktif pada port `8443` dengan root `D:/Adam/Project/Web/pos3/public`.
+- URL lokal utama: `https://localhost:8443`; URL LAN saat ini: `https://10.77.147.173:8443`.
+- HTTP `8082` dipertahankan sebagai entry point redirect ke HTTPS agar link lama tidak langsung putus.
+- Sertifikat lokal self-signed memakai SAN `localhost`, `127.0.0.1`, dan `10.77.147.173`; sertifikat publik Let's Encrypt tidak dipakai untuk `localhost` karena ACME tidak dapat memvalidasi hostname tersebut.
+- README ditambah tutorial trust certificate lokal serta alur win-acme untuk domain publik memakai filesystem HTTP-01 dan PEM files.
+- Konfigurasi Nginx divalidasi dengan `nginx.exe -t`; service `nginx` berhasil dijalankan ulang dan port `8443` terdeteksi listen.
+- Response HTTPS nyata mengembalikan `302` Laravel ke `/login`; tidak ada perubahan database atau penghapusan riwayat transaksi.
+- Browser berhasil membuka `https://localhost:8443/login`; `window.isSecureContext=true`, `navigator.mediaDevices=true`, dan `getUserMedia=true`.
+- Layout cart POS tidak lagi menutupi header; status/error kamera tidak lagi silent ketika secure context, API, izin, atau detector bermasalah.
+- Test POS/layout/branding/invoice, Blade cache, dan frontend build lulus. Full suite terakhir: 110 passed, 2 skipped, 381 assertions. `php artisan migrate:status` dan `git diff --check` lulus.
+- Uji browser authenticated, kamera fisik, dan checkout nyata tetap pending karena credential vault belum tersedia.
+
+## 2026-09-19
+
+### QA Full Aplikasi dan Perlindungan Data
+
+- Full suite terakhir: 100 passed, 2 skipped, 322 assertions.
+- Menu harness Laravel: 52/52 halaman representative PASS, tanpa HTTP 500.
+- Regression test menemukan barcode quick-add menerima produk expired; sekarang ditolak dengan HTTP 422.
+- Regression test menemukan penghapusan customer dapat cascade ke histori order; customer yang punya order sekarang ditolak tanpa menghapus customer/order.
+- Token invoice publik yang malformed sebelumnya menghasilkan HTTP 500 dan stack trace debug; sekarang ditangani sebagai 404.
+- Receipt, invoice visual, invoice PDF, WhatsApp text, subtotal/diskon/pajak/biaya/metode/kembalian, branding toko, Google Maps, dan kamera barcode mendapat regression coverage.
+- Audit keamanan route menemukan endpoint WhatsApp invoice/struk memakai GET walau menulis `whatsapp_message_logs`, audit log, dan metadata invoice. Route diubah menjadi POST; view memakai form dengan CSRF. Endpoint GET PDF invoice dipisahkan menjadi read-only: hanya menyajikan file lokal yang sudah dibuat, tanpa generate/update/audit.
+- Regression invoice/security: `php artisan test tests/Feature/SecurityRegressionTest.php tests/Unit/InvoiceFeatureTest.php --no-ansi` — 19 passed, 57 assertions.
+- Migration status bersih; `view:cache`, PHP lint 247 file, frontend build, route list, `git diff --check`, dan integrity check orphan utama lulus.
+- Database production/local tidak di-reset atau dihapus. QA test memakai DB MySQL lokal testing yang sama; regression test branding/barcode memakai `DatabaseTransactions`, user Faker sementara sudah dibersihkan, sedangkan user Admin/User, order, shift, permission, dan histori lama dipertahankan.
+
+### Bugfix Pembayaran Gaji
+
+- Root cause: form `pay-salary/{id}` mengirim ID record `advance_salaries`, tetapi `PaySalaryController::store()` memvalidasi `employee_id`, sehingga pembayaran selalu gagal sebelum transaksi dijalankan.
+- `StorePaySalaryRequest` sekarang memvalidasi mode pembayaran dari gaji di muka atau karyawan langsung, bulan `01`–`12`, tanggal, dan tahun.
+- Pembayaran dari gaji di muka mengambil karyawan dari record tersebut, menyimpan `pay_salaries`, menandai `advance_salaries.is_deducted`, dan menolak pembayaran bulan yang sama dua kali.
+- Form pembayaran menampilkan seluruh validation error agar kegagalan tidak lagi tanpa keterangan.
+- Form pembayaran otomatis memilih bulan dan tahun sesuai tanggal gaji di muka.
+- Mode bayar karyawan langsung tanpa gaji di muka tetap dipertahankan.
+- Regression test: `tests/Feature/PaySalaryControllerTest.php`.
+- Verifikasi: `php artisan test tests/Feature/PaySalaryControllerTest.php --no-ansi` — 4 passed.
+
 ## 2026-09-17
 
 ### Bugfix Produk - Collision Kode Setelah Validasi
@@ -112,7 +154,7 @@
 - Test ditambahkan untuk normalisasi nomor Indonesia, pesan multi-data, URL `api.whatsapp.com/send`, multipart tmp0.cc, expiration 30 hari, dan response validation.
 - Validasi: `php artisan migrate --force`, `php artisan view:cache`, `php artisan route:list --name=invoice`, PHP lint, Composer validate/check-platform-reqs, dan unit test invoice.
 - Perbaikan runtime: request tmp0.cc sebelumnya menyimpan response ke `$client` tetapi membaca `$response`, memicu `Undefined variable $response`. Variabel diperbaiki dan diuji melalui Nginx/PHP-CGI aktif dengan dummy PDF tanpa data transaksi nyata; upload berhasil.
-- Receipt `/orders/receipt/print/{id}` memakai link aktif `Kirim WhatsApp + Invoice PDF` ke route invoice khusus. Klik link memastikan pembayaran sudah dikonfirmasi walau order pending, membuat/reuse PDF, upload ke tmp0.cc bila perlu, lalu membuka `api.whatsapp.com/send` dengan link invoice. Error tidak kembali ke print receipt; WhatsApp teks tetap tidak bergantung pada tmp0.cc.
+- Receipt `/orders/receipt/print/{id}` memakai form POST+CSRF aktif `Kirim WhatsApp + Invoice PDF` ke route invoice khusus. Submit memastikan pembayaran sudah dikonfirmasi walau order pending, membuat/reuse PDF, upload ke tmp0.cc bila perlu, lalu membuka `api.whatsapp.com/send` dengan link invoice. Error tidak kembali ke print receipt; WhatsApp teks tetap tidak bergantung pada tmp0.cc.
 - Checkout POS menampilkan loading struk setelah `Konfirmasi Pembayaran`, membuka halaman cetak struk setelah order tersimpan, lalu tombol `Kirim WhatsApp + Invoice PDF` pada halaman itu memproses PDF/upload dan redirect ke URL WhatsApp manual.
 
 ## 2026-06-20

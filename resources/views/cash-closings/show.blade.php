@@ -21,7 +21,7 @@
                             <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h6 class="card-title">Total Sales</h6>
-                                    <h3 class="mb-0">Rp {{ number_format($closing->total_sales, 0) }}</h3>
+                                    <h3 class="mb-0">{{ format_rupiah($closing->total_sales) }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -29,7 +29,7 @@
                             <div class="card bg-primary text-white">
                                 <div class="card-body">
                                     <h6 class="card-title">Total Tunai</h6>
-                                    <h3 class="mb-0">Rp {{ number_format($closing->total_cash, 0) }}</h3>
+                                    <h3 class="mb-0">{{ format_rupiah($closing->total_cash) }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -37,7 +37,7 @@
                             <div class="card bg-warning text-white">
                                 <div class="card-body">
                                     <h6 class="card-title">Total Non-Tunai</h6>
-                                    <h3 class="mb-0">Rp {{ number_format($closing->total_non_cash, 0) }}</h3>
+                                    <h3 class="mb-0">{{ format_rupiah($closing->total_non_cash) }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                             <div class="card bg-info text-white">
                                 <div class="card-body">
                                     <h6 class="card-title">Selisih Kas</h6>
-                                    <h3 class="mb-0">Rp {{ number_format($closing->cash_difference, 0) }}</h3>
+                                    <h3 class="mb-0">{{ format_rupiah($closing->cash_difference) }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -71,13 +71,13 @@
                                 @forelse($closing->details as $detail)
                                     <tr>
                                         <td>{{ $detail->cashShift->user->name ?? '-' }}</td>
-                                        <td>Rp {{ number_format($detail->shift_sales, 0) }}</td>
-                                        <td>Rp {{ number_format($detail->shift_cash, 0) }}</td>
-                                        <td>Rp {{ number_format($detail->shift_non_cash, 0) }}</td>
-                                        <td>Rp {{ number_format($detail->shift_void, 0) }}</td>
-                                        <td>Rp {{ number_format($detail->shift_refund, 0) }}</td>
-                                        <td>Rp {{ number_format($detail->shift_cash_actual, 0) }}</td>
-                                        <td>Rp {{ number_format($detail->shift_cash_difference, 0) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_sales) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_cash) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_non_cash) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_void) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_refund) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_cash_actual) }}</td>
+                                        <td>{{ format_rupiah($detail->shift_cash_difference) }}</td>
                                     </tr>
                                 @empty
                                     <tr><td colspan="8" class="text-center">No data</td></tr>

@@ -19,7 +19,7 @@
     }
     $cartBaseTotal = max($cartGross - $cartItemDiscount + $cartTax, 0);
 @endphp
-<div class="cart-items-wrapper position-relative" style="height: 350px; overflow-y: auto; overflow-x: hidden;">
+<div class="cart-items-wrapper position-relative">
     @if ($productItem->count() > 0)
         <div class="list-group list-group-flush">
             @foreach ($productItem as $item)
@@ -27,14 +27,14 @@
                 <div class="list-group-item p-3 border-0 border-bottom">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h6 class="font-weight-bold text-dark mb-0">{{ $item->name }}</h6>
-                        <span class="font-weight-bolder text-dark">{{ number_format(($item->price - (float) ($item->options->discount ?? 0)) * $item->qty, 0, ',', '.') }}</span>
+                        <span class="font-weight-bolder text-dark">{{ format_rupiah(($item->price - (float) ($item->options->discount ?? 0)) * $item->qty) }}</span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-muted small">
-                            {{ number_format($item->price) }}
+                            {{ format_rupiah($item->price) }}
                             @if ((float) ($item->options->discount ?? 0) > 0)
-                                <span class="text-danger">-{{ number_format((float) $item->options->discount, 0, ',', '.') }}</span>
+                                <span class="text-danger">-{{ format_rupiah((float) $item->options->discount) }}</span>
                             @endif
                         </div>
 
@@ -79,19 +79,19 @@
 <div class="p-4 bg-white border-top">
     <div class="d-flex justify-content-between mb-2">
         <span class="text-secondary small">Subtotal</span>
-        <span class="font-weight-bold">{{ number_format($cartGross, 0, ',', '.') }}</span>
+        <span class="font-weight-bold">{{ format_rupiah($cartGross) }}</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
         <span class="text-secondary small">Diskon Item</span>
-        <span class="font-weight-bold text-danger">-{{ number_format($cartItemDiscount, 0, ',', '.') }}</span>
+        <span class="font-weight-bold text-danger">-{{ format_rupiah($cartItemDiscount) }}</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
         <span class="text-secondary small">Pajak</span>
-        <span class="font-weight-bold">{{ number_format($cartTax, 0, ',', '.') }}</span>
+        <span class="font-weight-bold">{{ format_rupiah($cartTax) }}</span>
     </div>
     <div class="d-flex justify-content-between mb-3" id="voucher-discount-row" style="display: none !important;">
         <span class="text-secondary small">Diskon Voucher</span>
-        <span class="font-weight-bold text-danger" id="voucher-discount-display">-0</span>
+        <span class="font-weight-bold text-danger" id="voucher-discount-display">-Rp 0</span>
     </div>
     @if (Cart::count() > 0)
         <div class="form-group mb-2">
@@ -117,11 +117,11 @@
     @endif
     <div class="d-flex justify-content-between mb-2">
         <span class="text-secondary small">Total Dasar</span>
-        <span class="font-weight-bold">{{ number_format($cartBaseTotal, 0, ',', '.') }}</span>
+        <span class="font-weight-bold">{{ format_rupiah($cartBaseTotal) }}</span>
     </div>
     <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dashed">
         <span class="h6 font-weight-bold text-dark mb-0">Total</span>
-        <span class="h4 font-weight-bolder text-primary mb-0" id="cart-total" data-base-total="{{ $cartBaseTotal }}">{{ number_format($cartBaseTotal, 0, ',', '.') }}</span>
+        <span class="h4 font-weight-bolder text-primary mb-0" id="cart-total" data-base-total="{{ $cartBaseTotal }}">{{ format_rupiah($cartBaseTotal) }}</span>
     </div>
 </div>
 
@@ -158,7 +158,7 @@
         <!-- Change Display -->
         <div class="d-flex justify-content-between align-items-center mb-3 px-2 py-2 bg-light rounded">
             <span class="small font-weight-bold text-muted" id="change_label">Kembalian</span>
-            <span class="font-weight-bold text-success" id="change_amount">0.00</span>
+            <span class="font-weight-bold text-success" id="change_amount">Rp 0</span>
         </div>
 
         <!-- Confirm Payment Button -->

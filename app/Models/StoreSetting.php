@@ -13,6 +13,7 @@ class StoreSetting extends Model
         'store_name',
         'address',
         'phone',
+        'google_maps_url',
         'logo',
         'default_tax_rate',
         'currency',

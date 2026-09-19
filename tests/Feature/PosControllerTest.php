@@ -3,7 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\CashShift;
+use App\Models\CashShiftDetail;
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\OrderDetails;
 use App\Models\Product;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -25,11 +31,25 @@ class PosControllerTest extends TestCase
             ['name' => 'pos.menu'],
             ['group_name' => 'pos']
         );
+        Permission::firstOrCreate(
+            ['name' => 'discount.order'],
+            ['group_name' => 'orders']
+        );
+        Permission::firstOrCreate(
+            ['name' => 'orders.menu'],
+            ['group_name' => 'orders']
+        );
         
         // Create a role and assign permission (outside transaction)
         $role = Role::firstOrCreate(['name' => 'test-role']);
         if (!$role->hasPermissionTo('pos.menu')) {
             $role->givePermissionTo('pos.menu');
+        }
+        if (!$role->hasPermissionTo('discount.order')) {
+            $role->givePermissionTo('discount.order');
+        }
+        if (!$role->hasPermissionTo('orders.menu')) {
+            $role->givePermissionTo('orders.menu');
         }
     }
 
@@ -38,6 +58,13 @@ class PosControllerTest extends TestCase
         $user = User::factory()->create();
         $role = Role::where('name', 'test-role')->first();
         $user->assignRole($role);
+        CashShift::create([
+            'user_id' => $user->id,
+            'location_id' => 1,
+            'start_time' => now(),
+            'opening_balance' => 0,
+            'status' => 'active',
+        ]);
         return $user;
     }
 
@@ -279,6 +306,159 @@ class PosControllerTest extends TestCase
         $response = $this->actingAs($user)->get('/pos');
 
         $response->assertOk();
-        $response->assertSee('Search by name or barcode...', false);
+        $response->assertSee('Cari nama atau barcode...', false);
+    }
+
+    public function test_empty_cart_cannot_create_zero_value_order(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $customer = Customer::factory()->create();
+        $ordersBefore = Order::count();
+
+        $response = $this->actingAs($user)->postJson('/pos/order', [
+            'customer_id' => $customer->id,
+            'payment_type' => 'cash',
+            'pay_amount' => 1,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertSame($ordersBefore, Order::count());
+    }
+
+    public function test_negative_due_payment_is_rejected_without_order_change(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $customer = Customer::factory()->create();
+        $order = Order::create([
+            'customer_id' => $customer->id,
+            'user_id' => $user->id,
+            'invoice_no' => 'QA-DUE-'.uniqid(),
+            'order_date' => now(),
+            'order_status' => 'pending',
+            'total_products' => 1,
+            'sub_total' => 100000,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'service_charge' => 0,
+            'tax_total' => 0,
+            'tax_type' => 'exclusive',
+            'vat' => 0,
+            'total' => 100000,
+            'payment_type' => 'Tunai Rp 50.000',
+            'pay_amount' => 50000,
+            'due_amount' => 50000,
+        ]);
+
+        $response = $this->actingAs($user)->post('/update/due', [
+            'order_id' => $order->id,
+            'due_amount' => -1,
+        ]);
+
+        $response->assertSessionHasErrors('due_amount');
+        $this->assertSame(50000.0, (float) $order->fresh()->due_amount);
+    }
+
+    public function test_expired_product_cannot_be_added_directly_to_pos_cart(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $product = $this->createProductWithCode('Expired Direct Add', 'EXPIRED-DIRECT-001');
+        $product->update(['expire_date' => Carbon::now()->subDay()]);
+
+        $response = $this->actingAs($user)->postJson('/pos/add', [
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->selling_price,
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_pos_checkout_persists_multi_item_discount_tax_and_split_payments(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $customer = Customer::factory()->create();
+        $category = $this->createCategory();
+        $productOne = Product::factory()->create([
+            'name' => 'POS Taxed Product',
+            'code' => 'POS-TAX-001',
+            'category_id' => $category->id,
+            'stock' => 10,
+            'selling_price' => 10000,
+            'discount' => 10,
+            'discount_type' => 'percentage',
+            'tax_rate' => 10,
+            'expire_date' => Carbon::now()->addYear(),
+        ]);
+        $productTwo = Product::factory()->create([
+            'name' => 'POS Fixed Discount Product',
+            'code' => 'POS-DISCOUNT-001',
+            'category_id' => $category->id,
+            'stock' => 10,
+            'selling_price' => 5000,
+            'discount' => 500,
+            'discount_type' => 'fixed',
+            'tax_rate' => 0,
+            'expire_date' => Carbon::now()->addYear(),
+        ]);
+
+        Cart::destroy();
+        $this->actingAs($user)
+            ->postJson('/pos/add', [
+                'id' => $productOne->id,
+                'name' => $productOne->name,
+                'price' => $productOne->selling_price,
+            ])
+            ->assertOk();
+        $this->postJson('/pos/add', [
+            'id' => $productOne->id,
+            'name' => $productOne->name,
+            'price' => $productOne->selling_price,
+        ])->assertOk();
+        $this->postJson('/pos/add', [
+            'id' => $productTwo->id,
+            'name' => $productTwo->name,
+            'price' => $productTwo->selling_price,
+        ])->assertOk();
+
+        $productOneRow = Cart::content()->firstWhere('id', (string) $productOne->id);
+        $this->assertNotNull($productOneRow);
+        $this->postJson('/pos/update/'.$productOneRow->rowId, ['qty' => 3])->assertOk();
+
+        $checkout = $this->postJson('/pos/order', [
+            'customer_id' => $customer->id,
+            'payment_type' => 'cash',
+            'pay_amount' => 40000,
+            'invoice_discount' => 1000,
+            'service_charge' => 500,
+            'payments' => [
+                ['payment_type' => 'cash', 'amount' => 20000],
+                ['payment_type' => 'transfer', 'amount' => 20000],
+            ],
+        ]);
+
+        $checkout->assertOk()->assertJsonPath('success', true);
+
+        $order = Order::with(['details', 'payments'])
+            ->where('customer_id', $customer->id)
+            ->latest('id')
+            ->firstOrFail();
+        $orderId = $order->id;
+        $this->assertSame(35000.0, (float) $order->sub_total);
+        $this->assertSame(1000.0, (float) $order->discount);
+        $this->assertSame(500.0, (float) $order->service_charge);
+        $this->assertSame(2700.0, (float) $order->tax_total);
+        $this->assertSame(33700.0, (float) $order->total);
+        $this->assertSame(40000.0, (float) $order->pay_amount);
+        $this->assertSame(-6300.0, (float) $order->due_amount);
+        $this->assertSame(2, $order->payments->count());
+        $this->assertSame(31500.0, (float) $order->details->sum('total'));
+        $this->assertSame(10, (int) $productOne->fresh()->stock);
+        $this->assertSame(10, (int) $productTwo->fresh()->stock);
+        $this->assertSame(0, Cart::count());
+
+        $this->actingAs($user)->put('/orders/update/status', ['id' => $order->id])->assertRedirect();
+        $this->assertSame('complete', $order->fresh()->order_status);
+        $this->assertSame(7, (int) $productOne->fresh()->stock);
+        $this->assertSame(9, (int) $productTwo->fresh()->stock);
     }
 }

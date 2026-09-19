@@ -50,7 +50,7 @@
                                         <td>{{ $voucher->code }}</td>
                                         <td>{{ $voucher->name }}</td>
                                         <td>{{ $voucher->type === 'percentage' ? 'Persen' : 'Nominal' }}</td>
-                                        <td>{{ $voucher->type === 'percentage' ? $voucher->discount . '%' : 'Rp ' . number_format($voucher->discount, 0, ',', '.') }}</td>
+                                        <td>{{ $voucher->type === 'percentage' ? $voucher->discount . '%' : format_rupiah($voucher->discount) }}</td>
                                         <td>{{ $voucher->start_date->format('Y-m-d') }} - {{ $voucher->end_date->format('Y-m-d') }}</td>
                                         <td>{{ $voucher->used_count }}{{ $voucher->max_use ? ' / ' . $voucher->max_use : '' }}</td>
                                         <td><span class="badge bg-{{ $voucher->is_active ? 'success' : 'secondary' }}">{{ $voucher->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>

@@ -149,7 +149,7 @@ class ProductControllerTest extends TestCase
         $response = $this->actingAs($user)->get('/products/create');
 
         $response->assertOk();
-        $response->assertSee('Product Code', false);
+        $response->assertSee('Kode Produk', false);
         $response->assertSee('Barcode Scanner', false);
         $response->assertSee('id="code"', false);
         $response->assertSee('id="barcode_scanner"', false);
@@ -248,7 +248,7 @@ class ProductControllerTest extends TestCase
         $response = $this->actingAs($user)->get("/products/{$product->id}/edit");
 
         $response->assertOk();
-        $response->assertSee('Product Code', false);
+        $response->assertSee('Kode Produk', false);
         $response->assertSee('Barcode Scanner', false);
         $response->assertSee('value="TEST-CODE"', false);
         $response->assertSee('id="code"', false);
@@ -331,8 +331,8 @@ class ProductControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('BARCODE-TEST-123', false);
-        $response->assertSee('Product Code', false);
-        $response->assertSee('Product Barcode', false);
+        $response->assertSee('Kode Produk', false);
+        $response->assertSee('Barcode Produk', false);
     }
 
     public function test_product_with_custom_code_displays_correct_barcode(): void

@@ -99,9 +99,16 @@
 
                                 <div class="form-group col-md-6">
                                     <label for="barcode_scanner">Barcode Scanner</label>
-                                    <input type="text" class="form-control" id="barcode_scanner" 
-                                        placeholder="Scan barcode di sini (mobile-friendly)" autocomplete="off">
-                                    <small class="form-text text-muted">Scan barcode untuk mengisi Kode Produk otomatis</small>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="barcode_scanner"
+                                            placeholder="Scan barcode di sini (mobile-friendly)" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" id="start_barcode_camera" class="btn btn-success">Kamera</button>
+                                        </div>
+                                    </div>
+                                    <video id="product_barcode_camera_video" class="d-none mt-2" style="width: 100%; max-height: 220px; object-fit: cover;" playsinline muted></video>
+                                    <button type="button" id="close_barcode_camera" class="btn btn-sm btn-outline-secondary d-none mt-1">Tutup kamera</button>
+                                    <small id="product_barcode_camera_status" class="form-text text-muted">Scan barcode untuk mengisi Kode Produk otomatis</small>
                                 </div>
 
                                 <div class="form-group col-md-6">
@@ -247,7 +254,16 @@
                                 <!-- Page end  -->
                                 </div>
 
+    <script src="{{ asset('assets/js/barcode-camera.js') }}"></script>
     <script>
+        createBarcodeCameraScanner({
+            buttonId: 'start_barcode_camera',
+            videoId: 'product_barcode_camera_video',
+            statusId: 'product_barcode_camera_status',
+            inputId: 'code',
+            closeId: 'close_barcode_camera'
+        });
+
         $('#buying_date').datepicker({
             uiLibrary: 'bootstrap4',
             format: 'yyyy-mm-dd'

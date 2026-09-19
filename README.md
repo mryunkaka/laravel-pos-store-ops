@@ -8,7 +8,7 @@ Target folder:
 Installer   : C:\Server\Installer
 Server      : C:\Server
 Project     : D:\Project\Web\pos3
-URL         : http://localhost:8082
+URL         : https://localhost:8443
 Nginx       : C:\Server\nginx
 PHP         : C:\Server\php
 NSSM        : C:\Server\nssm
@@ -200,7 +200,7 @@ Edit `.env`:
 APP_NAME="POS3"
 APP_ENV=local
 APP_DEBUG=false
-APP_URL=http://localhost:8082
+APP_URL=https://localhost:8443
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -256,15 +256,25 @@ events {
 http {
     include       mime.types;
     default_type  application/octet-stream;
+    server_names_hash_bucket_size 64;
     sendfile      on;
     keepalive_timeout 65;
 
     server {
         listen 8082;
         server_name localhost;
+        return 301 https://$host:8443$request_uri;
+    }
+
+    server {
+        listen 8443 ssl;
+        server_name localhost;
         root D:/Project/Web/pos3/public;
         index index.php index.html;
 
+        ssl_certificate C:/Server/certs/pos3-local.crt.pem;
+        ssl_certificate_key C:/Server/certs/pos3-local.key.pem;
+        ssl_protocols TLSv1.2 TLSv1.3;
         client_max_body_size 64M;
 
         location / {
@@ -272,6 +282,7 @@ http {
         }
 
         location ~ \.php$ {
+            try_files $uri =404;
             include fastcgi_params;
             fastcgi_pass 127.0.0.1:9000;
             fastcgi_index index.php;
@@ -282,7 +293,6 @@ http {
         location ~ /\. {
             deny all;
         }
-
     }
 }
 ```
@@ -302,6 +312,107 @@ Harus muncul:
 syntax is ok
 test is successful
 ```
+
+### 8.1 HTTPS lokal untuk kamera barcode
+
+URL aplikasi lokal:
+
+```text
+https://localhost:8443
+```
+
+URL dari perangkat lain satu jaringan:
+
+```text
+https://ALAMAT_IP_PC:8443
+```
+
+Sertifikat lokal harus memiliki SAN untuk hostname/IP yang dipakai. Contoh sertifikat PC saat ini:
+
+```text
+C:\Server\certs\pos3-local.crt.pem
+C:\Server\certs\pos3-local.key.pem
+SAN: localhost, 127.0.0.1, 10.77.147.173
+```
+
+Import hanya file sertifikat publik ke Root store Windows. Jangan membagikan file `*-key.pem`.
+
+```powershell
+certutil.exe -user -addstore -f Root C:\Server\certs\pos3-local.crt.pem
+```
+
+Restart service Nginx dari PowerShell Administrator setelah konfigurasi berubah:
+
+```powershell
+& 'C:\Server\nginx\nginx.exe' -t -p 'C:\Server\nginx' -c 'conf\nginx.conf'
+& 'C:\Server\nssm\win64\nssm.exe' restart pos3-web
+```
+
+Verifikasi:
+
+```powershell
+curl.exe -k -I https://localhost:8443/
+netstat.exe -ano | findstr ":8443"
+```
+
+Browser membutuhkan secure context untuk `navigator.mediaDevices.getUserMedia`. Kamera fisik tetap perlu izin Camera pada browser/Windows. Jika izin ditolak, buka pengaturan site browser lalu izinkan Camera; aplikasi menampilkan status/error kamera.
+
+### 8.2 Sertifikat publik dengan win-acme
+
+win-acme tidak dapat menerbitkan sertifikat publik untuk `localhost`. Gunakan domain sungguhan, misalnya `pos.example.com`, dengan DNS mengarah ke IP publik server dan TCP `80` dapat dijangkau Let's Encrypt. Untuk domain publik, gunakan port `443` atau pertahankan `8443` dengan URL port eksplisit.
+
+Referensi resmi:
+
+- https://letsencrypt.org/docs/certificates-for-localhost/
+- https://www.win-acme.com/reference/cli
+- https://www.win-acme.com/reference/plugins/source/manual
+- https://www.win-acme.com/reference/plugins/validation/http/filesystem
+- https://www.win-acme.com/reference/plugins/store/pemfiles
+
+Buat folder challenge dan tambahkan server HTTP sementara sebelum menjalankan win-acme:
+
+```powershell
+New-Item -ItemType Directory -Force C:\Server\acme-challenge
+```
+
+```nginx
+server {
+    listen 80;
+    server_name pos.example.com;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root C:/Server/acme-challenge;
+        default_type text/plain;
+        try_files $uri =404;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+```
+
+Jalankan `wacs.exe` sebagai Administrator. Ganti domain dan email contoh:
+
+```powershell
+.\wacs.exe --source manual --host pos.example.com --validation filesystem --webroot C:\Server\acme-challenge --store pemfiles --pemfilespath C:\Server\certs --pemfilesname pos3 --installation none --accepttos --emailaddress admin@example.com
+```
+
+File PEM yang dipakai Nginx:
+
+```text
+C:\Server\certs\pos3-chain.pem
+C:\Server\certs\pos3-key.pem
+```
+
+Ubah vhost HTTPS menjadi:
+
+```nginx
+ssl_certificate C:/Server/certs/pos3-chain.pem;
+ssl_certificate_key C:/Server/certs/pos3-key.pem;
+```
+
+Lalu validasi dan restart service. win-acme membuat renewal terjadwal; setiap renewal harus diikuti reload/restart Nginx agar sertifikat baru dibaca.
 
 ## 9. Buat runner PowerShell
 

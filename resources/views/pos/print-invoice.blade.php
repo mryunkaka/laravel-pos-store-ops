@@ -30,9 +30,16 @@
                         <!-- Company Header -->
                         <div class="row mb-5">
                             <div class="col-6">
-                                <h3 class="font-weight-bold text-dark mb-1">POS SHOP</h3>
-                                <p class="text-muted mb-0">123 Commerce Avenue</p>
-                                <p class="text-muted">Jakarta, Indonesia</p>
+                                @if ($setting->logo)
+                                    <img src="{{ asset('storage/' . $setting->logo) }}" alt="{{ $setting->store_name }}" class="img-fluid mb-2" style="max-width: 160px; max-height: 70px; object-fit: contain;">
+                                @endif
+                                <h3 class="font-weight-bold text-dark mb-1">{{ $setting->store_name ?: 'POS Shop' }}</h3>
+                                @if ($setting->address)
+                                    <p class="text-muted mb-0"><a href="{{ $setting->google_maps_url ?: '#' }}" target="_blank" rel="noopener noreferrer">{{ $setting->address }}</a></p>
+                                @endif
+                                @if ($setting->phone)
+                                    <p class="text-muted">{{ $setting->phone }}</p>
+                                @endif
                             </div>
                             <div class="col-6 text-right">
                                 <h6 class="text-uppercase text-muted font-weight-bold letter-spacing-2 mb-2">Faktur</h6>
@@ -75,8 +82,8 @@
                                                 <p class="font-weight-bold text-dark mb-0">{{ $item->product->name }}</p>
                                             </td>
                                             <td class="border-bottom-0 text-center py-3">{{ $item->quantity }}</td>
-                                            <td class="border-bottom-0 text-right py-3">{{ number_format($item->unit_price, 2) }}</td>
-                                            <td class="border-bottom-0 text-right py-3 pr-4 font-weight-bold">{{ number_format($item->total, 2) }}</td>
+                                            <td class="border-bottom-0 text-right py-3">{{ format_rupiah($item->unit_price) }}</td>
+                                            <td class="border-bottom-0 text-right py-3 pr-4 font-weight-bold">{{ format_rupiah($item->total) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -89,15 +96,23 @@
                                 <table class="table table-sm table-borderless">
                                     <tr>
                                         <td class="text-muted">Subtotal</td>
-                                        <td class="text-right font-weight-bold">{{ number_format($order->sub_total, 2) }}</td>
+                                        <td class="text-right font-weight-bold">{{ format_rupiah($order->sub_total) }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Pajak (PPN)</td>
-                                        <td class="text-right font-weight-bold">{{ number_format($order->vat, 2) }}</td>
+                                        <td class="text-muted">Diskon</td>
+                                        <td class="text-right font-weight-bold">-{{ format_rupiah($order->discountTotal()) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Pajak/PPN</td>
+                                        <td class="text-right font-weight-bold">{{ format_rupiah($order->taxAmount()) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Biaya lainnya</td>
+                                        <td class="text-right font-weight-bold">{{ format_rupiah($order->service_charge) }}</td>
                                     </tr>
                                     <tr class="border-top">
                                         <td class="text-dark font-weight-bold pt-3 h5">Total</td>
-                                        <td class="text-primary font-weight-bold text-right pt-3 h5">{{ number_format($order->total, 2) }}</td>
+                                        <td class="text-primary font-weight-bold text-right pt-3 h5">{{ format_rupiah($order->total) }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-muted">Pembayaran</td>
@@ -105,11 +120,11 @@
                                     </tr>
                                     <tr>
                                         <td class="text-muted">Total Dibayar</td>
-                                        <td class="text-success text-right font-weight-bold">{{ number_format($order->pay_amount, 2) }}</td>
+                                        <td class="text-success text-right font-weight-bold">{{ format_rupiah($order->pay_amount) }}</td>
                                     </tr>
                                      <tr>
                                         <td class="text-muted">{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}</td>
-                                        <td class="text-dark text-right font-weight-bold">{{ number_format($order->due_amount > 0 ? $order->due_amount : abs(min($order->due_amount, 0)), 2) }}</td>
+                                        <td class="text-dark text-right font-weight-bold">{{ format_rupiah($order->due_amount > 0 ? $order->outstandingAmount() : $order->changeAmount()) }}</td>
                                     </tr>
                                 </table>
                             </div>

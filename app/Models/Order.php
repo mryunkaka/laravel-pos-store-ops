@@ -149,14 +149,43 @@ class Order extends Model
             $label = $isDuePayment ? 'Piutang ' . (++$dueIndex) : ($labels[$payment->payment_type] ?? ucfirst($payment->payment_type));
             $suffix = $isDuePayment && $payment->id === $lastDueId && $this->due_amount <= 0 ? ' (Lunas)' : '';
 
-            return $label . ' Rp ' . number_format((float) $payment->amount, 0, ',', '.') . $suffix;
+            return $label . ' ' . format_rupiah($payment->amount) . $suffix;
         });
 
         $missingPaidHistory = max((float) $this->pay_amount - (float) $payments->sum('amount'), 0);
         if ($missingPaidHistory > 0) {
-            $parts->push('Piutang ' . (++$dueIndex) . ' Rp ' . number_format($missingPaidHistory, 0, ',', '.') . ($this->due_amount <= 0 ? ' (Lunas)' : ''));
+            $parts->push('Piutang ' . (++$dueIndex) . ' ' . format_rupiah($missingPaidHistory) . ($this->due_amount <= 0 ? ' (Lunas)' : ''));
         }
 
         return $parts->implode(', ');
+    }
+
+    public function itemDiscountTotal(): float
+    {
+        $details = $this->relationLoaded('details')
+            ? $this->details
+            : $this->details()->get();
+
+        return (float) $details->sum(fn ($detail) => (float) $detail->discount * (int) $detail->quantity);
+    }
+
+    public function discountTotal(): float
+    {
+        return max((float) $this->discount, 0) + $this->itemDiscountTotal();
+    }
+
+    public function taxAmount(): float
+    {
+        return (float) ($this->tax_total ?? $this->vat ?? 0);
+    }
+
+    public function changeAmount(): float
+    {
+        return max(-((float) $this->due_amount), 0);
+    }
+
+    public function outstandingAmount(): float
+    {
+        return max((float) $this->due_amount, 0);
     }
 }

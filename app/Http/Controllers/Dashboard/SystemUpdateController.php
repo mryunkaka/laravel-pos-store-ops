@@ -94,7 +94,10 @@ class SystemUpdateController extends Controller
     <p>Langkah: <strong>{$progress['label']}</strong></p>
     <div class="bar"><div class="fill">{$progress['percent']}%</div></div>
     <p>Selesai terakhir: {$doneAt}</p>
-    <p><a class="button" href="/update-web.start" onclick="return confirm('Jalankan update web sekarang?')">Jalankan Update Web</a></p>
+    <form method="POST" action="/update-web.start" onsubmit="return confirm('Jalankan update web sekarang?')">
+        <input type="hidden" name="_token" value="{$this->csrfToken()}">
+        <button class="button" type="submit">Jalankan Update Web</button>
+    </form>
     <p class="muted">Link darurat jika GUI/sidebar tidak bisa dibuka. Hanya berjalan dari localhost.</p>
     <h2>Log</h2>
     <pre>{$log}</pre>
@@ -157,6 +160,11 @@ HTML);
     private function abortUnlessLocal(Request $request): void
     {
         abort_unless(in_array($request->ip(), ['127.0.0.1', '::1'], true), 403);
+    }
+
+    private function csrfToken(): string
+    {
+        return e(csrf_token());
     }
 
     private function updateInfo(): array

@@ -34,8 +34,8 @@
                                     <tr>
                                         <td>{{ $detail->product->name ?? '-' }}</td>
                                         <td>{{ $detail->quantity }}</td>
-                                        <td>Rp {{ number_format($detail->unit_price, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($detail->total, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($detail->unit_price) }}</td>
+                                        <td>{{ format_rupiah($detail->total) }}</td>
                                         <td>{{ $detail->description ?? '-' }}</td>
                                     </tr>
                                 @endforeach

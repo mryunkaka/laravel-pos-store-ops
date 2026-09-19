@@ -50,7 +50,7 @@
                                         <td>{{ $return->return_date }}</td>
                                         <td>{{ $return->purchaseReceiving->receiving_number ?? '-' }}</td>
                                         <td>{{ $return->supplier->name ?? '-' }}</td>
-                                        <td>Rp {{ number_format($return->grand_total, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($return->grand_total) }}</td>
                                         <td>
                                             <span class="badge bg-{{ 
                                                 $return->status == 'pending' ? 'warning' : 'success'

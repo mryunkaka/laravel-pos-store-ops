@@ -47,7 +47,7 @@
                         @php($value = $row[$column] ?? '')
                         <td>
                             @if(is_numeric($value) && !in_array($column, ['Transaksi', 'Qty', 'Qty Terjual', 'Stok', 'Stok Minimum'], true))
-                                Rp {{ number_format($value, 0, ',', '.') }}
+                                {{ format_rupiah($value) }}
                             @else
                                 {{ $value }}
                             @endif

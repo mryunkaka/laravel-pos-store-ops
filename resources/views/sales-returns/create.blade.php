@@ -88,7 +88,7 @@
                                                         <option value="damaged">Rusak</option>
                                                     </select>
                                                 </td>
-                                                <td>Rp {{ number_format($detail->unit_price, 0, ',', '.') }}</td>
+                                                <td>{{ format_rupiah($detail->unit_price) }}</td>
                                                 <td>
                                                     <input type="text" name="items[{{ $detail->id }}][notes]" class="form-control" {{ $available <= 0 ? 'disabled' : '' }}>
                                                 </td>

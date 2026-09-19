@@ -42,7 +42,7 @@ class InvoiceFeatureTest extends TestCase
         self::assertStringContainsString('Padli', $message);
         self::assertStringContainsString('Rabu, 13/05/2026', $message);
         self::assertStringContainsString('https://tmp0.cc/d/AbC123', $message);
-        self::assertStringContainsString('Produk : Banner', $message);
+        self::assertStringContainsString('*Produk* : Banner', $message);
     }
 
     public function test_manual_text_url_omits_invoice_link(): void
@@ -57,7 +57,7 @@ class InvoiceFeatureTest extends TestCase
 
         self::assertStringStartsWith('https://api.whatsapp.com/send/?phone=6281234567890&text=', $url);
         self::assertStringContainsString('&type=phone_number&app_absent=0', $url);
-        self::assertStringContainsString('Produk : Banner', $message);
+        self::assertStringContainsString('*Produk* : Banner', $message);
         self::assertStringNotContainsString('https://tmp0.cc/d/AbC123', $message);
     }
 
@@ -142,6 +142,16 @@ class InvoiceFeatureTest extends TestCase
         self::assertSame('orders/invoice/whatsapp/{order_id}', $route->uri());
         self::assertSame('App\\Http\\Controllers\\Dashboard\\InvoiceController@whatsapp', $route->getActionName());
         self::assertContains('permission:orders.menu', $route->gatherMiddleware());
+    }
+
+    public function test_whatsapp_actions_are_post_only_because_they_write_logs_and_invoice_state(): void
+    {
+        foreach (['order.invoiceWhatsapp', 'order.receiptWhatsapp'] as $name) {
+            $route = app('router')->getRoutes()->getByName($name);
+
+            self::assertContains('POST', $route->methods(), $name);
+            self::assertNotContains('GET', $route->methods(), $name);
+        }
     }
 
     public function test_invoice_pdf_renderer_returns_a4_pdf_bytes(): void

@@ -79,3 +79,171 @@ svg.w-6 { width: 1.5rem; }
     min-height: 32px;
 }
 svg.h-6 { height: 1.5rem; }
+
+/* POS layout: reserve cart column and keep it below fixed header. */
+.pos-page {
+    max-width: 1920px;
+    margin-inline: auto;
+}
+
+.pos-catalog-column,
+.pos-cart-column {
+    min-width: 0;
+}
+
+.pos-cart-card {
+    position: sticky;
+    top: 90px;
+    z-index: 10;
+    height: min(calc(100dvh - 105px), 900px);
+    max-height: calc(100dvh - 105px);
+    min-height: 540px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pos-cart-card .card-header {
+    flex: 0 0 auto;
+}
+
+.pos-cart-card .card-body {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.pos-cart-card #cart-sidebar-container {
+    min-height: 0;
+    overflow: visible;
+}
+
+.cart-items-wrapper {
+    height: clamp(180px, 35vh, 420px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.iq-sidebar-logo {
+    min-width: 0;
+    align-items: center !important;
+}
+
+.iq-sidebar-logo .header-logo {
+    min-width: 0;
+    align-items: center !important;
+    overflow: hidden;
+}
+
+.iq-sidebar-logo .header-logo .logo-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iq-sidebar-logo .wrapper-menu,
+.iq-menu-bt-sidebar.wrapper-menu {
+    display: inline-flex;
+    flex: 0 0 42px;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.iq-sidebar-logo .wrapper-menu:hover,
+.iq-sidebar-logo .wrapper-menu:focus-visible,
+.iq-menu-bt-sidebar.wrapper-menu:hover,
+.iq-menu-bt-sidebar.wrapper-menu:focus-visible {
+    background: rgba(13, 110, 253, 0.1);
+    outline: none;
+}
+
+.pos-search-control,
+.pos-search-actions {
+    min-width: 0;
+}
+
+.pos-search-actions {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+@media (min-width: 1300px) {
+    body.sidebar-main .iq-sidebar-logo {
+        transform: none;
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    body.sidebar-main .iq-sidebar-logo .header-logo {
+        display: none;
+    }
+
+    body.sidebar-main .iq-sidebar-logo .wrapper-menu {
+        margin-inline: auto;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .pos-page {
+        padding-inline: 10px;
+    }
+
+    .pos-cart-card {
+        position: static;
+        max-height: none;
+        margin-top: 1rem;
+    }
+
+    .cart-items-wrapper {
+        height: min(42vh, 360px);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .pos-page {
+        padding-inline: 5px;
+    }
+
+    .pos-page .card-body,
+    .pos-page .card-header {
+        padding-inline: 0.75rem;
+    }
+
+    .pos-page .product-card .product-image {
+        height: 135px;
+    }
+
+    .pos-page .btn {
+        min-height: 40px;
+    }
+
+    .pos-page .input-group {
+        flex-wrap: wrap;
+    }
+
+    .pos-page .input-group > .form-control,
+    .pos-page .input-group > .select2-container {
+        min-width: 0;
+        flex: 1 1 100%;
+        width: 100% !important;
+    }
+
+    .pos-page .input-group-append {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .pos-page .input-group-append > .btn,
+    .pos-page .input-group-append > button {
+        width: 100%;
+    }
+}

@@ -43,7 +43,7 @@
                             </div>
                             <div>
                                 <p class="mb-2">Total Dibayar</p>
-                                <h4>${{ number_format($total_paid, 2) }}</h4>
+                                <h4>{{ format_rupiah($total_paid) }}</h4>
                             </div>
                         </div>
                         <div class="iq-progress-bar mt-2">
@@ -62,7 +62,7 @@
                             </div>
                             <div>
                                 <p class="mb-2">Total Piutang</p>
-                                <h4>${{ number_format($total_due, 2) }}</h4>
+                                <h4>{{ format_rupiah(max($total_due, 0)) }}</h4>
                             </div>
                         </div>
                         <div class="iq-progress-bar mt-2">
@@ -153,7 +153,7 @@
                                         <tr>
                                             <td>{{ $order->created_at->format('d M Y') }}</td>
                                             <td>{{ $order->customer->name ?? 'Pelanggan Umum' }}</td>
-                                            <td>${{ number_format($order->total, 2) }}</td>
+                                            <td>{{ format_rupiah($order->total) }}</td>
                                             <td>
                                                 <span
                                                     class="badge {{ $order->order_status == 'complete' ? 'bg-success' : 'bg-warning' }}">
@@ -248,7 +248,7 @@
                     tooltip: {
                         y: {
                             formatter: function (val) {
-                                return "Rp " + val
+                                return "Rp " + Math.round(Number(val) || 0).toLocaleString('id-ID')
                             }
                         }
                     },

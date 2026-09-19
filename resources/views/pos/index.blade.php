@@ -1,7 +1,7 @@
 @extends('dashboard.body.main')
 
 @section('container')
-    <div class="container-fluid">
+    <div class="container-fluid pos-page">
         <!-- Success Alert -->
         <div class="row">
             <div class="col-lg-12">
@@ -26,7 +26,7 @@
 
         <div class="row">
             <!-- LEFT COLUMN: Product Catalog -->
-            <div class="col-md-12 col-lg-8">
+            <div class="col-12 col-lg-8 pos-catalog-column">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card card-block card-stretch card-height">
@@ -36,20 +36,26 @@
                                     <div class="d-flex flex-wrap align-items-center justify-content-between">
                                         <!-- Search Input -->
                                         <div class="form-group row mb-0 col-md-5">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" name="search" id="pos_search"
-                                                    placeholder="Cari nama atau barcode..." value="{{ request('search') }}" autocomplete="off">
-                                                <div class="input-group-append">
-                                                    <button type="submit" class="input-group-text bg-primary text-white">
-                                                        <x-heroicon-o-magnifying-glass class="w-5 h-5" />
-                                                    </button>
-                                                    @if (request('search') || request('category_id'))
-                                                        <a href="{{ route('pos.index') }}" class="input-group-text bg-danger text-white">
+                                            <div class="pos-search-control">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" name="search" id="pos_search"
+                                                        placeholder="Cari nama atau barcode..." value="{{ request('search') }}" autocomplete="off">
+                                                    <div class="input-group-append pos-search-actions">
+                                                        <button type="submit" class="input-group-text bg-primary text-white">
+                                                            <x-heroicon-o-magnifying-glass class="w-5 h-5" />
+                                                        </button>
+                                                        <button type="button" id="start_pos_barcode_camera" class="btn btn-success" title="Scan barcode dengan kamera">Kamera</button>
+                                                        @if (request('search') || request('category_id'))
+                                                            <a href="{{ route('pos.index') }}" class="input-group-text bg-danger text-white">
                                                                 <x-heroicon-o-x-mark class="w-5 h-5" />
                                                             </a>
-                                                    @endif
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                                </div>
+                                                <video id="pos_barcode_camera_video" class="d-none mt-2" style="width: 100%; max-height: 220px; object-fit: cover;" playsinline muted></video>
+                                                <button type="button" id="close_pos_barcode_camera" class="btn btn-sm btn-outline-secondary d-none mt-1">Tutup kamera</button>
+                                                <small id="pos_barcode_camera_status" class="form-text"></small>
+                                            </div>
                                         </div>
 
                                         <!-- Category Filter -->
@@ -108,7 +114,7 @@
 
                                             <div class="d-flex align-items-center justify-content-between mt-auto">
                                                 <h5 class="text-primary font-weight-bolder mb-0" style="font-size: 1.1rem;">
-                                                    {{ number_format($product->selling_price) }}
+                                                    {{ format_rupiah($product->selling_price) }}
                                                 </h5>
 
                                                 <!-- Add to Cart Form -->
@@ -146,8 +152,8 @@
             </div>
 
             <!-- RIGHT COLUMN: Cart System -->
-            <div class="col-md-12 col-lg-4">
-                <div class="card border-0 shadow-lg sticky-top" style="top: 20px; z-index: 100;">
+            <div class="col-12 col-lg-4 pos-cart-column">
+                <div class="card border-0 shadow-lg pos-cart-card">
                     <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between p-3">
                         <h5 class="mb-0 text-white">
                             <x-heroicon-o-shopping-cart class="w-5 h-5 mr-1 inline" /> Order Saat Ini
@@ -207,7 +213,7 @@
                                 <tr>
                                     <td class="text-muted font-weight-bold">Total Tagihan:</td>
                                     <td class="text-right font-weight-bold h5 text-primary" id="modal_total_display">
-                                        {{ Cart::total() }}
+                                        {{ format_rupiah(Cart::total()) }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -285,11 +291,21 @@
 @endsection
 
 @section('specificpagescripts')
+    <script src="{{ asset('assets/js/barcode-camera.js') }}"></script>
     <!-- External Dependencies: Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+        createBarcodeCameraScanner({
+            buttonId: 'start_pos_barcode_camera',
+            videoId: 'pos_barcode_camera_video',
+            statusId: 'pos_barcode_camera_status',
+            inputId: 'pos_search',
+            closeId: 'close_pos_barcode_camera',
+            onDetected: quickAddBarcode
+        });
+
         // Initialize Select2 on Load
             window.addEventListener('load', function () {
             $('.select2').select2({
@@ -381,7 +397,7 @@
             const customerId = getCustomerId();
             try {
                 const response = await fetch("{{ url('pos/delete') }}/" + rowId + "?customer_id=" + (customerId || ''), {
-                    method: 'GET',
+                    method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Accept': 'application/json'
@@ -461,7 +477,7 @@
         function formatRupiah(value) {
             const number = Math.round(Number(value) || 0);
             const prefix = number < 0 ? '-' : '';
-            return prefix + Math.abs(number).toLocaleString('id-ID');
+            return prefix + 'Rp ' + Math.abs(number).toLocaleString('id-ID');
         }
 
         function getVoucherDiscount() {
@@ -611,7 +627,7 @@
                     changeElement.classList.add('text-success');
                 }
             } else {
-                changeElement.innerText = "0.00";
+                changeElement.innerText = 'Rp 0';
                 if (changeLabel) changeLabel.innerText = 'Kembalian';
                 changeElement.classList.remove('text-success', 'text-danger');
             }
@@ -727,8 +743,7 @@
                     document.querySelectorAll('.payment-amount').forEach(function(input) {
                         input.value = '';
                     });
-                    if (document.getElementById('change_amount')) document.getElementById('change_amount').innerText =
-                        '0.00';
+                    if (document.getElementById('change_amount')) document.getElementById('change_amount').innerText = 'Rp 0';
 
                     if (!data.receipt_url && receiptWindow && !receiptWindow.closed) {
                         receiptWindow.close();

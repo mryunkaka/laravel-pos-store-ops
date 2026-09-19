@@ -31,7 +31,7 @@
                             <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h6>Total Sales</h6>
-                                    <h4 class="mb-0">Rp {{ number_format($totalSales, 0, ',', '.') }}</h4>
+                                    <h4 class="mb-0">{{ format_rupiah($totalSales) }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -39,7 +39,7 @@
                             <div class="card bg-primary text-white">
                                 <div class="card-body">
                                     <h6>Tunai</h6>
-                                    <h4 class="mb-0">Rp {{ number_format($totalCash, 0, ',', '.') }}</h4>
+                                    <h4 class="mb-0">{{ format_rupiah($totalCash) }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +47,7 @@
                             <div class="card bg-info text-white">
                                 <div class="card-body">
                                     <h6>Non Tunai</h6>
-                                    <h4 class="mb-0">Rp {{ number_format($totalNonCash, 0, ',', '.') }}</h4>
+                                    <h4 class="mb-0">{{ format_rupiah($totalNonCash) }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -55,13 +55,13 @@
                             <div class="card bg-warning text-white">
                                 <div class="card-body">
                                     <h6>Void / Refund</h6>
-                                    <h4 class="mb-0">Rp {{ number_format($totalVoid + $totalRefund, 0, ',', '.') }}</h4>
+                                    <h4 class="mb-0">{{ format_rupiah($totalVoid + $totalRefund) }}</h4>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-12 mt-2">
                             <div class="alert alert-light border mb-0">
-                                Total piutang dari shift terpilih: <strong>Rp {{ number_format($totalDue, 0, ',', '.') }}</strong>
+                                Total piutang dari shift terpilih: <strong>{{ format_rupiah($totalDue) }}</strong>
                             </div>
                         </div>
                     </div>
@@ -95,9 +95,9 @@
                                                     <input type="hidden" name="shifts[{{ $loop->index }}][id]" value="{{ $shift->id }}">
                                                 </td>
                                                 <td>{{ $shift->start_time->format('H:i') }} - {{ optional($shift->end_time)->format('H:i') }}</td>
-                                                <td>Rp {{ number_format($shift->total_sales, 0, ',', '.') }}</td>
-                                                <td>Rp {{ number_format($shift->total_cash, 0, ',', '.') }}</td>
-                                                <td>Rp {{ number_format($shift->total_non_cash, 0, ',', '.') }}</td>
+                                                <td>{{ format_rupiah($shift->total_sales) }}</td>
+                                                <td>{{ format_rupiah($shift->total_cash) }}</td>
+                                                <td>{{ format_rupiah($shift->total_non_cash) }}</td>
                                                 <td>
                                                     <input type="number" name="shifts[{{ $loop->index }}][cash_actual]" class="form-control" value="{{ old('shifts.' . $loop->index . '.cash_actual', $shift->closing_balance) }}" min="0" step="100" required>
                                                 </td>

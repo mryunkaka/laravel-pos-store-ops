@@ -54,7 +54,7 @@ Route::get('/', function () {
 Route::get('/e-invoice-mobile/{token}', [InvoiceMobileController::class, 'show'])->name('invoice.mobile');
 
 Route::get('/update-web.test', [SystemUpdateController::class, 'test'])->name('system-update.test');
-Route::get('/update-web.start', [SystemUpdateController::class, 'startFromLink'])->name('system-update.start-link');
+Route::post('/update-web.start', [SystemUpdateController::class, 'startFromLink'])->name('system-update.start-link');
 
 // DEFAULT DASHBOARD & PROFILE
 Route::middleware('auth')->group(function () {
@@ -129,7 +129,7 @@ Route::middleware(['permission:pos.menu'])->group(function () {
     Route::get('/pos', [PosController::class,'index'])->name('pos.index');
     Route::post('/pos/add', [PosController::class, 'addCart'])->name('pos.addCart');
     Route::post('/pos/update/{rowId}', [PosController::class, 'updateCart'])->name('pos.updateCart');
-    Route::get('/pos/delete/{rowId}', [PosController::class, 'deleteCart'])->name('pos.deleteCart');
+    Route::delete('/pos/delete/{rowId}', [PosController::class, 'deleteCart'])->name('pos.deleteCart');
     Route::post('/pos/customer', [PosController::class, 'storeCustomer'])->name('pos.storeCustomer');
     Route::post('/pos/voucher-preview', [PosController::class, 'voucherPreview'])->name('pos.voucher.preview');
     Route::get('/pos/customers-ajax', [PosController::class, 'searchCustomers'])->name('pos.customers.search');
@@ -155,8 +155,8 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::get('/orders/invoice/pdf/{order_id}', [InvoiceController::class, 'pdf'])->name('order.invoicePdf');
     Route::post('/orders/invoice/generate/{order_id}', [InvoiceController::class, 'generate'])->name('order.invoiceGenerate');
     Route::post('/orders/invoice/upload/{order_id}', [InvoiceController::class, 'upload'])->name('order.invoiceUpload');
-    Route::get('/orders/invoice/whatsapp/{order_id}', [InvoiceController::class, 'whatsapp'])->name('order.invoiceWhatsapp');
-    Route::get('/orders/receipt/whatsapp/{order_id}', [InvoiceController::class, 'whatsappText'])->name('order.receiptWhatsapp');
+    Route::post('/orders/invoice/whatsapp/{order_id}', [InvoiceController::class, 'whatsapp'])->name('order.invoiceWhatsapp');
+    Route::post('/orders/receipt/whatsapp/{order_id}', [InvoiceController::class, 'whatsappText'])->name('order.receiptWhatsapp');
 
     // Pending Due
     Route::get('/pending/due', [OrderController::class, 'pendingDue'])->name('order.pendingDue');
@@ -257,9 +257,9 @@ Route::middleware(['permission:orders.menu'])->group(function () {
 // ====== DATABASE BACKUP ======
 Route::middleware(['auth', 'permission:database.menu'])->group(function () {
     Route::get('/database/backup', [DatabaseBackupController::class, 'index'])->name('backup.index');
-    Route::get('/database/backup/now', [DatabaseBackupController::class, 'create'])->name('backup.create');
+    Route::post('/database/backup/now', [DatabaseBackupController::class, 'create'])->name('backup.create');
     Route::get('/database/backup/download/{getFileName}', [DatabaseBackupController::class, 'download'])->name('backup.download');
-    Route::get('/database/backup/delete/{getFileName}', [DatabaseBackupController::class, 'delete'])->name('backup.delete');
+    Route::delete('/database/backup/delete/{getFileName}', [DatabaseBackupController::class, 'delete'])->name('backup.delete');
     Route::post('/database/backup/restore', [DatabaseBackupController::class, 'restore'])->middleware(['permission:restore-database'])->name('backup.restore');
 });
 

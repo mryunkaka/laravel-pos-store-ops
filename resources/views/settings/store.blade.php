@@ -4,6 +4,18 @@
 
 @section('container')
 <div class="container-fluid">
+    @php
+        $validationErrors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+    @endphp
+    @if ($validationErrors->any())
+        <div class="alert text-white bg-danger" role="alert">
+            <ul class="mb-0 pl-3">
+                @foreach ($validationErrors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="row">
         <div class="col-lg-8">
             <div class="card inventory-card">
@@ -38,6 +50,12 @@
                                 <textarea name="address" class="form-control @error('address') is-invalid @enderror" rows="3">{{ old('address', $setting->address) }}</textarea>
                                 @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
+                            <div class="form-group col-md-12">
+                                <label>Link Google Maps</label>
+                                <input type="url" name="google_maps_url" class="form-control @error('google_maps_url') is-invalid @enderror" value="{{ old('google_maps_url', $setting->google_maps_url) }}" placeholder="https://maps.google.com/?q=Nama+Toko">
+                                <small class="form-text text-muted">Link ini tampil sebagai alamat klik di struk, invoice, dan WhatsApp.</small>
+                                @error('google_maps_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
                             <div class="form-group col-md-4">
                                 <label>Pajak Default (%)</label>
                                 <input type="number" name="default_tax_rate" class="form-control @error('default_tax_rate') is-invalid @enderror" value="{{ old('default_tax_rate', $setting->default_tax_rate) }}" min="0" max="100" step="0.01">
@@ -46,7 +64,7 @@
                             <div class="form-group col-md-4">
                                 <label>Mata Uang <span class="text-danger">*</span></label>
                                 <select name="currency" class="form-control @error('currency') is-invalid @enderror" required>
-                                    @foreach(['IDR', 'USD', 'SGD', 'MYR'] as $currency)
+                                    @foreach(['IDR'] as $currency)
                                         <option value="{{ $currency }}" {{ old('currency', $setting->currency) === $currency ? 'selected' : '' }}>{{ $currency }}</option>
                                     @endforeach
                                 </select>

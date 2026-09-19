@@ -128,30 +128,40 @@ class WhatsappNotificationService
         $orderDate = ($order->order_date ?: $order->created_at)->locale('id')->translatedFormat('l, d/m/Y');
         $status = $order->due_amount <= 0 ? 'LUNAS' : 'BELUM LUNAS';
         $lines = [
-            $this->greeting() . ' ' . $customerName,
+            $this->greeting() . ' *' . $customerName . '*',
             '',
-            "No. Pesanan anda {$order->invoice_no} pada {$orderDate}",
+            "No. Pesanan anda *{$order->invoice_no}* pada {$orderDate}",
             '',
         ];
+        $discount = max((float) $order->discount, 0);
+        $tax = (float) ($order->tax_total ?? $order->vat ?? 0);
+        $serviceCharge = max((float) $order->service_charge, 0);
+        $change = max(-((float) $order->due_amount), 0);
+        $paymentMethod = trim((string) $order->paymentHistoryText()) ?: '-';
 
         foreach ($order->details as $detail) {
             $product = $detail->product;
             $lines[] = '----------------------------------';
-            $lines[] = 'Produk : ' . ($product?->name ?: 'Produk');
-            $lines[] = 'Bahan : ' . ($product?->material ?: ($product?->category?->name ?: ''));
-            $lines[] = 'Jml. : ' . $detail->quantity;
-            $lines[] = 'Harga : ' . $this->money($detail->unit_price);
-            $lines[] = 'Ukuran : ' . ($product?->print_size ?: '');
-            $lines[] = 'Keterangan : ' . ($product?->print_notes ?: '');
+            $lines[] = '*Produk* : ' . ($product?->name ?: 'Produk');
+            $lines[] = '*Bahan* : ' . ($product?->material ?: ($product?->category?->name ?: ''));
+            $lines[] = '*Jml.* : ' . $detail->quantity;
+            $lines[] = '*Harga* : ' . format_rupiah($detail->unit_price);
+            $lines[] = '*Ukuran* : ' . ($product?->print_size ?: '');
+            $lines[] = '*Keterangan* : ' . ($product?->print_notes ?: '');
         }
 
         $lines[] = '----------------------------------';
         $lines[] = '';
-        $lines[] = 'TOTAL ORDER : ' . $this->money($order->total);
-        $lines[] = 'TOTAL BAYAR : ' . $this->money($order->pay_amount);
-        $lines[] = 'SISA PEMBAYARAN : ' . $this->money(max($order->due_amount, 0));
+        $lines[] = '*RINGKASAN PEMBAYARAN*';
+        $lines[] = '*Subtotal:* ' . format_rupiah($order->sub_total);
+        $lines[] = '*Diskon:* -' . format_rupiah($discount);
+        $lines[] = '*Pajak/PPN:* ' . format_rupiah($tax);
+        $lines[] = '*Biaya lainnya:* ' . format_rupiah($serviceCharge);
+        $lines[] = '*Pembayaran:* ' . $paymentMethod;
+        $lines[] = '*Kembalian:* ' . format_rupiah($change);
+        $lines[] = '*Sisa piutang:* ' . format_rupiah(max((float) $order->due_amount, 0));
         $lines[] = '';
-        $lines[] = 'Status Pembayaran : ' . $status;
+        $lines[] = 'Status Pembayaran : *' . $status . '*';
 
         if ($invoiceUrl) {
             $lines[] = '';
@@ -238,8 +248,4 @@ class WhatsappNotificationService
         };
     }
 
-    private function money(float|int|string|null $amount): string
-    {
-        return number_format((float) $amount, 0, ',', '.');
-    }
 }

@@ -9,11 +9,14 @@
 <div class="iq-sidebar sidebar-default ">
     <div class="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <a href="{{ route('dashboard') }}" class="header-logo">
-            <img src="{{ asset('assets/images/logo.png') }}" class="img-fluid rounded-normal light-logo" alt="logo"><h5 class="logo-title light-logo ml-3">POSDash</h5>
+            @php
+                $storeSetting = \App\Models\StoreSetting::current();
+            @endphp
+            <img src="{{ $storeSetting->logo ? asset('storage/' . $storeSetting->logo) : asset('assets/images/logo.png') }}" class="img-fluid rounded-normal light-logo" alt="{{ $storeSetting->store_name }}"><h5 class="logo-title light-logo ml-3">{{ $storeSetting->store_name }}</h5>
         </a>
-        <div class="iq-menu-bt-sidebar ml-0">
-            <x-heroicon-o-bars-3 class="wrapper-menu w-8 h-8" />
-        </div>
+        <button type="button" class="iq-menu-bt-sidebar wrapper-menu ml-0" aria-label="Buka atau tutup menu samping" aria-expanded="false">
+            <x-heroicon-o-bars-3 class="w-8 h-8" aria-hidden="true" />
+        </button>
     </div>
     <style>
         .sidebar-search-wrap {

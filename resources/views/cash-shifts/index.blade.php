@@ -58,8 +58,8 @@
                                         <td>{{ $shift->start_time->format('Y-m-d') }}</td>
                                         <td>{{ $shift->start_time->format('H:i') }}</td>
                                         <td>{{ $shift->user->name ?? '-' }}</td>
-                                        <td>Rp {{ number_format($shift->opening_balance, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($shift->closing_balance, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($shift->opening_balance) }}</td>
+                                        <td>{{ format_rupiah($shift->closing_balance) }}</td>
                                         <td>
                                             <span class="badge bg-{{ 
                                                 $shift->status == 'active' ? 'success' : 'warning'

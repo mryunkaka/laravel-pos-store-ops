@@ -98,12 +98,27 @@
     </script>
 </head>
 <body>
+@php
+    $setting = $setting ?? new \App\Models\StoreSetting([
+        'store_name' => 'POS Shop',
+        'address' => null,
+        'phone' => null,
+        'logo' => null,
+        'google_maps_url' => null,
+    ]);
+@endphp
 
     <!-- User Actions (Hidden on Print) -->
     <div class="action-buttons">
         <button class="btn" onclick="window.print()">Cetak Ulang</button>
-        <a class="btn" href="{{ route('order.receiptWhatsapp', $order->id) }}" target="_blank" rel="noopener noreferrer">Kirim WhatsApp (Teks)</a>
-        <a class="btn" href="{{ route('order.invoiceWhatsapp', $order->id) }}" target="_blank" rel="noopener noreferrer">Kirim WhatsApp + Invoice PDF</a>
+        <form action="{{ route('order.receiptWhatsapp', $order->id) }}" method="POST" target="_blank">
+            @csrf
+            <button type="submit" class="btn">Kirim WhatsApp (Teks)</button>
+        </form>
+        <form action="{{ route('order.invoiceWhatsapp', $order->id) }}" method="POST" target="_blank">
+            @csrf
+            <button type="submit" class="btn">Kirim WhatsApp + Invoice PDF</button>
+        </form>
         <button class="btn btn-outline" onclick="window.close()">Tutup</button>
     </div>
 
@@ -112,9 +127,20 @@
 
         <!-- Header -->
         <div class="header text-center mb-3">
-            <h2 class="font-bold text-uppercase">POS SHOP</h2>
-            <p>123 Commerce Avenue, Jakarta</p>
-            <p>Telp: +62 812 3456 7890</p>
+            @if ($setting->logo)
+                <img src="{{ asset('storage/' . $setting->logo) }}" alt="{{ $setting->store_name }}" style="max-width: 42mm; max-height: 18mm; object-fit: contain;">
+            @endif
+            <h2 class="font-bold text-uppercase">{{ $setting->store_name ?: 'POS Shop' }}</h2>
+            @if ($setting->address)
+                @if ($setting->google_maps_url)
+                    <a href="{{ $setting->google_maps_url }}" target="_blank" rel="noopener noreferrer">{{ $setting->address }}</a>
+                @else
+                    <p>{{ $setting->address }}</p>
+                @endif
+            @endif
+            @if ($setting->phone)
+                <p>Telp: {{ $setting->phone }}</p>
+            @endif
         </div>
 
         <div class="dashed-line"></div>
@@ -157,8 +183,8 @@
                 <tr>
                     <td></td>
                     <td class="text-center">{{ $item->quantity }}</td>
-                    <td class="text-right">{{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                    <td class="text-right font-bold">{{ number_format($item->total, 0, ',', '.') }}</td>
+                    <td class="text-right">{{ format_rupiah($item->unit_price) }}</td>
+                    <td class="text-right font-bold">{{ format_rupiah($item->total) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -170,28 +196,24 @@
         <div class="total-section">
             <div class="d-flex justify-between mb-1">
                 <span>Subtotal</span>
-                <span>{{ number_format($order->sub_total, 0, ',', '.') }}</span>
+                <span>{{ format_rupiah($order->sub_total) }}</span>
             </div>
-            @if ($order->discount > 0)
-                <div class="d-flex justify-between mb-1">
-                    <span>Diskon</span>
-                    <span>-{{ number_format($order->discount, 0, ',', '.') }}</span>
-                </div>
-            @endif
-            @if ($order->service_charge > 0)
-                <div class="d-flex justify-between mb-1">
-                    <span>Service</span>
-                    <span>{{ number_format($order->service_charge, 0, ',', '.') }}</span>
-                </div>
-            @endif
             <div class="d-flex justify-between mb-1">
-                <span>Pajak</span>
-                <span>{{ number_format($order->tax_total ?: $order->vat, 0, ',', '.') }}</span>
+                <span>Diskon</span>
+                <span>-{{ format_rupiah($order->discountTotal()) }}</span>
+            </div>
+            <div class="d-flex justify-between mb-1">
+                <span>Biaya lainnya</span>
+                <span>{{ format_rupiah($order->service_charge) }}</span>
+            </div>
+            <div class="d-flex justify-between mb-1">
+                <span>Pajak/PPN</span>
+                <span>{{ format_rupiah($order->taxAmount()) }}</span>
             </div>
 
             <div class="grand-total d-flex justify-between align-center font-bold">
                 <span>TOTAL</span>
-                <span style="font-size: 16px;">{{ number_format($order->total, 0, ',', '.') }}</span>
+                <span style="font-size: 16px;">{{ format_rupiah($order->total) }}</span>
             </div>
 
             <div class="d-flex justify-between mt-2 mb-1">
@@ -200,11 +222,11 @@
             </div>
             <div class="d-flex justify-between mb-1">
                 <span>Total Dibayar</span>
-                <span>{{ number_format($order->pay_amount, 0, ',', '.') }}</span>
+                <span>{{ format_rupiah($order->pay_amount) }}</span>
             </div>
             <div class="d-flex justify-between">
                 <span>{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}</span>
-                <span>{{ number_format($order->due_amount > 0 ? $order->due_amount : abs(min($order->due_amount, 0)), 0, ',', '.') }}</span>
+                <span>{{ format_rupiah($order->due_amount > 0 ? $order->outstandingAmount() : $order->changeAmount()) }}</span>
             </div>
         </div>
 

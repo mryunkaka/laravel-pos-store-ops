@@ -53,32 +53,32 @@
     <div class="summary-box">
         <div class="summary-row">
             <strong>Kas Awal:</strong>
-            <strong>Rp {{ number_format($shift->opening_balance, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->opening_balance) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Penjualan:</strong>
-            <strong>Rp {{ number_format($shift->total_sales, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->total_sales) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Tunai:</strong>
-            <strong>Rp {{ number_format($shift->total_cash, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->total_cash) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Non-Tunai:</strong>
-            <strong>Rp {{ number_format($shift->total_non_cash, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->total_non_cash) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Void:</strong>
-            <strong>Rp {{ number_format($shift->total_void, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->total_void) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Refund:</strong>
-            <strong>Rp {{ number_format($shift->total_refund, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->total_refund) }}</strong>
         </div>
         <hr>
         <div class="summary-row">
             <strong>Kas Akhir:</strong>
-            <strong>Rp {{ number_format($shift->closing_balance, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($shift->closing_balance) }}</strong>
         </div>
     </div>
 
@@ -102,7 +102,7 @@
                     <td>{{ $detail->transaction_type }}</td>
                     <td>{{ $detail->order ? 'Order #'.substr($detail->order->invoice_no, -6) : $detail->description }}</td>
                     <td>{{ $detail->payment_type }}</td>
-                    <td class="text-right">Rp {{ number_format($detail->amount, 0, ',', '.') }}</td>
+                    <td class="text-right">{{ format_rupiah($detail->amount) }}</td>
                 </tr>
             @empty
                 <tr>
@@ -113,7 +113,7 @@
         <tfoot>
             <tr>
                 <th colspan="5" class="text-right">Total</th>
-                <th class="text-right">Rp {{ number_format($shift->details->sum('amount'), 0, ',', '.') }}</th>
+                <th class="text-right">{{ format_rupiah($shift->details->sum('amount')) }}</th>
             </tr>
         </tfoot>
     </table>

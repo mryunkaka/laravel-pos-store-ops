@@ -74,7 +74,7 @@
                                         </div>
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($advance->date)->format('d F Y') }}</td>
-                                    <td>{{ number_format($advance->advance_salary, 2) }}</td>
+                                    <td>{{ format_rupiah($advance->advance_salary) }}</td>
                                     <td>
                                         @if ($advance->is_deducted)
                                             <span class="badge badge-success">Deducted</span>

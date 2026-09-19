@@ -25,7 +25,7 @@
                         <div class="col-md-3"><div class="alert alert-light border mb-0">Invoice<br><strong>{{ $salesReturn->order->invoice_no ?? '-' }}</strong></div></div>
                         <div class="col-md-3"><div class="alert alert-light border mb-0">Tanggal<br><strong>{{ $salesReturn->return_date->format('Y-m-d') }}</strong></div></div>
                         <div class="col-md-3"><div class="alert alert-light border mb-0">Status<br><strong>{{ ucfirst($salesReturn->status) }}</strong></div></div>
-                        <div class="col-md-3"><div class="alert alert-light border mb-0">Refund<br><strong>Rp {{ number_format($salesReturn->refund_amount, 0, ',', '.') }}</strong></div></div>
+                        <div class="col-md-3"><div class="alert alert-light border mb-0">Refund<br><strong>{{ format_rupiah($salesReturn->refund_amount) }}</strong></div></div>
                     </div>
 
                     <div class="table-responsive">
@@ -46,8 +46,8 @@
                                         <td>{{ $detail->product->name ?? '-' }}</td>
                                         <td>{{ $detail->quantity }}</td>
                                         <td>{{ $detail->condition === 'sellable' ? 'Layak Jual' : 'Rusak' }}</td>
-                                        <td>Rp {{ number_format($detail->unit_price, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($detail->total, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($detail->unit_price) }}</td>
+                                        <td>{{ format_rupiah($detail->total) }}</td>
                                         <td>{{ $detail->notes ?? '-' }}</td>
                                     </tr>
                                 @endforeach

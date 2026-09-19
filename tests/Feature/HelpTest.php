@@ -42,14 +42,14 @@ class HelpTest extends TestCase
             ->get('/help');
 
         $response->assertOk();
-        $response->assertSee('Help', false);
-        $response->assertSee('Documentation', false);
-        $response->assertSee('About POSDash', false);
+        $response->assertSee('Bantuan', false);
+        $response->assertSee('Dokumentasi', false);
+        $response->assertSee('Tentang POSDash', false);
         $response->assertSee('Point of Sale', false);
-        $response->assertSee('Product', false);
-        $response->assertSee('Inventory', false);
-        $response->assertSee('Order Management', false);
-        $response->assertSee('Technical Stack', false);
-        $response->assertSee('Quick Tips', false);
+        $response->assertSee('Produk', false);
+        $response->assertSee('Inventaris', false);
+        $response->assertSee('Pengelolaan Pesanan', false);
+        $response->assertSee('Stack Teknis', false);
+        $response->assertSee('Tips Cepat', false);
     }
 }

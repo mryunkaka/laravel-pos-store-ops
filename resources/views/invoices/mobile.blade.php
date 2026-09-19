@@ -27,9 +27,16 @@
 <body>
     <main class="page">
         <header class="hero">
-            <h1>{{ $setting->store_name }}</h1>
-            <p>{{ $setting->address }}</p>
-            <p>{{ $setting->phone }}</p>
+            @if ($setting->logo)
+                <img src="{{ asset('storage/' . $setting->logo) }}" alt="{{ $setting->store_name }}" style="max-width: 180px; max-height: 70px; object-fit: contain;">
+            @endif
+            <h1>{{ $setting->store_name ?: 'POS Shop' }}</h1>
+            @if ($setting->address)
+                <p><a href="{{ $setting->google_maps_url ?: '#' }}" target="_blank" rel="noopener noreferrer" style="color: inherit;">{{ $setting->address }}</a></p>
+            @endif
+            @if ($setting->phone)
+                <p>{{ $setting->phone }}</p>
+            @endif
         </header>
 
         <section class="section">
@@ -51,15 +58,20 @@
                     <div class="row"><span class="label">Ukuran</span><span class="value">{{ $product->print_size ?: '-' }}</span></div>
                     <div class="row"><span class="label">Keterangan</span><span class="value">{{ $product->print_notes ?: '-' }}</span></div>
                     <div class="row"><span class="label">Qty</span><span class="value">{{ $detail->quantity }}</span></div>
-                    <div class="row"><span class="label">Subtotal</span><span class="value">Rp {{ number_format($detail->total, 0, ',', '.') }}</span></div>
+                    <div class="row"><span class="label">Subtotal</span><span class="value">{{ format_rupiah($detail->total) }}</span></div>
                 </div>
             @endforeach
         </section>
 
         <section class="section total">
-            <div class="row"><span class="label">Total Order</span><span class="value">Rp {{ number_format($order->total, 0, ',', '.') }}</span></div>
-            <div class="row"><span class="label">Total Bayar</span><span class="value">Rp {{ number_format($order->pay_amount, 0, ',', '.') }}</span></div>
-            <div class="row"><span class="label">Sisa Pembayaran</span><span class="value">Rp {{ number_format(max($order->due_amount, 0), 0, ',', '.') }}</span></div>
+            <div class="row"><span class="label">Subtotal</span><span class="value">{{ format_rupiah($order->sub_total) }}</span></div>
+            <div class="row"><span class="label">Diskon</span><span class="value">-{{ format_rupiah($order->discountTotal()) }}</span></div>
+            <div class="row"><span class="label">Pajak/PPN</span><span class="value">{{ format_rupiah($order->taxAmount()) }}</span></div>
+            <div class="row"><span class="label">Biaya lainnya</span><span class="value">{{ format_rupiah($order->service_charge) }}</span></div>
+            <div class="row"><span class="label">Total Order</span><span class="value">{{ format_rupiah($order->total) }}</span></div>
+            <div class="row"><span class="label">Metode pembayaran</span><span class="value">{{ $order->paymentHistoryText() }}</span></div>
+            <div class="row"><span class="label">Total Bayar</span><span class="value">{{ format_rupiah($order->pay_amount) }}</span></div>
+            <div class="row"><span class="label">{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}</span><span class="value">{{ format_rupiah($order->due_amount > 0 ? $order->outstandingAmount() : $order->changeAmount()) }}</span></div>
         </section>
 
         @if($setting->whatsapp_payment_instructions)

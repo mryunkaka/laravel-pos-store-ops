@@ -25,9 +25,10 @@ class StoreSettingController extends Controller
             'store_name' => 'required|string|max:150',
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:50',
+            'google_maps_url' => 'nullable|url|max:500',
             'logo' => 'nullable|image|max:1024',
             'default_tax_rate' => 'nullable|numeric|min:0|max:100',
-            'currency' => 'required|string|max:10',
+            'currency' => 'required|in:IDR',
             'whatsapp_invoice_base_url' => 'nullable|url|max:255',
             'whatsapp_payment_instructions' => 'nullable|string|max:2000',
         ]);

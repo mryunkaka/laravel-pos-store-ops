@@ -38,7 +38,7 @@
         <div class="name">{{ $product->name }}</div>
         {!! $barcode !!}
         <div class="code">{{ $product->code }}</div>
-        <div class="price">Rp {{ number_format($product->selling_price, 0, ',', '.') }}</div>
+        <div class="price">{{ format_rupiah($product->selling_price) }}</div>
     </div>
     <script>
         window.addEventListener('load', function () {

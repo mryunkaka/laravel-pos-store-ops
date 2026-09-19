@@ -117,9 +117,9 @@
                                             <td>{{ $order->customer->name }}</td>
                                             <td>{{ $order->order_date->format('Y-m-d') }}</td>
                                             <td>{{ $order->paymentHistoryText() }}</td>
-                                            <td>{{ number_format($order->pay_amount, 2) }}</td>
+                                            <td>{{ format_rupiah($order->pay_amount) }}</td>
                                             <td>
-                                                <span class="badge badge-warning">{{ number_format($order->due_amount, 2) }}</span>
+                                                <span class="badge badge-warning">{{ format_rupiah($order->due_amount) }}</span>
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center list-action">

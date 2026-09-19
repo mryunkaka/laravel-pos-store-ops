@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class BarcodeController extends Controller
 {
@@ -23,6 +24,13 @@ class BarcodeController extends Controller
                 'success' => false,
                 'message' => 'Produk tidak ditemukan',
             ], 404);
+        }
+
+        if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk sudah kadaluarsa.',
+            ], 422);
         }
 
         return response()->json([
@@ -55,6 +63,13 @@ class BarcodeController extends Controller
                 'success' => false,
                 'message' => 'Produk tidak ditemukan',
             ], 404);
+        }
+
+        if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk sudah kadaluarsa.',
+            ], 422);
         }
 
         // Stock check

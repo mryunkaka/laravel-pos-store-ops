@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Employee;
 
+use App\Models\Employee;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreEmployeeRequest extends FormRequest
 {
@@ -18,7 +20,7 @@ class StoreEmployeeRequest extends FormRequest
             'name' => 'required|string|max:50',
             'email' => 'required|email|max:50|unique:employees,email',
             'phone' => 'required|string|max:15|unique:employees,phone',
-            'experience' => 'max:6|nullable',
+            'experience' => ['nullable', Rule::in(Employee::EXPERIENCE_OPTIONS)],
             'salary' => 'required|numeric',
             'vacation' => 'max:50|nullable',
             'city' => 'required|max:50',

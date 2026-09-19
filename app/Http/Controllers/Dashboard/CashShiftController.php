@@ -204,9 +204,9 @@ class CashShiftController extends Controller
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
                 'closing_notes' => $request->closing_notes ?: sprintf(
-                    'Ekspektasi kas: Rp %s. Selisih: Rp %s.',
-                    number_format(($cashIn + $cashSales - $cashOut - $refund), 0, ',', '.'),
-                    number_format($request->closing_balance - ($cashIn + $cashSales - $cashOut - $refund), 0, ',', '.')
+                    'Ekspektasi kas: %s. Selisih: %s.',
+                    format_rupiah($cashIn + $cashSales - $cashOut - $refund),
+                    format_rupiah($request->closing_balance - ($cashIn + $cashSales - $cashOut - $refund))
                 )
             ]);
 

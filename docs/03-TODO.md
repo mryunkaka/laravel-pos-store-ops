@@ -272,6 +272,19 @@ Kriteria penerimaan Phase 8:
 - [x] Profil: semua halaman profil diterjemahkan.
 - [x] Footer dan layout utama diterjemahkan.
 
+## QA Full Aplikasi (2026-09-19)
+
+- [x] Audit menu representative dengan Laravel HTTP-kernel harness: 52/52 tanpa HTTP 500.
+- [x] Audit format Rupiah, formula total/kembalian/piutang, timezone `Asia/Singapore`, receipt, invoice visual/PDF, dan WhatsApp.
+- [x] Regression test barcode kamera POS/form produk, Google Maps, branding toko, detail invoice, dan pesan WhatsApp.
+- [x] Tolak quick-add barcode untuk produk expired.
+- [x] Lindungi histori order: customer dengan order tidak dapat dihapus.
+- [x] Token invoice publik malformed ditangani sebagai 404 tanpa stack trace.
+- [x] Audit verb route: aksi WhatsApp invoice/struk memakai POST+CSRF; GET PDF invoice hanya read-only dan tidak membuat atau mengubah metadata invoice.
+- [x] Full suite, PHP lint, Blade cache, frontend build, route list, migration status, dan integrity check lulus.
+- [ ] Uji browser authenticated end-to-end memakai login vault; saat ini BLOCKED karena vault belum memiliki credential localhost.
+- [ ] Pindahkan test suite ke DB testing disposable/SQLite agar test tidak menambah user Faker ke DB MySQL lokal.
+
 ## Invoice PDF Online + tmp0.cc + WhatsApp Manual (2026-09-18)
 
 - [x] Audit dokumentasi, order, order details, customer, payment, invoice lama, PDF, konfigurasi, route, dan WhatsApp existing.
@@ -287,10 +300,22 @@ Kriteria penerimaan Phase 8:
 - [x] Lepas pemakaian WhatsApp Cloud API untuk invoice tanpa menghapus migration/tabel/data lama.
 - [x] Unit test normalisasi nomor, pesan WhatsApp, dan response upload tmp0.cc.
 - [x] Verifikasi upload dummy PDF melalui runtime web aktif Nginx/PHP-CGI pada port `8082`.
-- [x] Receipt menyediakan link aktif WhatsApp teks dan WhatsApp + Invoice PDF; klik link PDF membuat/reuse PDF, upload tmp0.cc bila perlu, lalu membuka `api.whatsapp.com/send` dengan link invoice. Error tidak kembali ke print receipt.
+- [x] Receipt menyediakan form POST+CSRF aktif WhatsApp teks dan WhatsApp + Invoice PDF; submit PDF membuat/reuse PDF, upload tmp0.cc bila perlu, lalu membuka `api.whatsapp.com/send` dengan link invoice. Error tidak kembali ke print receipt. GET PDF hanya menyajikan file lokal yang sudah tersedia.
 - [x] Verifikasi route invoice WhatsApp memakai ID order dinamis; pembayaran terkonfirmasi boleh diproses walau order pending, order batal/void ditolak.
 - [ ] Uji browser end-to-end pada order nyata dengan internet ON/OFF.
 - [ ] Uji handoff PC konsumen setelah `git pull` dan `migrate --force`.
+
+## HTTPS Lokal dan Kamera Barcode (2026-09-20)
+
+- [x] Aktifkan vhost HTTPS POS3 pada port `8443` dengan sertifikat lokal.
+- [x] Pertahankan HTTP `8082` sebagai entry point yang mengarah ke HTTPS.
+- [x] Sertifikat memiliki SAN untuk `localhost`, loopback, dan IP LAN PC saat ini.
+- [x] Tambahkan tutorial trust certificate lokal dan win-acme untuk domain publik di `README.md`.
+- [x] Validasi service Nginx, port HTTPS, response Laravel, Nginx config, test POS, Blade cache, dan frontend build.
+- [x] Verifikasi browser membuka `https://localhost:8443/login` dalam secure context dengan `getUserMedia` tersedia.
+- [ ] Uji login browser authenticated, tampilan POS, dan izin kamera fisik; credential vault localhost belum tersedia.
+- [ ] Uji transaksi POS nyata melalui browser.
+- [ ] Uji handoff ke PC konsumen dan trust certificate pada perangkat client.
 
 ## Tambahan Lama - WhatsApp Invoice Otomatis (historis, dinonaktifkan)
 

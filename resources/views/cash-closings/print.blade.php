@@ -52,28 +52,28 @@
         <h3 style="margin-top: 0;">Ringkasan Harian</h3>
         <div class="summary-row">
             <strong>Total Penjualan:</strong>
-            <strong>Rp {{ number_format($closing->total_sales, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->total_sales) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Tunai:</strong>
-            <strong>Rp {{ number_format($closing->total_cash, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->total_cash) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Non-Tunai:</strong>
-            <strong>Rp {{ number_format($closing->total_non_cash, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->total_non_cash) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Void:</strong>
-            <strong>Rp {{ number_format($closing->total_void, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->total_void) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Total Refund:</strong>
-            <strong>Rp {{ number_format($closing->total_refund, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->total_refund) }}</strong>
         </div>
         <hr>
         <div class="summary-row">
             <strong>Total Piutang:</strong>
-            <strong>Rp {{ number_format($closing->total_due, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->total_due) }}</strong>
         </div>
     </div>
 
@@ -81,17 +81,17 @@
         <h3 style="margin-top: 0;">Penghitungan Kas</h3>
         <div class="summary-row">
             <strong>Kas yang Diharapkan:</strong>
-            <strong>Rp {{ number_format($closing->cash_expected, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->cash_expected) }}</strong>
         </div>
         <div class="summary-row">
             <strong>Kas Fisik:</strong>
-            <strong>Rp {{ number_format($closing->cash_actual, 0, ',', '.') }}</strong>
+            <strong>{{ format_rupiah($closing->cash_actual) }}</strong>
         </div>
         <hr>
         <div class="summary-row">
             <strong>Selisih:</strong>
             <strong style="color: {{ $closing->cash_difference == 0 ? 'green' : 'red' }}">
-                Rp {{ number_format($closing->cash_difference, 0, ',', '.') }}
+                {{ format_rupiah($closing->cash_difference) }}
             </strong>
         </div>
     </div>
@@ -116,13 +116,13 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $detail->cashShift->user->name ?? '-' }}</td>
-                    <td>Rp {{ number_format($detail->shift_sales, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($detail->shift_cash, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($detail->shift_non_cash, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($detail->shift_void, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($detail->shift_refund, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($detail->shift_cash_actual, 0, ',', '.') }}</td>
-                    <td>Rp {{ number_format($detail->shift_cash_difference, 0, ',', '.') }}</td>
+                    <td>{{ format_rupiah($detail->shift_sales) }}</td>
+                    <td>{{ format_rupiah($detail->shift_cash) }}</td>
+                    <td>{{ format_rupiah($detail->shift_non_cash) }}</td>
+                    <td>{{ format_rupiah($detail->shift_void) }}</td>
+                    <td>{{ format_rupiah($detail->shift_refund) }}</td>
+                    <td>{{ format_rupiah($detail->shift_cash_actual) }}</td>
+                    <td>{{ format_rupiah($detail->shift_cash_difference) }}</td>
                 </tr>
             @empty
                 <tr>
@@ -133,13 +133,13 @@
         <tfoot>
             <tr>
                 <th colspan="2" class="text-right">Total</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_sales'), 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_cash'), 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_non_cash'), 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_void'), 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_refund'), 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_cash_actual'), 0, ',', '.') }}</th>
-                <th>Rp {{ number_format($closing->details->sum('shift_cash_difference'), 0, ',', '.') }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_sales')) }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_cash')) }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_non_cash')) }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_void')) }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_refund')) }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_cash_actual')) }}</th>
+                <th>{{ format_rupiah($closing->details->sum('shift_cash_difference')) }}</th>
             </tr>
         </tfoot>
     </table>

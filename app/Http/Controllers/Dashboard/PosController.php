@@ -101,6 +101,15 @@ class PosController extends Controller
 
         // Stock validation
         $product = Product::findOrFail($validatedData['id']);
+        if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
+            $message = 'Produk sudah kadaluarsa.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+
+            return Redirect::back()->with('error', $message);
+        }
+
         $currentQtyInCart = 0;
         $existingRowId = null;
         foreach (Cart::content() as $item) {
@@ -292,7 +301,7 @@ class PosController extends Controller
         return response()->json([
             'success' => true,
             'discount' => $discount,
-            'message' => 'Voucher diterapkan: -Rp ' . number_format($discount, 0, ',', '.'),
+            'message' => 'Voucher diterapkan: -' . format_rupiah($discount),
         ]);
     }
 

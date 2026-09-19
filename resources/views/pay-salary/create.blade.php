@@ -18,6 +18,17 @@
                     </div>
 
                     <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                <strong>Pembayaran gaji gagal.</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <form action="{{ route('pay-salary.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="id" value="{{ $advanceSalary->id }}">
@@ -34,35 +45,30 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Gaji</label>
-                                    <input type="text" class="form-control bg-white" value="{{ $advanceSalary->employee->salary }}" readonly>
+                                    <input type="text" class="form-control bg-white" value="{{ format_rupiah($advanceSalary->employee->salary) }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Gaji di Muka</label>
-                                    <input type="text" class="form-control bg-white" value="{{ $advanceSalary->advance_salary }}" readonly>
+                                    <input type="text" class="form-control bg-white" value="{{ format_rupiah($advanceSalary->advance_salary) }}" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Gaji Terhutang</label>
                                     <input type="text" class="form-control bg-white"
-                                        value="{{ $advanceSalary->employee->salary - $advanceSalary->advance_salary }}" readonly>
+                                        value="{{ format_rupiah($advanceSalary->employee->salary - $advanceSalary->advance_salary) }}" readonly>
                                 </div>
 
                                 {{-- Section: Salary Month Selection --}}
                                 <div class="form-group col-md-4">
                                     <label for="month">Bulan Gaji <span class="text-danger">*</span></label>
                                     <select class="form-control @error('month') is-invalid @enderror" name="month" required>
-                                        <option value="" disabled selected>Pilih Bulan</option>
-                                        <option value="01">Januari</option>
-                                        <option value="02">Februari</option>
-                                        <option value="03">Maret</option>
-                                        <option value="04">April</option>
-                                        <option value="05">Mei</option>
-                                        <option value="06">Juni</option>
-                                        <option value="07">Juli</option>
-                                        <option value="08">Agustus</option>
-                                        <option value="09">September</option>
-                                        <option value="10">Oktober</option>
-                                        <option value="11">November</option>
-                                        <option value="12">Desember</option>
+                                        <option value="" disabled>Pilih Bulan</option>
+                                        @foreach ([
+                                            '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
+                                            '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
+                                            '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember',
+                                        ] as $monthValue => $monthLabel)
+                                            <option value="{{ $monthValue }}" {{ old('month', $advanceMonth) === $monthValue ? 'selected' : '' }}>{{ $monthLabel }}</option>
+                                        @endforeach
                                     </select>
                                     @error('month')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -72,8 +78,8 @@
                                 <div class="form-group col-md-4">
                                     <label for="year">Tahun Gaji <span class="text-danger">*</span></label>
                                     <select class="form-control @error('year') is-invalid @enderror" name="year" required>
-                                        <option value="{{ date('Y') }}">{{ date('Y') }}</option>
-                                        <option value="{{ date('Y') - 1 }}">{{ date('Y') - 1 }}</option>
+                                        <option value="{{ date('Y') }}" {{ old('year', $advanceYear) == date('Y') ? 'selected' : '' }}>{{ date('Y') }}</option>
+                                        <option value="{{ date('Y') - 1 }}" {{ old('year', $advanceYear) == date('Y') - 1 ? 'selected' : '' }}>{{ date('Y') - 1 }}</option>
                                     </select>
                                     @error('year')
                                         <div class="invalid-feedback">{{ $message }}</div>

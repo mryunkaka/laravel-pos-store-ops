@@ -40,7 +40,13 @@
                     <img class="logo" src="{{ $logoDataUri }}" alt="{{ $setting->store_name }}">
                 @endif
                 <div class="store-name">{{ $setting->store_name ?: 'POS Shop' }}</div>
-                @if($setting->address)<div class="muted">{{ $setting->address }}</div>@endif
+                @if($setting->address)
+                    @if($setting->google_maps_url)
+                        <div class="muted"><a href="{{ $setting->google_maps_url }}">{{ $setting->address }}</a></div>
+                    @else
+                        <div class="muted">{{ $setting->address }}</div>
+                    @endif
+                @endif
                 @if($setting->phone)<div class="muted">{{ $setting->phone }}</div>@endif
             </td>
             <td style="vertical-align: top;">
@@ -89,8 +95,8 @@
                             @if($product?->print_notes)<div class="product-note">Keterangan: {{ $product->print_notes }}</div>@endif
                         </td>
                         <td class="number">{{ $detail->quantity }}</td>
-                        <td class="number">Rp {{ number_format($detail->unit_price, 0, ',', '.') }}</td>
-                        <td class="number">Rp {{ number_format($detail->total, 0, ',', '.') }}</td>
+                        <td class="number">{{ format_rupiah($detail->unit_price) }}</td>
+                        <td class="number">{{ format_rupiah($detail->total) }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -99,14 +105,14 @@
 
     <div class="section summary-wrap">
         <table class="summary-table">
-            <tr><td>Subtotal</td><td>Rp {{ number_format($order->sub_total, 0, ',', '.') }}</td></tr>
-            <tr><td>Diskon</td><td>Rp {{ number_format($order->discount, 0, ',', '.') }}</td></tr>
-            <tr><td>Pajak/PPN</td><td>Rp {{ number_format($order->tax_total ?? $order->vat, 0, ',', '.') }}</td></tr>
-            <tr><td>Biaya lainnya</td><td>Rp {{ number_format($order->service_charge, 0, ',', '.') }}</td></tr>
-            <tr class="grand-total"><td>Total</td><td>Rp {{ number_format($order->total, 0, ',', '.') }}</td></tr>
+            <tr><td>Subtotal</td><td>{{ format_rupiah($order->sub_total) }}</td></tr>
+            <tr><td>Diskon</td><td>-{{ format_rupiah($order->discountTotal()) }}</td></tr>
+            <tr><td>Pajak/PPN</td><td>{{ format_rupiah($order->taxAmount()) }}</td></tr>
+            <tr><td>Biaya lainnya</td><td>{{ format_rupiah($order->service_charge) }}</td></tr>
+            <tr class="grand-total"><td>Total</td><td>{{ format_rupiah($order->total) }}</td></tr>
             <tr><td>Metode pembayaran</td><td>{{ $order->paymentHistoryText() }}</td></tr>
-            <tr><td>Jumlah dibayar</td><td>Rp {{ number_format($order->pay_amount, 0, ',', '.') }}</td></tr>
-            <tr><td>{{ $order->due_amount > 0 ? 'Sisa/piutang' : 'Kembalian' }}</td><td>Rp {{ number_format($order->due_amount > 0 ? $order->due_amount : abs(min($order->due_amount, 0)), 0, ',', '.') }}</td></tr>
+            <tr><td>Jumlah dibayar</td><td>{{ format_rupiah($order->pay_amount) }}</td></tr>
+            <tr><td>{{ $order->due_amount > 0 ? 'Sisa/piutang' : 'Kembalian' }}</td><td>{{ format_rupiah($order->due_amount > 0 ? $order->due_amount : abs(min($order->due_amount, 0))) }}</td></tr>
         </table>
     </div>
 

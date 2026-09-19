@@ -106,7 +106,7 @@
                                             </span>
                                         </td>
                                         <td>{{ $movement->quantity }}</td>
-                                        <td>Rp {{ number_format($movement->unit_price, 0, ',', '.') }}</td>
+                                        <td>{{ format_rupiah($movement->unit_price) }}</td>
                                         <td>{{ $movement->description ?? '-' }}</td>
                                         <td>{{ $movement->user->name ?? '-' }}</td>
                                     </tr>

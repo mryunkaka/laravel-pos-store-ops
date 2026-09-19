@@ -254,6 +254,6 @@ class ProfileTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Developer');
-        $response->assertSee('Unknown');
+        $response->assertSee('Tidak Diketahui');
     }
 }

@@ -68,13 +68,13 @@
                                         </div>
                                     </td>
                                     <td>{{ \Carbon\Carbon::parse($advance->date)->format('M d, Y') }}</td>
-                                    <td>{{ number_format($advance->employee->salary, 2) }}</td>
+                                    <td>{{ format_rupiah($advance->employee->salary) }}</td>
                                     <td>
-                                        <span class="badge badge-warning">{{ number_format($advance->advance_salary, 2) }}</span>
+                                        <span class="badge badge-warning">{{ format_rupiah($advance->advance_salary) }}</span>
                                     </td>
                                     <td>
                                         <span class="text-success font-weight-bold">
-                                            {{ number_format($advance->employee->salary - $advance->advance_salary, 2) }}
+                                            {{ format_rupiah($advance->employee->salary - $advance->advance_salary) }}
                                         </span>
                                     </td>
                                     <td>

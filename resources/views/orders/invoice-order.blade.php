@@ -29,7 +29,7 @@
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="logo">
-                                        <img class="logo" src="{{ asset('assets/images/logo.png') }}" alt="logo">
+                                        <img class="logo" src="{{ $setting->logo ? asset('storage/' . $setting->logo) : asset('assets/images/logo.png') }}" alt="{{ $setting->store_name ?: 'POS Shop' }}">
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-6">
@@ -51,9 +51,13 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 text-end mb-50">
-                                    <h4 class="inv-title-1">POS System</h4>
-                                    <p class="inv-from-1">admin@pos-system.com</p>
-                                    <p class="inv-from-2">Jakarta, Indonesia</p>
+                                    <h4 class="inv-title-1">{{ $setting->store_name ?: 'POS Shop' }}</h4>
+                                    @if ($setting->phone)
+                                        <p class="inv-from-1">{{ $setting->phone }}</p>
+                                    @endif
+                                    @if ($setting->address)
+                                        <p class="inv-from-2"><a href="{{ $setting->google_maps_url ?: '#' }}" target="_blank" rel="noopener noreferrer">{{ $setting->address }}</a></p>
+                                    @endif
                                 </div>
                             </div>
                             <div class="row">
@@ -67,8 +71,8 @@
                                 <div class="col-sm-6 text-end mb-50">
                                     <h4 class="inv-title-1">Detail</h4>
                                     <p class="inv-from-1">Tipe Pembayaran: {{ $order->payment_type }}</p>
-                                    <p class="inv-from-1">Total Dibayar: {{ number_format($order->pay_amount, 2) }}</p>
-                                    <p class="inv-from-1">Sisa Piutang: {{ number_format($order->due_amount, 2) }}</p>
+                                    <p class="inv-from-1">Total Dibayar: {{ format_rupiah($order->pay_amount) }}</p>
+                                    <p class="inv-from-1">{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}: {{ format_rupiah($order->due_amount > 0 ? $order->outstandingAmount() : $order->changeAmount()) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -88,16 +92,42 @@
                                         @foreach ($orderDetails as $item)
                                             <tr>
                                                 <td>{{ $item->product->name }}</td>
-                                                <td>{{ number_format($item->unit_price, 2) }}</td>
+                                                <td>{{ format_rupiah($item->unit_price) }}</td>
                                                 <td>{{ $item->quantity }}</td>
-                                                <td>{{ number_format($item->total, 2) }}</td>
+                                                <td>{{ format_rupiah($item->total) }}</td>
                                             </tr>
                                         @endforeach
                                         <tr>
-                                            <td><strong class="text-danger">Total</strong></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td><strong class="text-danger">{{ number_format($order->total, 2) }}</strong></td>
+                                            <td colspan="3" class="text-right">Subtotal</td>
+                                            <td>{{ format_rupiah($order->sub_total) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right">Diskon</td>
+                                            <td>-{{ format_rupiah($order->discountTotal()) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right">Pajak/PPN</td>
+                                            <td>{{ format_rupiah($order->taxAmount()) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right">Biaya lainnya</td>
+                                            <td>{{ format_rupiah($order->service_charge) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right"><strong class="text-danger">Total</strong></td>
+                                            <td><strong class="text-danger">{{ format_rupiah($order->total) }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right">Metode pembayaran</td>
+                                            <td>{{ $order->paymentHistoryText() }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right">Total dibayar</td>
+                                            <td>{{ format_rupiah($order->pay_amount) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-right">{{ $order->due_amount > 0 ? 'Sisa Piutang' : 'Kembalian' }}</td>
+                                            <td>{{ format_rupiah($order->due_amount > 0 ? $order->outstandingAmount() : $order->changeAmount()) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
