@@ -102,6 +102,8 @@
     <!-- User Actions (Hidden on Print) -->
     <div class="action-buttons">
         <button class="btn" onclick="window.print()">Cetak Ulang</button>
+        <a class="btn" href="{{ route('order.receiptWhatsapp', $order->id) }}" target="_blank" rel="noopener noreferrer">Kirim WhatsApp (Teks)</a>
+        <a class="btn" href="{{ route('order.invoiceWhatsapp', $order->id) }}" target="_blank" rel="noopener noreferrer">Kirim WhatsApp + Invoice PDF</a>
         <button class="btn btn-outline" onclick="window.close()">Tutup</button>
     </div>
 

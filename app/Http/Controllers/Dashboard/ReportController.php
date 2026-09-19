@@ -168,11 +168,11 @@ class ReportController extends Controller
     {
         $rows = OrderDetails::query()
             ->join('orders', 'order_details.order_id', '=', 'orders.id')
-            ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
+            ->leftJoin('product_references', 'order_details.product_id', '=', 'product_references.id')
             ->where('orders.order_status', 'complete')
             ->whereBetween('orders.order_date', [$startDate, $endDate])
-            ->selectRaw("COALESCE(products.name, 'Produk dihapus') as produk, SUM(order_details.quantity) as qty, SUM(order_details.total) as penjualan")
-            ->groupBy('products.name')
+            ->selectRaw("COALESCE(product_references.name, 'Produk dihapus') as produk, SUM(order_details.quantity) as qty, SUM(order_details.total) as penjualan")
+            ->groupBy('product_references.name')
             ->orderByDesc('penjualan')
             ->get()
             ->map(fn ($row) => [
@@ -229,11 +229,11 @@ class ReportController extends Controller
     {
         $rows = OrderDetails::query()
             ->join('orders', 'order_details.order_id', '=', 'orders.id')
-            ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
+            ->leftJoin('product_references', 'order_details.product_id', '=', 'product_references.id')
             ->where('orders.order_status', 'complete')
             ->whereBetween('orders.order_date', [$startDate, $endDate])
-            ->selectRaw("COALESCE(products.name, 'Produk dihapus') as produk, SUM(order_details.quantity) as qty, SUM(order_details.total) as penjualan, SUM(COALESCE(NULLIF(order_details.buying_price, 0), products.buying_price, 0) * order_details.quantity) as modal")
-            ->groupBy('products.name')
+            ->selectRaw("COALESCE(product_references.name, 'Produk dihapus') as produk, SUM(order_details.quantity) as qty, SUM(order_details.total) as penjualan, SUM(COALESCE(NULLIF(order_details.buying_price, 0), product_references.buying_price, 0) * order_details.quantity) as modal")
+            ->groupBy('product_references.name')
             ->orderByDesc('penjualan')
             ->get()
             ->map(fn ($row) => [

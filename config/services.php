@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'tmp0' => [
+        'upload_url' => env('TMP0_UPLOAD_URL', 'https://tmp0.cc/api/v1/upload'),
+        'expiration' => env('TMP0_INVOICE_EXPIRATION', '30d'),
+        'timeout' => (int) env('TMP0_TIMEOUT', 30),
+        'ca_bundle' => env('TMP0_CA_BUNDLE', PHP_OS_FAMILY === 'Windows' ? 'C:/Server/certs/cacert.pem' : null),
+    ],
+
 ];

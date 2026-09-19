@@ -659,6 +659,19 @@
         async function submitOrder(event) {
             event.preventDefault();
 
+            const submitButton = event.submitter || event.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton ? submitButton.innerHTML : '';
+            const receiptWindow = window.open('about:blank', '_blank');
+            if (receiptWindow) {
+                receiptWindow.document.title = 'Memproses Struk';
+                receiptWindow.document.body.innerHTML = '<p style="font-family: sans-serif; padding: 24px;">Memproses struk...</p>';
+            }
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.setAttribute('aria-busy', 'true');
+                submitButton.innerHTML = 'Menyimpan order...';
+            }
+
             // Construct FormData manually since inputs are in Sidebar, not in this Form
             const formData = new FormData();
             formData.append('_token', '{{ csrf_token() }}');
@@ -692,9 +705,12 @@
                 if (data.success) {
                     $('#paymentModal').modal('hide');
 
-                    // Allow popup for invoice
-                    if (data.invoice_url) {
-                        window.open(data.invoice_url, '_blank');
+                    if (data.receipt_url) {
+                        if (receiptWindow && !receiptWindow.closed) {
+                            receiptWindow.location.href = data.receipt_url;
+                        } else {
+                            window.location.href = data.receipt_url;
+                        }
                     }
 
                     // Reset UI
@@ -714,14 +730,28 @@
                     if (document.getElementById('change_amount')) document.getElementById('change_amount').innerText =
                         '0.00';
 
-                    alert('Order Berhasil!');
+                    if (!data.receipt_url && receiptWindow && !receiptWindow.closed) {
+                        receiptWindow.close();
+                    }
+
+                    if (!data.receipt_url) {
+                        alert(data.message || 'Order tersimpan, tetapi struk belum berhasil dibuka.');
+                    }
 
                 } else {
+                    if (receiptWindow && !receiptWindow.closed) receiptWindow.close();
                     alert('Order Gagal: ' + (data.message || 'Kesalahan tidak diketahui'));
                 }
             } catch (error) {
+                if (receiptWindow && !receiptWindow.closed) receiptWindow.close();
                 console.error('Error submitting order:', error);
                 alert('Terjadi kesalahan saat memproses order.');
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.removeAttribute('aria-busy');
+                    submitButton.innerHTML = originalButtonText;
+                }
             }
         }
 

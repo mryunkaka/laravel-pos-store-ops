@@ -28,7 +28,7 @@ class StockMovement extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class)->withTrashed();
+        return $this->belongsTo(ProductReference::class, 'product_id');
     }
 
     public function reference()
@@ -42,7 +42,7 @@ class StockMovement extends Model
     }
 
     // Helper method to record stock movement
-    public static function recordOut(Product $product, $quantity, $description = null, $user = null, $referenceType = null, $referenceId = null)
+    public static function recordOut(Product|ProductReference $product, $quantity, $description = null, $user = null, $referenceType = null, $referenceId = null)
     {
         return self::create([
             'product_id' => $product->id,
@@ -56,7 +56,7 @@ class StockMovement extends Model
         ]);
     }
 
-    public static function recordIn(Product $product, $quantity, $description = null, $user = null, $referenceType = null, $referenceId = null)
+    public static function recordIn(Product|ProductReference $product, $quantity, $description = null, $user = null, $referenceType = null, $referenceId = null)
     {
         return self::create([
             'product_id' => $product->id,
@@ -70,7 +70,7 @@ class StockMovement extends Model
         ]);
     }
 
-    public static function recordAdjustment(Product $product, $quantity, $description, $user = null, $referenceType = null, $referenceId = null)
+    public static function recordAdjustment(Product|ProductReference $product, $quantity, $description, $user = null, $referenceType = null, $referenceId = null)
     {
         $type = $quantity > 0 ? 'adjustment_in' : 'adjustment_out';
         return self::create([

@@ -5,7 +5,13 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderDetail;
+use App\Models\Supplier;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -347,5 +353,156 @@ class ProductControllerTest extends TestCase
         
         // Verify the product code is displayed in the readonly input
         $response->assertSee('value="' . $customCode . '"', false);
+    }
+
+    public function test_product_delete_is_permanent(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $category = $this->createCategory();
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        $response = $this->withoutMiddleware(VerifyCsrfToken::class)
+            ->actingAs($user)
+            ->delete("/products/{$product->id}");
+
+        $response->assertRedirect('/products');
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
+
+    public function test_permanent_product_delete_preserves_purchase_history(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $category = $this->createCategory();
+        $supplier = Supplier::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+        ]);
+        $purchaseOrder = PurchaseOrder::create([
+            'supplier_id' => $supplier->id,
+            'po_number' => 'PO-DELETE-TEST',
+            'po_date' => now()->toDateString(),
+            'status' => 'completed',
+            'sub_total' => 100,
+            'vat' => 0,
+            'total' => 100,
+        ]);
+        $purchaseDetail = PurchaseOrderDetail::create([
+            'purchase_order_id' => $purchaseOrder->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'unit_price' => 50,
+            'total' => 100,
+        ]);
+
+        $response = $this->withoutMiddleware(VerifyCsrfToken::class)
+            ->actingAs($user)
+            ->delete("/products/{$product->id}");
+
+        $response->assertRedirect('/products');
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $this->assertDatabaseHas('purchase_order_details', [
+            'id' => $purchaseDetail->id,
+            'product_id' => $product->id,
+        ]);
+        $this->assertDatabaseHas('purchase_orders', ['id' => $purchaseOrder->id]);
+        $this->assertDatabaseHas('product_references', [
+            'id' => $product->id,
+            'code' => $product->code,
+        ]);
+    }
+
+    public function test_bulk_product_delete_is_permanent(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $category = $this->createCategory();
+        $products = Product::factory()->count(2)->create([
+            'category_id' => $category->id,
+        ]);
+
+        $response = $this->withoutMiddleware(VerifyCsrfToken::class)
+            ->actingAs($user)
+            ->delete('/products', [
+                'product_ids' => $products->pluck('id')->all(),
+            ]);
+
+        $response->assertRedirect('/products');
+        $products->each(function (Product $product): void {
+            $this->assertDatabaseMissing('products', ['id' => $product->id]);
+            $reference = DB::table('product_references')->where('id', $product->id)->first();
+            $this->assertNotNull($reference);
+            $this->assertNotNull($reference->archived_at);
+            $this->assertNotNull($reference->deleted_at);
+        });
+    }
+
+    public function test_product_with_pending_purchase_cannot_be_deleted(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $category = $this->createCategory();
+        $supplier = Supplier::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+        ]);
+        $purchaseOrder = PurchaseOrder::create([
+            'supplier_id' => $supplier->id,
+            'po_number' => 'PO-PENDING-DELETE-TEST',
+            'po_date' => now()->toDateString(),
+            'status' => 'pending',
+            'sub_total' => 100,
+            'vat' => 0,
+            'total' => 100,
+        ]);
+        PurchaseOrderDetail::create([
+            'purchase_order_id' => $purchaseOrder->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'unit_price' => 50,
+            'total' => 100,
+        ]);
+
+        $response = $this->withoutMiddleware(VerifyCsrfToken::class)
+            ->actingAs($user)
+            ->delete("/products/{$product->id}");
+
+        $response->assertRedirect('/products');
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('products', ['id' => $product->id]);
+    }
+
+    public function test_product_creation_returns_validation_error_when_code_collides_after_validation(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $category = $this->createCategory();
+        $armed = true;
+
+        DB::listen(function (QueryExecuted $query) use (&$armed, $category): void {
+            if (! $armed || ! str_contains(strtolower($query->sql), 'select count(*) as aggregate')) {
+                return;
+            }
+
+            if (! in_array('RACE-CODE', $query->bindings, true)) {
+                return;
+            }
+
+            $armed = false;
+            Product::factory()->create([
+                'code' => 'RACE-CODE',
+                'category_id' => $category->id,
+            ]);
+        });
+
+        $response = $this->withoutMiddleware(VerifyCsrfToken::class)->actingAs($user)->post('/products', [
+            'name' => 'Race Product',
+            'code' => 'RACE-CODE',
+            'category_id' => $category->id,
+            'stock' => 10,
+            'buying_price' => 100,
+            'selling_price' => 150,
+        ]);
+
+        $response->assertSessionHasErrors(['code' => 'Kode produk sudah digunakan.']);
+        $this->assertDatabaseMissing('products', ['name' => 'Race Product']);
     }
 }

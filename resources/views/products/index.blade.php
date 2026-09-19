@@ -110,7 +110,7 @@
                         <span class="badge badge-warning" id="selected-products-count">0 produk dipilih</span>
                     </div>
                     <button type="submit" class="btn btn-danger" id="bulk-delete-button" disabled onclick="return confirmBulkDelete()">
-                        <x-heroicon-o-trash class="w-5 h-5 mr-1" /> Tandai Hapus Terpilih
+                        <x-heroicon-o-trash class="w-5 h-5 mr-1" /> Hapus Permanen Terpilih
                     </button>
                 </div>
 
@@ -163,7 +163,7 @@
                                         <a class="btn btn-warning mr-2" data-toggle="tooltip" data-placement="top" title="Ubah" href="{{ route('products.edit', $product->id) }}">
                                             <x-heroicon-o-pencil class="w-5 h-5 mr-0" />
                                         </a>
-                                        <button type="submit" form="delete-product-{{ $product->id }}" class="btn btn-danger border-0" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" data-toggle="tooltip" data-placement="top" title="Hapus">
+                                        <button type="submit" form="delete-product-{{ $product->id }}" class="btn btn-danger border-0" onclick="return confirm('Hapus produk ini secara permanen? Riwayat transaksi dan pembelian tetap tersimpan.')" data-toggle="tooltip" data-placement="top" title="Hapus">
                                             <x-heroicon-o-trash class="w-5 h-5 mr-0" />
                                         </button>
                                     </div>
@@ -271,7 +271,7 @@
     });
 
     function confirmBulkDelete() {
-        return selectedProductIds.size > 0 && confirm(`Tandai hapus ${selectedProductIds.size} produk terpilih?`);
+        return selectedProductIds.size > 0 && confirm(`Hapus permanen ${selectedProductIds.size} produk terpilih? Riwayat transaksi dan pembelian tetap tersimpan.`);
     }
 
     syncBulkSelection();

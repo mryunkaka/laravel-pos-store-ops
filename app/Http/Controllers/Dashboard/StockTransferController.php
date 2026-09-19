@@ -101,7 +101,7 @@ class StockTransferController extends Controller
             $stockTransfer->load(['fromLocation', 'toLocation', 'details.product']);
 
             foreach ($stockTransfer->details as $detail) {
-                $product = $detail->product;
+                $product = Product::findOrFail($detail->product_id);
 
                 if ($product->stock < $detail->quantity && !auth()->user()->can('allow-negative-stock')) {
                     abort(422, "Stok {$product->name} tidak cukup untuk transfer.");

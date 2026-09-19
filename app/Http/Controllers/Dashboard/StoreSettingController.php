@@ -28,10 +28,6 @@ class StoreSettingController extends Controller
             'logo' => 'nullable|image|max:1024',
             'default_tax_rate' => 'nullable|numeric|min:0|max:100',
             'currency' => 'required|string|max:10',
-            'whatsapp_enabled' => 'nullable|boolean',
-            'whatsapp_api_version' => 'nullable|string|max:20',
-            'whatsapp_phone_number_id' => 'nullable|string|max:100',
-            'whatsapp_access_token' => 'nullable|string',
             'whatsapp_invoice_base_url' => 'nullable|url|max:255',
             'whatsapp_payment_instructions' => 'nullable|string|max:2000',
         ]);
@@ -44,11 +40,6 @@ class StoreSettingController extends Controller
         }
 
         $validated['default_tax_rate'] = $validated['default_tax_rate'] ?? 0;
-        $validated['whatsapp_enabled'] = (bool) $request->boolean('whatsapp_enabled');
-        $validated['whatsapp_api_version'] = $validated['whatsapp_api_version'] ?? 'v20.0';
-        if (!$request->filled('whatsapp_access_token')) {
-            unset($validated['whatsapp_access_token']);
-        }
 
         $setting->update($validated);
 
@@ -63,10 +54,12 @@ class StoreSettingController extends Controller
 
         $log = $whatsapp->sendTestMessage($validated['test_phone']);
 
-        if ($log->status === 'sent') {
-            return redirect()->route('settings.store.edit')->with('success', 'Pesan test WhatsApp berhasil dikirim.');
+        if ($log->status === 'manual') {
+            return redirect()->route('settings.store.edit')
+                ->with('success', 'Link test WhatsApp siap. Pesan belum dikirim otomatis.')
+                ->with('whatsapp_test_url', data_get($log->response_payload, 'url'));
         }
 
-        return redirect()->route('settings.store.edit')->with('error', 'Pesan test WhatsApp gagal: ' . $log->error_message);
+        return redirect()->route('settings.store.edit')->with('error', 'Nomor WhatsApp tidak valid.');
     }
 }

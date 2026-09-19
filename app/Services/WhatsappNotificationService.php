@@ -6,66 +6,165 @@ use App\Models\Order;
 use App\Models\StoreSetting;
 use App\Models\WhatsappMessageLog;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class WhatsappNotificationService
 {
     public function sendTestMessage(string $phone): WhatsappMessageLog
     {
-        $setting = StoreSetting::current();
         $normalizedPhone = $this->normalizePhone($phone);
-        $message = "Test WhatsApp Bot {$setting->store_name}\n\nJika pesan ini diterima, konfigurasi WhatsApp Cloud API sudah tersambung.";
+        $message = 'Test WhatsApp manual dari ' . StoreSetting::current()->store_name;
+        $url = $normalizedPhone ? $this->manualChatUrl($normalizedPhone, $message) : null;
 
-        $log = WhatsappMessageLog::create([
+        return WhatsappMessageLog::create([
             'order_id' => null,
-            'phone' => $normalizedPhone,
-            'status' => 'pending',
+            'phone' => $normalizedPhone ?: '-',
+            'status' => $url ? 'manual' : 'skipped',
             'message' => $message,
+            'response_payload' => $url ? ['mode' => 'manual', 'url' => $url] : null,
+            'error_message' => $url ? null : 'Nomor WhatsApp tidak valid.',
         ]);
-
-        if (!$setting->whatsapp_enabled || !$setting->whatsapp_access_token || !$setting->whatsapp_phone_number_id) {
-            $log->update([
-                'status' => 'failed',
-                'error_message' => 'Konfigurasi WhatsApp belum lengkap atau status masih nonaktif.',
-            ]);
-
-            return $log;
-        }
-
-        return $this->sendText($log, $setting, $normalizedPhone, $message);
     }
 
     public function sendOrderPaid(Order $order): ?WhatsappMessageLog
     {
-        $setting = StoreSetting::current();
-        $order->loadMissing(['customer', 'details.product']);
+        $order->loadMissing(['customer', 'details.product.category', 'payments']);
+        $url = $this->manualUrl($order);
 
-        if (!$setting->whatsapp_enabled || !$setting->whatsapp_access_token || !$setting->whatsapp_phone_number_id) {
-            return null;
-        }
-
-        if (!$order->customer?->phone) {
+        if (!$url) {
             return WhatsappMessageLog::create([
                 'order_id' => $order->id,
-                'phone' => '-',
+                'phone' => $this->normalizePhone((string) ($order->customer?->phone ?? '')) ?: '-',
                 'status' => 'skipped',
-                'error_message' => 'Nomor WhatsApp customer kosong.',
+                'error_message' => $order->customer?->phone
+                    ? 'URL invoice belum tersedia.'
+                    : 'Nomor WhatsApp customer kosong atau tidak valid.',
             ]);
         }
 
-        $phone = $this->normalizePhone($order->customer->phone);
-        $message = $this->buildOrderMessage($order, $setting);
-
         $log = WhatsappMessageLog::create([
             'order_id' => $order->id,
-            'phone' => $phone,
-            'status' => 'pending',
-            'message' => $message,
+            'phone' => $this->normalizePhone((string) $order->customer->phone),
+            'status' => 'manual',
+            'message' => $this->buildOrderMessage($order, $order->invoice_url),
+            'response_payload' => ['mode' => 'manual', 'url' => $url],
         ]);
 
-        return $this->sendText($log, $setting, $phone, $message);
+        try {
+            AuditService::log('invoice', 'whatsapp_manual', $order, null, [
+                'phone' => $log->phone,
+            ], "Manual WhatsApp link prepared for {$order->invoice_no}");
+        } catch (\Throwable) {
+            // Message log remains source of truth if audit storage is unavailable.
+        }
+
+        return $log;
+    }
+
+    public function sendOrderText(Order $order, ?StoreSetting $setting = null): ?WhatsappMessageLog
+    {
+        $order->loadMissing(['customer', 'details.product.category', 'payments']);
+        $url = $this->manualTextUrl($order, $setting);
+
+        if (!$url) {
+            return WhatsappMessageLog::create([
+                'order_id' => $order->id,
+                'phone' => $this->normalizePhone((string) ($order->customer?->phone ?? '')) ?: '-',
+                'status' => 'skipped',
+                'error_message' => 'Nomor WhatsApp customer kosong atau tidak valid.',
+            ]);
+        }
+
+        $message = $this->buildOrderMessage($order, null, $setting);
+        $log = WhatsappMessageLog::create([
+            'order_id' => $order->id,
+            'phone' => $this->normalizePhone((string) $order->customer->phone),
+            'status' => 'manual',
+            'message' => $message,
+            'response_payload' => ['mode' => 'manual_text', 'url' => $url],
+        ]);
+
+        try {
+            AuditService::log('invoice', 'whatsapp_manual_text', $order, null, [
+                'phone' => $log->phone,
+            ], "Manual WhatsApp text link prepared for {$order->invoice_no}");
+        } catch (\Throwable) {
+            // Message log remains source of truth if audit storage is unavailable.
+        }
+
+        return $log;
+    }
+
+    public function manualUrl(Order $order, ?StoreSetting $setting = null): ?string
+    {
+        $order->loadMissing(['customer', 'details.product.category', 'payments']);
+        $phone = $this->normalizePhone((string) ($order->customer?->phone ?? ''));
+        $invoiceUrl = trim((string) $order->invoice_url);
+
+        if (!$phone || !$this->isTmp0DocumentUrl($invoiceUrl)
+            || $order->invoice_upload_status !== 'uploaded'
+            || ($order->invoice_expires_at && $order->invoice_expires_at->isPast())) {
+            return null;
+        }
+
+        return $this->manualChatUrl($phone, $this->buildOrderMessage($order, $invoiceUrl, $setting));
+    }
+
+    public function manualTextUrl(Order $order, ?StoreSetting $setting = null): ?string
+    {
+        $order->loadMissing(['customer', 'details.product.category', 'payments']);
+        $phone = $this->normalizePhone((string) ($order->customer?->phone ?? ''));
+
+        if (!$phone) {
+            return null;
+        }
+
+        return $this->manualChatUrl($phone, $this->buildOrderMessage($order, null, $setting));
+    }
+
+    public function buildOrderMessage(Order $order, ?string $invoiceUrl = null, ?StoreSetting $setting = null): string
+    {
+        $setting ??= StoreSetting::current();
+        $customerName = trim((string) ($order->customer?->name ?? 'Pelanggan')) ?: 'Pelanggan';
+        $orderDate = ($order->order_date ?: $order->created_at)->locale('id')->translatedFormat('l, d/m/Y');
+        $status = $order->due_amount <= 0 ? 'LUNAS' : 'BELUM LUNAS';
+        $lines = [
+            $this->greeting() . ' ' . $customerName,
+            '',
+            "No. Pesanan anda {$order->invoice_no} pada {$orderDate}",
+            '',
+        ];
+
+        foreach ($order->details as $detail) {
+            $product = $detail->product;
+            $lines[] = '----------------------------------';
+            $lines[] = 'Produk : ' . ($product?->name ?: 'Produk');
+            $lines[] = 'Bahan : ' . ($product?->material ?: ($product?->category?->name ?: ''));
+            $lines[] = 'Jml. : ' . $detail->quantity;
+            $lines[] = 'Harga : ' . $this->money($detail->unit_price);
+            $lines[] = 'Ukuran : ' . ($product?->print_size ?: '');
+            $lines[] = 'Keterangan : ' . ($product?->print_notes ?: '');
+        }
+
+        $lines[] = '----------------------------------';
+        $lines[] = '';
+        $lines[] = 'TOTAL ORDER : ' . $this->money($order->total);
+        $lines[] = 'TOTAL BAYAR : ' . $this->money($order->pay_amount);
+        $lines[] = 'SISA PEMBAYARAN : ' . $this->money(max($order->due_amount, 0));
+        $lines[] = '';
+        $lines[] = 'Status Pembayaran : ' . $status;
+
+        if ($invoiceUrl) {
+            $lines[] = '';
+            $lines[] = 'Untuk Nota/Invoice order klik link berikut :';
+            $lines[] = $invoiceUrl;
+        }
+
+        if (trim((string) $setting->whatsapp_payment_instructions) !== '') {
+            $lines[] = '';
+            $lines[] = trim($setting->whatsapp_payment_instructions);
+        }
+
+        return implode("\n", $lines);
     }
 
     public function invoiceUrl(Order $order): string
@@ -85,119 +184,46 @@ class WhatsappNotificationService
         return Order::with(['customer', 'details.product'])->findOrFail($orderId);
     }
 
-    private function buildOrderMessage(Order $order, StoreSetting $setting): string
+    public function normalizePhone(string $phone): ?string
     {
-        $greeting = $this->greeting();
-        $customerName = $order->customer->name ?? 'Pelanggan';
-        $date = $order->created_at->locale('id')->translatedFormat('l, d/m/Y');
-        $status = $order->due_amount <= 0 ? 'LUNAS' : 'BELUM LUNAS';
-        $lines = [];
-
-        $lines[] = "{$greeting} {$customerName}";
-        $lines[] = '';
-        $lines[] = "No. Pesanan anda {$order->invoice_no} pada {$date}";
-        $lines[] = '';
-
-        foreach ($order->details as $detail) {
-            $product = $detail->product;
-            $lines[] = '----------------------------------';
-            $lines[] = 'Produk : ' . ($product->name ?? 'Produk');
-            $lines[] = 'Bahan : ' . ($product->material ?: ($product->category->name ?? '-'));
-            $lines[] = 'Jml. : ' . $detail->quantity;
-            $lines[] = 'Harga : ' . $this->money($detail->total);
-            $lines[] = 'Ukuran : ' . ($product->print_size ?: '-');
-            $lines[] = 'Keterangan : ' . ($product->print_notes ?: '-');
+        $digits = preg_replace('/\D+/', '', $phone) ?: '';
+        if ($digits === '') {
+            return null;
         }
 
-        $lines[] = '----------------------------------';
-        $lines[] = '';
-        $lines[] = 'TOTAL ORDER : ' . $this->money($order->total);
-        $lines[] = 'TOTAL BAYAR : ' . $this->money($order->pay_amount);
-        $lines[] = 'SISA PEMBAYARAN : ' . $this->money(max($order->due_amount, 0));
-        $lines[] = '';
-        $lines[] = "Status Pembayaran : {$status}";
-        $lines[] = '';
-        $lines[] = 'Untuk Nota/Invoice order klik link berikut :';
-        $lines[] = $this->invoiceUrl($order);
-
-        if ($setting->whatsapp_payment_instructions) {
-            $lines[] = '';
-            $lines[] = trim($setting->whatsapp_payment_instructions);
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . ltrim($digits, '0');
+        } elseif (str_starts_with($digits, '8')) {
+            $digits = '62' . $digits;
         }
 
-        return implode("\n", $lines);
+        return preg_match('/^628\d{7,13}$/', $digits) ? $digits : null;
     }
 
-    private function endpoint(StoreSetting $setting): string
+    private function isTmp0DocumentUrl(string $url): bool
     {
-        $version = $setting->whatsapp_api_version ?: 'v20.0';
+        $parts = parse_url($url);
 
-        return "https://graph.facebook.com/{$version}/{$setting->whatsapp_phone_number_id}/messages";
+        return ($parts['scheme'] ?? '') === 'https'
+            && ($parts['host'] ?? '') === 'tmp0.cc'
+            && preg_match('#^/d/[A-Za-z0-9_-]+$#', $parts['path'] ?? '') === 1
+            && !isset($parts['query'])
+            && !isset($parts['fragment']);
     }
 
-    private function sendText(WhatsappMessageLog $log, StoreSetting $setting, string $phone, string $message): WhatsappMessageLog
+    private function manualChatUrl(string $phone, string $message): string
     {
-        try {
-            $response = Http::withToken($setting->whatsapp_access_token)
-                ->timeout(10)
-                ->acceptJson()
-                ->post($this->endpoint($setting), [
-                    'messaging_product' => 'whatsapp',
-                    'recipient_type' => 'individual',
-                    'to' => $phone,
-                    'type' => 'text',
-                    'text' => [
-                        'preview_url' => true,
-                        'body' => $message,
-                    ],
-                ]);
-
-            $payload = $response->json() ?: ['body' => $response->body()];
-
-            if ($response->successful()) {
-                $log->update([
-                    'status' => 'sent',
-                    'message_id' => $payload['messages'][0]['id'] ?? null,
-                    'response_payload' => $payload,
-                    'sent_at' => now(),
-                ]);
-            } else {
-                $log->update([
-                    'status' => 'failed',
-                    'error_message' => $payload['error']['message'] ?? $response->body(),
-                    'response_payload' => $payload,
-                ]);
-            }
-        } catch (\Throwable $exception) {
-            $log->update([
-                'status' => 'failed',
-                'error_message' => $exception->getMessage(),
-            ]);
-
-            Log::warning('WhatsApp message failed', [
-                'order_id' => $log->order_id,
-                'phone' => $phone,
-                'error' => $exception->getMessage(),
-            ]);
-        }
-
-        return $log;
+        return 'https://api.whatsapp.com/send/?' . http_build_query([
+            'phone' => $phone,
+            'text' => $message,
+            'type' => 'phone_number',
+            'app_absent' => '0',
+        ]);
     }
 
     private function invoiceToken(Order $order): string
     {
         return rtrim(strtr(base64_encode(Crypt::encryptString((string) $order->id)), '+/', '-_'), '=');
-    }
-
-    private function normalizePhone(string $phone): string
-    {
-        $digits = preg_replace('/\D+/', '', $phone);
-
-        if (Str::startsWith($digits, '0')) {
-            return '62' . substr($digits, 1);
-        }
-
-        return $digits;
     }
 
     private function greeting(): string
@@ -212,8 +238,8 @@ class WhatsappNotificationService
         };
     }
 
-    private function money(float $amount): string
+    private function money(float|int|string|null $amount): string
     {
-        return number_format($amount, 0, ',', '.');
+        return number_format((float) $amount, 0, ',', '.');
     }
 }

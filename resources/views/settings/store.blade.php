@@ -60,33 +60,13 @@
                         </div>
 
                         <hr>
-                        <h5 class="mb-3">WhatsApp Bot</h5>
+                        <h5 class="mb-3">WhatsApp Manual</h5>
+                        <p class="text-muted">Invoice memakai click-to-chat <code>api.whatsapp.com/send</code>. Sistem hanya menyiapkan pesan; kasir tetap menekan Send di WhatsApp.</p>
                         <div class="row">
-                            <div class="form-group col-md-4">
-                                <label>Status WhatsApp</label>
-                                <select name="whatsapp_enabled" class="form-control">
-                                    <option value="0" {{ old('whatsapp_enabled', $setting->whatsapp_enabled) ? '' : 'selected' }}>Nonaktif</option>
-                                    <option value="1" {{ old('whatsapp_enabled', $setting->whatsapp_enabled) ? 'selected' : '' }}>Aktif</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label>API Version</label>
-                                <input type="text" name="whatsapp_api_version" class="form-control @error('whatsapp_api_version') is-invalid @enderror" value="{{ old('whatsapp_api_version', $setting->whatsapp_api_version ?: 'v20.0') }}" placeholder="v20.0">
-                                @error('whatsapp_api_version')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label>Phone Number ID</label>
-                                <input type="text" name="whatsapp_phone_number_id" class="form-control @error('whatsapp_phone_number_id') is-invalid @enderror" value="{{ old('whatsapp_phone_number_id', $setting->whatsapp_phone_number_id) }}">
-                                @error('whatsapp_phone_number_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
                             <div class="form-group col-md-12">
-                                <label>Access Token</label>
-                                <input type="password" name="whatsapp_access_token" class="form-control @error('whatsapp_access_token') is-invalid @enderror" placeholder="{{ $setting->whatsapp_access_token ? 'Token sudah tersimpan. Isi hanya jika ingin mengganti.' : 'Masukkan permanent access token Meta' }}">
-                                @error('whatsapp_access_token')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="form-group col-md-12">
-                                <label>Base URL Invoice Mobile</label>
+                                <label>Base URL Invoice Mobile Lama</label>
                                 <input type="url" name="whatsapp_invoice_base_url" class="form-control @error('whatsapp_invoice_base_url') is-invalid @enderror" value="{{ old('whatsapp_invoice_base_url', $setting->whatsapp_invoice_base_url ?: config('app.url')) }}" placeholder="https://domain-anda.com">
+                                <small class="form-text text-muted">Dipertahankan untuk link invoice mobile lama.</small>
                                 @error('whatsapp_invoice_base_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group col-md-12">
@@ -111,10 +91,16 @@
                                 @error('test_phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="form-group col-md-4 mb-0 d-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-success">Kirim Test WhatsApp</button>
+                                <button type="submit" class="btn btn-success">Buat Link Test WhatsApp</button>
                             </div>
                         </div>
                     </form>
+                    @if (session('whatsapp_test_url'))
+                        <div class="alert alert-info mt-3 mb-0">
+                            Link siap. Pesan belum dikirim otomatis.
+                            <a href="{{ session('whatsapp_test_url') }}" target="_blank" rel="noopener">Buka WhatsApp</a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

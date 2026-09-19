@@ -343,10 +343,11 @@
 
 ## Risiko Saat Ini
 
-- Produk kini memakai soft delete agar produk yang sudah punya riwayat transaksi bisa ditandai hapus tanpa memutus data order, stock movement, purchase order, dan retur.
+- Produk baru dihapus permanen; snapshot produk disimpan di `product_references` sebelum histori dibuat, sehingga order, stock movement, purchase order, receiving, retur, opname, dan transfer tetap utuh. Row legacy yang sebelumnya soft-deleted tidak disentuh migration.
+- Create/update produk sekarang menangkap collision unique `products.code` yang terjadi setelah validasi dan mengembalikan error pada field kode, bukan HTTP 500; data lama dan file gambar tidak diubah.
 - Halaman `products.index` punya bulk selection: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, dan badge jumlah produk terpilih.
 - POS memakai pelanggan default `Walk-in Customer` agar checkout kasir tidak wajib memilih pelanggan manual.
-- Relasi histori inventaris yang menyimpan `product_id` memakai `withTrashed()` agar halaman lama tetap bisa dibuka setelah produk ditandai hapus.
+- Relasi histori inventaris mengarah ke `product_references`; penghapusan produk aktif tidak menghapus atau mengubah baris histori. Produk yang masih dipakai dokumen pending ditolak agar alur penerimaan/penyelesaian tidak rusak.
 - Audit menu lokal 2026-09-17: 61 halaman GET utama berhasil dirender tanpa HTTP 500 memakai harness Laravel.
 - Validasi lokal 2026-09-17: `npm run build`, `git diff --check`, `php artisan view:cache`, dan audit 61 halaman menu berhasil.
 - Sidebar sekarang otomatis scroll ke menu aktif setelah refresh dan memiliki pencarian sticky untuk menemukan menu cepat.
@@ -375,22 +376,39 @@
 - File `.env` production harus memakai nilai ber-spasi dalam tanda kutip, misalnya `APP_NAME="Laravel POS Store Ops"`; tanpa kutip Laravel gagal bootstrap dengan `Dotenv\\Exception\\InvalidFileException`.
 - Seeder production tidak boleh bergantung pada `fakerphp/faker` karena hosting memakai Composer `--no-dev`; `UserSeeder` sudah disesuaikan agar membuat admin/user eksplisit tanpa factory.
 - Stok yang sudah pernah di-void dan diselesaikan ulang belum diuji skenario kompleks.
-- Export PDF memakai print browser, bukan generator PDF server-side.
-- WhatsApp otomatis membutuhkan WhatsApp Business Cloud API aktif dari Meta: `Phone Number ID`, permanent access token, nomor customer valid, dan domain publik untuk link invoice mobile.
+- Export laporan PDF lama tetap memakai print browser; invoice elektronik baru memakai generator PDF server-side.
+- Invoice WhatsApp aktif memakai `api.whatsapp.com/send` manual; Cloud API Meta hanya tercatat sebagai implementasi historis yang tidak lagi dipanggil.
+- Link tmp0.cc bersifat publik dan sementara selama 30 hari; PDF invoice tidak memakai password karena link harus langsung dapat dibuka customer. Hindari memasukkan data sensitif yang tidak diperlukan.
 
 ### Langkah Selanjutnya
 
-Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari pekerjaan sebelumnya. Tambahan WhatsApp invoice otomatis juga sudah tersedia dan bisa diaktifkan dari Pengaturan Toko.
+Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari pekerjaan sebelumnya. Fitur invoice WhatsApp manual melalui `api.whatsapp.com/send` tersedia dari detail order.
 
-## Tambahan WhatsApp Invoice Otomatis (2026-06-20)
+## Tambahan WhatsApp Invoice Otomatis (historis, dinonaktifkan)
 
-- Pengaturan Toko sekarang punya konfigurasi WhatsApp bot: aktif/nonaktif, API version, Phone Number ID, access token, base URL invoice, dan instruksi transfer.
-- Order sukses akan menjadwalkan pengiriman WhatsApp setelah transaksi database commit.
-- Pesan WhatsApp berisi salam, nomor pesanan, tanggal, daftar produk, bahan, qty, harga, ukuran, keterangan, total order, total bayar, sisa pembayaran, status pembayaran, link invoice mobile, dan instruksi transfer.
-- Link invoice mobile tersedia di `/e-invoice-mobile/{token}` dengan token terenkripsi.
+- Pengaturan dan migration Cloud API lama dipertahankan untuk kompatibilitas data.
+- Link invoice mobile lama tetap tersedia di `/e-invoice-mobile/{token}` dengan token terenkripsi.
 - Produk punya field pendukung `material`, `print_size`, dan `print_notes`.
-- Pengiriman dicatat di tabel `whatsapp_message_logs`.
-- Jika WhatsApp belum aktif atau nomor customer kosong, checkout tetap berhasil; pengiriman akan dilewati/dicatat.
+- Log aktivitas WhatsApp tetap memakai tabel `whatsapp_message_logs`.
+- Pengiriman invoice sekarang manual melalui `api.whatsapp.com/send`; tidak ada pengiriman otomatis atau Cloud API.
+
+## Invoice PDF Online + tmp0.cc + WhatsApp Manual (2026-09-18)
+
+- Audit enam dokumen project dan alur order/invoice/WhatsApp existing selesai.
+- PDF invoice server-side memakai `dompdf/dompdf`, A4, data transaksi tersimpan, dan logo toko existing jika tersedia.
+- Migration additive `2026_09_18_000002_add_invoice_delivery_fields_to_orders` menambah metadata PDF/upload nullable; tidak mengubah data transaksi lama.
+- Konfirmasi pembayaran hanya menyimpan order lalu membuka struk thermal; order boleh tetap `pending`. PDF belum dibuat dan tmp0.cc/WhatsApp belum dipanggil pada tahap ini.
+- Tidak ada job otomatis untuk membuat atau mengirim invoice; invoice hanya diproses dari tombol pada halaman struk.
+- `Tmp0Service` memakai `POST https://tmp0.cc/api/v1/upload`, multipart `file`, `expires=30d`, timeout, validasi response, dan URL `/d/{fileId}`. Response nyata terverifikasi: `success`, `fileId`, `url`, `fullUrl`, `fileInfo.expires`.
+- Retry tersedia dari detail order melalui tombol `Upload Invoice`; PDF yang sudah ada dipakai ulang.
+- Detail order punya `Buka Invoice`, `Salin Link`, dan `Kirim WhatsApp`.
+- WhatsApp invoice sekarang click-to-chat manual `https://api.whatsapp.com/send/?phone=...&text=...&type=phone_number&app_absent=0`; tidak ada request WhatsApp Cloud API dan tidak ada auto-send.
+- Migration/tabel/kolom Cloud API lama dipertahankan agar data lama aman; penggunaan invoice otomatis lama dilepas.
+- Validasi: PHP lint, `php artisan migrate`, `php artisan view:cache`, route invoice, dan unit test invoice/tmp0/WhatsApp.
+- Bug runtime diperbaiki: `Tmp0Service` memakai `$response` yang benar setelah request HTTP, bukan variabel `$client` yang tidak pernah dipakai.
+- CA bundle PHP aktif diverifikasi pada jalur Nginx `:8082` → PHP-CGI `:9000`; upload dummy PDF ke tmp0.cc berhasil dengan response `success=true` dan URL `/d/{id}`.
+- Receipt print memakai link aktif `Kirim WhatsApp + Invoice PDF` dengan route ID dinamis; saat diklik, route memastikan pembayaran sudah dikonfirmasi walau order masih pending, membuat/reuse PDF, upload ke tmp0.cc bila link belum valid/expired, lalu membuka `api.whatsapp.com/send` dengan link invoice. Kegagalan tidak kembali ke print receipt. Tombol `Kirim WhatsApp (Teks)` tetap tersedia tanpa invoice.
+- Checkout POS sesudah `Konfirmasi Pembayaran` menyimpan order dan membuka tab struk terlebih dahulu. Tombol `Kirim WhatsApp + Invoice PDF` pada halaman struk menjadi satu-satunya jalur generate PDF, upload tmp0.cc, dan membuka WhatsApp manual.
 
 ## Instruksi Untuk Sesi Lanjutan
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\Product;
+use App\Models\ProductReference;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -15,7 +16,7 @@ class StockMovementController extends Controller
     /**
      * Display stock movement history per product.
      */
-    public function history(Product $product)
+    public function history(ProductReference $product)
     {
         $summary = StockMovement::where('product_id', $product->id)
             ->select('type', DB::raw('SUM(ABS(quantity)) as total_quantity'))
@@ -69,7 +70,7 @@ class StockMovementController extends Controller
         }
 
         $movements = $query->latest()->paginate(20);
-        $products = Product::orderBy('name')->get();
+        $products = ProductReference::orderBy('name')->get();
 
         return view('stock-movements.index', [
             'movements' => $movements,

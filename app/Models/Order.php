@@ -32,6 +32,14 @@ class Order extends Model
         'payment_type',
         'pay_amount',
         'due_amount',
+        'invoice_pdf_path',
+        'invoice_upload_status',
+        'invoice_file_id',
+        'invoice_url',
+        'invoice_expires_at',
+        'invoice_generated_at',
+        'invoice_uploaded_at',
+        'invoice_error',
     ];
 
     protected $casts = [
@@ -47,6 +55,9 @@ class Order extends Model
         'due_amount' => 'float',
         'voided_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'invoice_expires_at' => 'datetime',
+        'invoice_generated_at' => 'datetime',
+        'invoice_uploaded_at' => 'datetime',
     ];
 
     /**

@@ -14,6 +14,7 @@ use App\Http\Controllers\Dashboard\AdvanceSalaryController;
 use App\Http\Controllers\Dashboard\DatabaseBackupController;
 use App\Http\Controllers\Dashboard\HelpController;
 use App\Http\Controllers\Dashboard\OrderController;
+use App\Http\Controllers\Dashboard\InvoiceController;
 use App\Http\Controllers\Dashboard\PosController;
 use App\Http\Controllers\Dashboard\RoleController;
 use App\Http\Controllers\Dashboard\UserController;
@@ -151,6 +152,11 @@ Route::middleware(['permission:orders.menu'])->group(function () {
     Route::put('/orders/update/status', [OrderController::class, 'updateStatus'])->name('order.updateStatus');
     Route::get('/orders/invoice/download/{order_id}', [OrderController::class, 'invoiceDownload'])->name('order.invoiceDownload');
     Route::get('/orders/receipt/print/{order_id}', [OrderController::class, 'printReceipt'])->name('order.printReceipt');
+    Route::get('/orders/invoice/pdf/{order_id}', [InvoiceController::class, 'pdf'])->name('order.invoicePdf');
+    Route::post('/orders/invoice/generate/{order_id}', [InvoiceController::class, 'generate'])->name('order.invoiceGenerate');
+    Route::post('/orders/invoice/upload/{order_id}', [InvoiceController::class, 'upload'])->name('order.invoiceUpload');
+    Route::get('/orders/invoice/whatsapp/{order_id}', [InvoiceController::class, 'whatsapp'])->name('order.invoiceWhatsapp');
+    Route::get('/orders/receipt/whatsapp/{order_id}', [InvoiceController::class, 'whatsappText'])->name('order.receiptWhatsapp');
 
     // Pending Due
     Route::get('/pending/due', [OrderController::class, 'pendingDue'])->name('order.pendingDue');

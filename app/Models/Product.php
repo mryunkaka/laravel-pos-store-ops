@@ -10,6 +10,14 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted(): void
+    {
+        static::created(function (Product $product): void {
+            ProductReference::ensureFromProduct($product);
+        });
+
+    }
+
     protected $fillable = [
         'name',
         'material',

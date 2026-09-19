@@ -27,6 +27,6 @@ class StockTransferDetail extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class)->withTrashed();
+        return $this->belongsTo(ProductReference::class, 'product_id');
     }
 }

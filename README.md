@@ -120,7 +120,18 @@ upload_max_filesize=64M
 post_max_size=64M
 max_execution_time=120
 date.timezone=Asia/Jakarta
+curl.cainfo="C:\\Server\\certs\\cacert.pem"
+openssl.cafile="C:\\Server\\certs\\cacert.pem"
 ```
+
+Buat folder sertifikat dan download CA bundle publik:
+
+```powershell
+New-Item -ItemType Directory -Force C:\Server\certs
+curl.exe -fsSL https://curl.se/ca/cacert.pem -o C:\Server\certs\cacert.pem
+```
+
+File ini wajib ada agar PHP cURL dapat memverifikasi HTTPS `tmp0.cc`. Jangan memakai `verify=false`.
 
 Tambah PHP ke PATH Windows:
 

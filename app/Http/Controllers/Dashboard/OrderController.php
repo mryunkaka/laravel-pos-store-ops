@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductReference;
 use App\Models\OrderDetails;
 use App\Models\CashShift;
 use App\Models\CashShiftDetail;
@@ -15,7 +16,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Services\AuditService;
-use App\Services\WhatsappNotificationService;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Redirect;
@@ -95,7 +95,7 @@ class OrderController extends Controller
     {
         // Validation handled by StoreOrderRequest
 
-        return DB::transaction(function () use ($request) {
+        $order = DB::transaction(function () use ($request) {
             $activeShift = CashShift::where('user_id', auth()->id())
                 ->where('status', 'active')
                 ->lockForUpdate()
@@ -249,26 +249,27 @@ class OrderController extends Controller
             // Audit log
             AuditService::log('order', 'create', $order, null, $order->toArray(), "Order {$invoice_no} created");
 
-            DB::afterCommit(function () use ($order) {
-                app(WhatsappNotificationService::class)->sendOrderPaid($order);
-            });
-
             // Clear Cart
             Cart::destroy();
 
-            if ($request->wantsJson()) {
-                // Return success with Invoice URL and Cleared Cart HTML
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Order created successfully!',
-                    'invoice_url' => route('order.printReceipt', $order->id),
-                    'cart_html' => view('pos.cart-sidebar', ['productItem' => Cart::content()])->render(),
-                    'cart_count' => Cart::count(),
-                ]);
-            }
-
-            return Redirect::route('order.invoiceDownload', $order->id)->with('success', 'Order has been created!');
+            return $order;
         });
+
+        if ($order instanceof \Symfony\Component\HttpFoundation\Response) {
+            return $order;
+        }
+
+        if (! $request->wantsJson()) {
+            return Redirect::route('order.printReceipt', $order->id)->with('success', 'Order berhasil dibuat. Silakan cetak struk.');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order tersimpan. Silakan cetak struk terlebih dahulu.',
+            'receipt_url' => route('order.printReceipt', $order->id),
+            'cart_html' => view('pos.cart-sidebar', ['productItem' => Cart::content()])->render(),
+            'cart_count' => Cart::count(),
+        ]);
     }
 
     /**
@@ -327,20 +328,23 @@ class OrderController extends Controller
 
             $oldStatus = $order->order_status;
             foreach ($details as $detail) {
-                Product::where('id', $detail->product_id)
-                    ->decrement('stock', $detail->quantity);
+                $product = Product::findOrFail($detail->product_id);
+                $product->decrement('stock', $detail->quantity);
 
                 // Record stock movement
                 StockMovement::recordOut(
-                    Product::find($detail->product_id),
+                    $product,
                     $detail->quantity,
                     "Order {$order->invoice_no} completed",
-                    auth()->user()
+                    auth()->user(),
+                    Order::class,
+                    $order->id
                 );
             }
             $order->update(['order_status' => 'complete']);
             // Audit log
             AuditService::log('order', 'complete', $order, ['order_status' => $oldStatus], ['order_status' => 'complete'], "Order {$order->invoice_no} completed, stock reduced");
+
         });
 
         return Redirect::route('order.pendingOrders')->with('success', 'Order has been completed!');
@@ -418,15 +422,21 @@ class OrderController extends Controller
             // Restore stock
             $details = OrderDetails::where('order_id', $order->id)->get();
             foreach ($details as $detail) {
-                Product::where('id', $detail->product_id)
-                    ->increment('stock', $detail->quantity);
+                $product = Product::find($detail->product_id);
+                if ($product) {
+                    $product->increment('stock', $detail->quantity);
+                } else {
+                    $product = ProductReference::findOrFail($detail->product_id);
+                }
 
                 // Record stock movement (restore)
                 StockMovement::recordIn(
-                    Product::find($detail->product_id),
+                    $product,
                     $detail->quantity,
                     "Order {$order->invoice_no} voided, stock restored",
-                    auth()->user()
+                    auth()->user(),
+                    Order::class,
+                    $order->id
                 );
             }
 

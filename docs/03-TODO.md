@@ -272,24 +272,40 @@ Kriteria penerimaan Phase 8:
 - [x] Profil: semua halaman profil diterjemahkan.
 - [x] Footer dan layout utama diterjemahkan.
 
-## Tambahan Setelah Phase 7 - WhatsApp Invoice Otomatis
+## Invoice PDF Online + tmp0.cc + WhatsApp Manual (2026-09-18)
 
-Tujuan: setelah pembayaran/order berhasil, customer mendapat pesan WhatsApp otomatis berisi ringkasan order, status pembayaran, link invoice mobile, dan instruksi transfer.
+- [x] Audit dokumentasi, order, order details, customer, payment, invoice lama, PDF, konfigurasi, route, dan WhatsApp existing.
+- [x] Verifikasi API tmp0.cc: endpoint, multipart `file`, `expires=30d`, response file document, dan URL `/d/{id}`.
+- [x] Tambah PDF invoice A4 server-side memakai library PDF.
+- [x] Tambah metadata invoice nullable secara additive pada `orders`.
+- [x] Setelah pembayaran dikonfirmasi, order tersimpan dan struk thermal dibuka lebih dahulu; order boleh tetap `pending` dan invoice belum diproses.
+- [x] Tombol `Kirim WhatsApp + Invoice PDF` pada halaman struk menjalankan generate/upload tmp0.cc lalu membuka WhatsApp manual.
+- [x] Upload tmp0.cc tidak rollback transaksi, dengan timeout dan validasi error.
+- [x] Tombol Generate Invoice, Upload Invoice, retry, dan Buka Invoice.
+- [x] Tombol Salin Link memakai Clipboard API dan fallback browser.
+- [x] WhatsApp invoice memakai `api.whatsapp.com/send` manual dengan pesan dinamis dan normalisasi nomor.
+- [x] Lepas pemakaian WhatsApp Cloud API untuk invoice tanpa menghapus migration/tabel/data lama.
+- [x] Unit test normalisasi nomor, pesan WhatsApp, dan response upload tmp0.cc.
+- [x] Verifikasi upload dummy PDF melalui runtime web aktif Nginx/PHP-CGI pada port `8082`.
+- [x] Receipt menyediakan link aktif WhatsApp teks dan WhatsApp + Invoice PDF; klik link PDF membuat/reuse PDF, upload tmp0.cc bila perlu, lalu membuka `api.whatsapp.com/send` dengan link invoice. Error tidak kembali ke print receipt.
+- [x] Verifikasi route invoice WhatsApp memakai ID order dinamis; pembayaran terkonfirmasi boleh diproses walau order pending, order batal/void ditolak.
+- [ ] Uji browser end-to-end pada order nyata dengan internet ON/OFF.
+- [ ] Uji handoff PC konsumen setelah `git pull` dan `migrate --force`.
 
-- [x] Setting WhatsApp bot di Pengaturan Toko.
-- [x] Konfigurasi WhatsApp Cloud API: status aktif, API version, phone number id, access token.
-- [x] Link invoice mobile publik dengan token terenkripsi.
-- [x] Template pesan WhatsApp mengikuti format ringkasan order.
-- [x] Data pendukung produk untuk pesan: bahan, ukuran, dan keterangan cetak.
-- [x] Log pengiriman WhatsApp.
-- [x] Pengiriman otomatis setelah order berhasil tersimpan.
+## Tambahan Lama - WhatsApp Invoice Otomatis (historis, dinonaktifkan)
+
+- [x] Migration dan tabel konfigurasi/log lama dipertahankan untuk kompatibilitas data.
+- [x] Invoice mobile lama tetap tersedia pada `/e-invoice-mobile/{token}`.
+- [x] Pengiriman Cloud API tidak lagi dipakai untuk invoice; fitur sekarang click-to-chat manual.
 
 ## Bugfix Tambahan - Produk
 
-- [x] Hapus produk memakai soft delete agar produk yang sudah punya riwayat transaksi tidak gagal karena foreign key.
-- [x] Bulk pilih produk di halaman index: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, dan tampilkan jumlah terpilih.
+- [x] Hapus produk permanen dengan snapshot `product_references`; histori transaksi, pembelian, stok, dan retur tetap tersimpan. Row legacy soft-deleted tidak disentuh migration.
+- [x] Create/update produk menangani collision unique kode setelah validasi dan mengembalikan error field, bukan HTTP 500.
+- [x] Bulk pilih produk di halaman index: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, dan tampilkan jumlah produk terpilih.
 - [x] POS memakai pelanggan default `Walk-in Customer` untuk checkout cepat.
-- [x] Audit 61 halaman menu utama dan perbaiki error histori inventaris setelah produk soft delete.
+- [x] Audit relasi histori inventaris setelah produk dihapus permanen dan arahkan relasi ke snapshot produk.
+- [x] Tolak penghapusan produk yang masih dipakai order/purchase/retur/transfer/opname berstatus pending atau aktif.
 - [x] Sidebar auto fokus ke menu aktif setelah refresh dan pencarian menu sticky.
 - [x] Voucher POS dihitung realtime sebelum checkout dan total pembayaran langsung berubah.
 - [x] Kurang bayar POS masuk ke piutang dan pembayaran piutang `/update/due` tidak error method.

@@ -47,7 +47,7 @@
                 @php($product = $detail->product)
                 <div class="item">
                     <h3>{{ $product->name ?? 'Produk' }}</h3>
-                    <div class="row"><span class="label">Bahan</span><span class="value">{{ $product->material ?: ($product->category->name ?? '-') }}</span></div>
+                    <div class="row"><span class="label">Bahan</span><span class="value">{{ $product->material ?: ($product->category_name ?? optional($product->category)->name ?? '-') }}</span></div>
                     <div class="row"><span class="label">Ukuran</span><span class="value">{{ $product->print_size ?: '-' }}</span></div>
                     <div class="row"><span class="label">Keterangan</span><span class="value">{{ $product->print_notes ?: '-' }}</span></div>
                     <div class="row"><span class="label">Qty</span><span class="value">{{ $detail->quantity }}</span></div>

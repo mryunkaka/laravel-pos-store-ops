@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Dashboard;
 use Exception;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductReference;
 use App\Services\AuditService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedSort;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
@@ -101,15 +104,31 @@ class ProductController extends Controller
         /**
          * Handle upload image with Storage.
          */
+        $storedImage = null;
         if ($file = $request->file('image')) {
             $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
             $path = 'public/products/';
 
             $file->storeAs($path, $fileName);
+            $storedImage = $fileName;
             $validatedData['image'] = $fileName;
         }
 
-        Product::create($validatedData);
+        try {
+            Product::create($validatedData);
+        } catch (UniqueConstraintViolationException $exception) {
+            if ($storedImage) {
+                Storage::delete('public/products/' . $storedImage);
+            }
+
+            if (str_contains($exception->getMessage(), 'products_code_unique')) {
+                return Redirect::back()
+                    ->withInput()
+                    ->withErrors(['code' => 'Kode produk sudah digunakan.']);
+            }
+
+            throw $exception;
+        }
 
         return Redirect::route('products.index')->with('success', 'Product has been created!');
     }
@@ -166,22 +185,36 @@ class ProductController extends Controller
         /**
          * Handle upload image with Storage.
          */
+        $oldImage = $product->image;
+        $storedImage = null;
         if ($file = $request->file('image')) {
             $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
             $path = 'public/products/';
 
-            /**
-             * Delete photo if exists.
-             */
-            if ($product->image) {
-                Storage::delete($path . $product->image);
-            }
-
             $file->storeAs($path, $fileName);
+            $storedImage = $fileName;
             $validatedData['image'] = $fileName;
         }
 
-        Product::where('id', $product->id)->update($validatedData);
+        try {
+            $product->update($validatedData);
+        } catch (UniqueConstraintViolationException $exception) {
+            if ($storedImage) {
+                Storage::delete('public/products/' . $storedImage);
+            }
+
+            if (str_contains($exception->getMessage(), 'products_code_unique')) {
+                return Redirect::back()
+                    ->withInput()
+                    ->withErrors(['code' => 'Kode produk sudah digunakan.']);
+            }
+
+            throw $exception;
+        }
+
+        if ($storedImage && $oldImage) {
+            Storage::delete('public/products/' . $oldImage);
+        }
 
         // Audit log
         AuditService::log('product', 'update', $product, null, $validatedData, "Product {$product->name} updated");
@@ -194,9 +227,16 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->delete();
+        if ($message = $this->pendingDeletionMessage($product->id)) {
+            return Redirect::route('products.index')->with('error', $message);
+        }
 
-        return Redirect::route('products.index')->with('success', 'Product has been deleted!');
+        DB::transaction(function () use ($product): void {
+            ProductReference::archiveFromProduct($product);
+            $product->forceDelete();
+        });
+
+        return Redirect::route('products.index')->with('success', 'Produk berhasil dihapus permanen. Riwayat tetap tersimpan.');
     }
 
     public function bulkDestroy(BulkDestroyProductRequest $request)
@@ -204,10 +244,51 @@ class ProductController extends Controller
         $products = Product::whereIn('id', $request->validated('product_ids'))->get();
 
         foreach ($products as $product) {
-            $product->delete();
+            if ($message = $this->pendingDeletionMessage($product->id)) {
+                return Redirect::route('products.index')->with('error', $message);
+            }
         }
 
-        return Redirect::route('products.index')->with('success', $products->count() . ' produk berhasil ditandai dihapus.');
+        DB::transaction(function () use ($products): void {
+            foreach ($products as $product) {
+                ProductReference::archiveFromProduct($product);
+                $product->forceDelete();
+            }
+        });
+
+        return Redirect::route('products.index')->with('success', $products->count() . ' produk berhasil dihapus permanen. Riwayat tetap tersimpan.');
+    }
+
+    private function pendingDeletionMessage(int $productId): ?string
+    {
+        $checks = [
+            ['order_details', 'orders', 'order_id', 'order_status', ['pending'], 'order penjualan pending'],
+            ['purchase_order_details', 'purchase_orders', 'purchase_order_id', 'status', ['pending'], 'purchase order pending'],
+            ['purchase_receiving_details', 'purchase_receivings', 'purchase_receiving_id', 'status', ['pending'], 'penerimaan pending'],
+            ['purchase_return_details', 'purchase_returns', 'purchase_return_id', 'status', ['pending'], 'retur pembelian pending'],
+            ['sales_return_details', 'sales_returns', 'sales_return_id', 'status', ['pending'], 'retur penjualan pending'],
+            ['stock_transfer_details', 'stock_transfers', 'stock_transfer_id', 'status', ['pending'], 'transfer stok pending'],
+            ['stock_opname_details', 'stock_opnames', 'stock_opname_id', 'status', ['draft', 'submitted'], 'stock opname aktif'],
+        ];
+
+        if (DB::table('stock_adjustments')
+            ->where('product_id', $productId)
+            ->where('status', 'pending')
+            ->exists()) {
+            return 'Produk tidak dapat dihapus karena masih dipakai penyesuaian stok pending. Selesaikan atau batalkan dokumen tersebut dulu.';
+        }
+
+        foreach ($checks as [$detailTable, $parentTable, $parentKey, $statusColumn, $statuses, $label]) {
+            if (DB::table($detailTable)
+                ->join($parentTable, $parentTable . '.id', '=', $detailTable . '.' . $parentKey)
+                ->where($detailTable . '.product_id', $productId)
+                ->whereIn($parentTable . '.' . $statusColumn, $statuses)
+                ->exists()) {
+                return "Produk tidak dapat dihapus karena masih dipakai {$label}. Selesaikan atau batalkan dokumen tersebut dulu.";
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -228,14 +309,11 @@ class ProductController extends Controller
 
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
-            $sheet        = $spreadsheet->getActiveSheet();
-            $row_limit    = $sheet->getHighestDataRow();
-            $column_limit = $sheet->getHighestDataColumn();
-            $row_range = range(2, $row_limit);
-            $column_range = range('J', $column_limit);
-            $startcount = 2;
-            $data = array();
-            foreach ($row_range as $row) {
+            $sheet = $spreadsheet->getActiveSheet();
+            $rowLimit = $sheet->getHighestDataRow();
+            $data = [];
+
+            for ($row = 2; $row <= $rowLimit; $row++) {
                 $name = $sheet->getCell('A' . $row)->getValue();
                 $data[] = [
                     'name' => $name,
@@ -249,15 +327,17 @@ class ProductController extends Controller
                     'buying_price' => $sheet->getCell('H' . $row)->getValue(),
                     'selling_price' => $sheet->getCell('I' . $row)->getValue(),
                 ];
-                $startcount++;
             }
 
             Product::insert($data);
 
+            Product::whereIn('code', collect($data)->pluck('code')->filter()->all())
+                ->get()
+                ->each(fn (Product $product) => ProductReference::ensureFromProduct($product));
         } catch (Exception $e) {
-            // $error_code = $e->errorInfo[1];
             return Redirect::route('products.index')->with('error', 'There was a problem uploading the data!');
         }
+
         return Redirect::route('products.index')->with('success', 'Data has been successfully imported!');
     }
 

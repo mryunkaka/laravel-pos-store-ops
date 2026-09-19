@@ -25,15 +25,15 @@ class DashboardController extends Controller
         // 3. Top 5 Best Selling Products (only from complete orders)
         $top_products = \Illuminate\Support\Facades\DB::table('order_details')
             ->join('orders', 'order_details.order_id', '=', 'orders.id')
-            ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->join('product_references', 'order_details.product_id', '=', 'product_references.id')
             ->where('orders.order_status', 'complete')
             ->select(
-                'products.name as product_name',
-                'products.image as product_image',
-                'products.code as product_code',
+                'product_references.name as product_name',
+                'product_references.image as product_image',
+                'product_references.code as product_code',
                 \Illuminate\Support\Facades\DB::raw('SUM(order_details.quantity) as total_sold')
             )
-            ->groupBy('products.id', 'products.name', 'products.image', 'products.code')
+            ->groupBy('product_references.id', 'product_references.name', 'product_references.image', 'product_references.code')
             ->orderByDesc('total_sold')
             ->limit(5)
             ->get();

@@ -2,13 +2,30 @@
 
 ## 2026-09-17
 
-### Bugfix Produk - Soft Delete dan Bulk Selection
+### Bugfix Produk - Collision Kode Setelah Validasi
 
-- Root cause hapus produk: hard delete pada `products` berisiko gagal saat produk sudah direferensikan oleh transaksi/riwayat stok/pembelian/retur.
-- Produk diubah memakai soft delete dengan migration `2026_09_17_070000_add_deleted_at_to_products_table.php`.
-- Relasi produk di `OrderDetails`, `PurchaseOrderDetail`, `PurchaseReceivingDetail`, `PurchaseReturnDetail`, `StockAdjustment`, `StockMovement`, `StockOpnameDetail`, `StockTransferDetail`, dan `SalesReturnDetail` memakai `withTrashed()` agar riwayat lama tetap bisa membaca produk yang ditandai hapus.
-- Halaman `products.index` ditambah bulk selection: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, badge jumlah terpilih, dan tombol `Tandai Hapus Terpilih`.
+- Flare mencatat `POST /products` gagal dengan `Duplicate entry 'PC01' for key 'products.products_code_unique'` setelah validasi kode lolos.
+- Root cause: validasi `unique` dan insert database bukan operasi atomik; kode dapat dipakai proses lain di antara dua operasi.
+- `ProductController` sekarang menangkap `UniqueConstraintViolationException` untuk index kode, menghapus file gambar baru yang belum terpakai, lalu mengembalikan error `Kode produk sudah digunakan.` ke form. Produk, transaksi, dan file gambar lama tetap aman.
+- Ditambahkan regression test collision setelah validasi.
+
+### Bugfix Produk - Soft Delete Legacy dan Bulk Selection
+
+- Root cause awal hapus produk: hard delete pada `products` berisiko cascade ke transaksi/riwayat stok/pembelian/retur.
+- Migration `2026_09_17_070000_add_deleted_at_to_products_table.php` tetap dipertahankan untuk kompatibilitas produk lama yang sudah pernah ditandai hapus.
+- Snapshot histori baru memakai tabel `product_references`; relasi `OrderDetails`, `PurchaseOrderDetail`, `PurchaseReceivingDetail`, `PurchaseReturnDetail`, `StockAdjustment`, `StockMovement`, `StockOpnameDetail`, `StockTransferDetail`, dan `SalesReturnDetail` tidak lagi bergantung pada row aktif `products`.
+- Halaman `products.index` ditambah bulk selection: pilih halaman ini, pilih semua hasil filter lintas pagination, highlight baris terpilih, badge jumlah terpilih, dan tombol `Hapus Permanen Terpilih`.
 - Ditambah route `products.bulkDestroy` dan request validasi `BulkDestroyProductRequest`.
+
+### Bugfix Produk - Hapus Permanen Tanpa Menghapus Histori
+
+- Migration additive `2026_09_19_000003_preserve_product_history_for_permanent_deletes` membuat snapshot produk dan memindahkan FK detail histori ke `product_references` dengan `RESTRICT`.
+- Hapus satu/banyak produk sekarang memakai hard delete pada row `products`; snapshot produk diarsipkan lebih dulu dan file gambar dipertahankan agar histori tetap dapat menampilkan aset lama.
+- Data `orders`, `order_details`, purchase order/receiving/return, stock movement/adjustment/opname/transfer, sales return, customer, dan payment tidak dihapus atau diubah.
+- Dashboard dan report penjualan membaca snapshot agar histori tetap tampil setelah produk hilang dari daftar aktif.
+- Row produk lama yang sebelumnya sudah soft-deleted dipertahankan agar migration tidak menghapus data existing; snapshot histori tetap tersedia di `product_references`.
+- Regression test membuktikan row produk hilang permanen, purchase order dan detail tetap ada, bulk delete bekerja, dan FK histori menunjuk snapshot.
+- Produk yang masih dipakai dokumen pending/aktif ditolak agar proses lanjutan tidak rusak; dokumen completed tetap menjadi histori yang aman dihapus dari katalog.
 - POS memakai pelanggan default `Walk-in Customer` agar checkout kasir bisa langsung berjalan tanpa memilih pelanggan manual.
 - `stock-adjustments.index` diperbaiki agar produk yang sudah dihapus tidak membuat error relasi null.
 - Audit 61 halaman menu utama berhasil tanpa HTTP 500 memakai harness Laravel.
@@ -79,9 +96,28 @@
 - Catatan: file `.env` tetap tidak dilacak Git dan harus diperbaiki langsung di hosting/cPanel.
 - `UserSeeder` diubah agar tidak memakai factory/Faker, sehingga `db:seed --class=UserSeeder --force` bisa berjalan di hosting production dengan Composer `--no-dev`.
 
+## 2026-09-18
+
+### Invoice PDF Online + tmp0.cc + WhatsApp Manual
+
+- Audit project membaca enam dokumen wajib dan menelusuri order, order details, customer, payment, invoice mobile lama, view invoice/receipt, konfigurasi toko, route, PDF, dan WhatsApp existing.
+- Ditambahkan dependency `dompdf/dompdf` untuk membuat PDF invoice server-side A4 tanpa CDN/JavaScript.
+- Ditambahkan migration additive `2026_09_18_000002_add_invoice_delivery_fields_to_orders` dengan kolom nullable untuk path PDF, status upload, file ID, URL, expiry, waktu generate/upload, dan error. `down()` sengaja no-op agar rollback tidak menghapus metadata invoice pada database konsumen.
+- `InvoiceService` membuat `invoice-{invoice_no}.pdf` dari data order yang sudah tersimpan, menyimpan PDF lokal, memakai logo toko existing, dan tidak mengubah total/payment/customer/product/order details.
+- Konfirmasi pembayaran sekarang hanya menyimpan order dan membuka struk thermal lebih dahulu walau `order_status` masih `pending`; PDF/upload tidak berjalan pada checkout. Tidak ada job otomatis yang membuat atau mengirim invoice.
+- `Tmp0Service` memakai `POST https://tmp0.cc/api/v1/upload`, multipart `file`, `expires=30d`, timeout, validasi response `success/fileId/url/fullUrl/fileInfo.expires`, dan hanya menerima URL file `/d/{id}`. Uji upload dummy PDF nyata menghasilkan response file ID dan URL `/d/`, bukan `/paste/`.
+- Detail order ditambah status invoice, generate, upload/retry, buka URL, salin link, dan click-to-chat WhatsApp manual.
+- WhatsApp invoice diubah dari Cloud API menjadi `https://api.whatsapp.com/send/?phone=...&text=...&type=phone_number&app_absent=0`. Sistem hanya membuka WhatsApp dengan pesan terisi; user tetap menekan Send. Tidak ada Graph API, token, webhook, bot, atau auto-send pada flow invoice.
+- Migration, kolom konfigurasi, tabel `whatsapp_message_logs`, controller `InvoiceMobileController`, dan link invoice mobile lama dipertahankan agar data lama tidak dihapus. Penggunaan Cloud API lama dilepas secara aman.
+- Test ditambahkan untuk normalisasi nomor Indonesia, pesan multi-data, URL `api.whatsapp.com/send`, multipart tmp0.cc, expiration 30 hari, dan response validation.
+- Validasi: `php artisan migrate --force`, `php artisan view:cache`, `php artisan route:list --name=invoice`, PHP lint, Composer validate/check-platform-reqs, dan unit test invoice.
+- Perbaikan runtime: request tmp0.cc sebelumnya menyimpan response ke `$client` tetapi membaca `$response`, memicu `Undefined variable $response`. Variabel diperbaiki dan diuji melalui Nginx/PHP-CGI aktif dengan dummy PDF tanpa data transaksi nyata; upload berhasil.
+- Receipt `/orders/receipt/print/{id}` memakai link aktif `Kirim WhatsApp + Invoice PDF` ke route invoice khusus. Klik link memastikan pembayaran sudah dikonfirmasi walau order pending, membuat/reuse PDF, upload ke tmp0.cc bila perlu, lalu membuka `api.whatsapp.com/send` dengan link invoice. Error tidak kembali ke print receipt; WhatsApp teks tetap tidak bergantung pada tmp0.cc.
+- Checkout POS menampilkan loading struk setelah `Konfirmasi Pembayaran`, membuka halaman cetak struk setelah order tersimpan, lalu tombol `Kirim WhatsApp + Invoice PDF` pada halaman itu memproses PDF/upload dan redirect ke URL WhatsApp manual.
+
 ## 2026-06-20
 
-### Tambahan - WhatsApp Invoice Otomatis
+### Tambahan - WhatsApp Invoice Otomatis (historis, dinonaktifkan)
 
 #### Migration yang Dibuat/Dijalankan
 - `2026_06_20_020000_add_whatsapp_settings_and_product_print_fields` - Tambah konfigurasi WhatsApp di store_settings dan field bahan/ukuran/keterangan cetak di products
@@ -90,10 +126,10 @@
 #### Fitur yang Diimplementasikan
 - WhatsApp bot bisa diaktifkan dari Pengaturan Toko.
 - Konfigurasi WhatsApp Cloud API tersedia: API version, Phone Number ID, access token, base URL invoice, dan instruksi transfer.
-- Order yang berhasil tersimpan mengirim ringkasan invoice otomatis ke nomor customer setelah commit database.
+- Implementasi awal pernah mengirim ringkasan invoice otomatis melalui WhatsApp Cloud API setelah commit database. Fitur ini historis dan sudah dinonaktifkan; implementasi aktif sekarang memakai click-to-chat manual `api.whatsapp.com/send`.
 - Link invoice mobile publik memakai token terenkripsi: `/e-invoice-mobile/{token}`.
 - Produk punya data pendukung untuk pesan: bahan, ukuran, dan keterangan cetak.
-- Pengiriman WhatsApp non-blocking terhadap checkout; gagal kirim dicatat di log.
+- Pengiriman WhatsApp non-blocking terhadap checkout; fitur Cloud API lama tidak lagi dipanggil oleh implementasi aktif.
 
 #### File Utama
 - `WhatsappNotificationService`
