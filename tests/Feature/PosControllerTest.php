@@ -299,6 +299,23 @@ class PosControllerTest extends TestCase
         $response->assertSee('Laptop A', false);
     }
 
+    public function test_pos_category_filter_excludes_products_from_other_categories(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $suffix = uniqid();
+        $foodCategory = Category::factory()->create(['name' => 'F&B '.$suffix]);
+        $retailCategory = Category::factory()->create(['name' => 'Retail '.$suffix]);
+
+        $foodProduct = $this->createProductWithCode('Food Product', 'FOOD-001', $foodCategory);
+        $retailProduct = $this->createProductWithCode('Retail Product', 'RETAIL-001', $retailCategory);
+
+        $response = $this->actingAs($user)->get('/pos?category_id='.$foodCategory->id);
+
+        $response->assertOk();
+        $response->assertSee('Food Product', false);
+        $response->assertDontSee('Retail Product', false);
+    }
+
     public function test_pos_search_field_has_correct_placeholder(): void
     {
         $user = $this->createAuthenticatedUser();
@@ -307,6 +324,47 @@ class PosControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Cari nama atau barcode...', false);
+    }
+
+    public function test_pos_scanner_channel_delivers_barcode_event_without_database_rows(): void
+    {
+        $user = $this->createAuthenticatedUser();
+        $this->createProductWithCode('Remote Product', 'REMOTE-001');
+        $ordersBefore = Order::count();
+        $productsBefore = Product::count();
+
+        $channelResponse = $this->actingAs($user)
+            ->postJson(route('pos.scanner.channel'))
+            ->assertOk()
+            ->assertJsonPath('success', true);
+        $scannerUrl = $channelResponse->json('scanner_url');
+        $scannerPath = parse_url($scannerUrl, PHP_URL_PATH).'?'.parse_url($scannerUrl, PHP_URL_QUERY);
+
+        $scannerPage = $this->get($scannerPath);
+        $scannerPage->assertOk()->assertSee('Scanner Barcode Kasir', false);
+        $lookupUrl = $scannerPage->viewData('lookupUrl');
+        $lookupPath = parse_url($lookupUrl, PHP_URL_PATH).'?'.parse_url($lookupUrl, PHP_URL_QUERY);
+        $this->postJson($lookupPath, ['code' => 'REMOTE-001'])
+            ->assertOk()
+            ->assertJsonPath('product.name', 'Remote Product');
+
+        $scanUrl = $scannerPage->viewData('scanUrl');
+        $scanPath = parse_url($scanUrl, PHP_URL_PATH).'?'.parse_url($scanUrl, PHP_URL_QUERY);
+
+        $this->postJson($scanPath, ['code' => 'REMOTE-001'])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->actingAs($user)
+            ->get(route('pos.scanner.events', [
+                'channel' => $channelResponse->json('channel'),
+                'after' => 0,
+            ]))
+            ->assertOk()
+            ->assertJsonPath('events.0.code', 'REMOTE-001');
+
+        $this->assertSame($ordersBefore, Order::count());
+        $this->assertSame($productsBefore, Product::count());
     }
 
     public function test_empty_cart_cannot_create_zero_value_order(): void

@@ -10,6 +10,12 @@
         let stream = null;
         let animationFrame = null;
         let detector = null;
+        let scannerAudio = null;
+        let audioUnlockPromise = null;
+        let audioUnlocked = false;
+        let lastAcceptedCode = '';
+        let barcodeLatched = false;
+        let paused = false;
 
         if (!button || !video || !input) {
             return;
@@ -23,7 +29,49 @@
             }
         }
 
+        function prepareAudio() {
+            if (scannerAudio) return;
+            scannerAudio = new Audio(options.soundUrl || '/assets/audio/store-scanner-beep-90395.mp3');
+            scannerAudio.preload = 'auto';
+            scannerAudio.load();
+        }
+
+        function unlockAudio() {
+            prepareAudio();
+            if (audioUnlocked) return Promise.resolve();
+            if (audioUnlockPromise) return audioUnlockPromise;
+
+            scannerAudio.muted = true;
+            audioUnlockPromise = scannerAudio.play().then(() => {
+                scannerAudio.pause();
+                scannerAudio.currentTime = 0;
+                scannerAudio.muted = false;
+                audioUnlocked = true;
+            }).catch(() => {
+                scannerAudio.muted = false;
+            });
+
+            return audioUnlockPromise;
+        }
+
+        function beep() {
+            prepareAudio();
+            const playSound = () => {
+                scannerAudio.currentTime = 0;
+                const playback = scannerAudio.play();
+                playback?.catch(() => {});
+            };
+
+            if (audioUnlockPromise) {
+                audioUnlockPromise.then(playSound).catch(playSound);
+                return;
+            }
+
+            playSound();
+        }
+
         function stop() {
+            paused = true;
             if (animationFrame) {
                 cancelAnimationFrame(animationFrame);
                 animationFrame = null;
@@ -38,32 +86,59 @@
             button.classList.remove('d-none');
         }
 
+        function pause() {
+            paused = true;
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+        }
+
+        function resume() {
+            if (!stream || !detector) return;
+            paused = false;
+            barcodeLatched = false;
+            lastAcceptedCode = '';
+            scanFrame();
+        }
+
         function accept(code) {
             const value = String(code || '').trim();
             if (!value) return;
+
+            if (barcodeLatched && value === lastAcceptedCode) return;
+            lastAcceptedCode = value;
+            barcodeLatched = true;
             input.value = value;
             input.dispatchEvent(new Event('input', { bubbles: true }));
             input.dispatchEvent(new Event('change', { bubbles: true }));
-            setStatus('Barcode berhasil diisi: ' + value, false);
-            stop();
+            beep();
+            setStatus('Barcode berhasil: ' + value, false);
+            if (options.keepOpenOnDetected !== true) stop();
             if (typeof options.onDetected === 'function') options.onDetected(value);
         }
 
         function scanFrame() {
-            if (!detector || !stream) return;
+            if (!detector || !stream || paused) return;
             detector.detect(video).then((barcodes) => {
                 if (barcodes.length > 0 && barcodes[0].rawValue) {
                     accept(barcodes[0].rawValue);
-                    return;
+                } else {
+                    barcodeLatched = false;
+                    lastAcceptedCode = '';
                 }
-                animationFrame = requestAnimationFrame(scanFrame);
+                if (stream && !paused) animationFrame = requestAnimationFrame(scanFrame);
             }).catch(() => {
-                setStatus('Kamera aktif, barcode belum terbaca.', false);
-                animationFrame = requestAnimationFrame(scanFrame);
+                if (options.keepOpenOnDetected !== true) {
+                    setStatus('Kamera aktif, barcode belum terbaca.', false);
+                }
+                if (stream && !paused) animationFrame = requestAnimationFrame(scanFrame);
             });
         }
 
         async function start() {
+            paused = false;
+            unlockAudio();
             if (!window.isSecureContext) {
                 setStatus('Kamera membutuhkan HTTPS atau localhost.', true);
                 return;
@@ -102,7 +177,11 @@
 
         button.addEventListener('click', start);
         closeButton?.addEventListener('click', stop);
+        window.playBarcodeBeep = beep;
+        window.prepareBarcodeAudio = unlockAudio;
         window.addEventListener('pagehide', stop);
+
+        return { pause, resume, stop };
     }
 
     window.createBarcodeCameraScanner = createCameraScanner;

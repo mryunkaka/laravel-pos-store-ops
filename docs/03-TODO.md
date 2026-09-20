@@ -317,6 +317,17 @@ Kriteria penerimaan Phase 8:
 - [ ] Uji transaksi POS nyata melalui browser.
 - [ ] Uji handoff ke PC konsumen dan trust certificate pada perangkat client.
 
+### Fitur Baru Barcode, Scanner HP, dan Gambar Produk
+
+- [x] Tambahkan pilihan gambar produk `Kamera langsung`.
+- [x] Tambahkan pilihan gambar produk `Browse dari galeri`.
+- [x] Tambahkan bunyi scanner kasir Pixabay setelah barcode terbaca; asset disimpan lokal agar tidak bergantung CDN.
+- [x] Pertahankan kamera barcode tetap aktif setelah scan dan tampilkan status berhasil.
+- [x] Hubungkan HP scanner ke POS PC melalui signed cache channel tanpa migration/database.
+- [x] Masukkan barcode dari HP otomatis ke cart POS aktif.
+- [x] Perbaiki filter kategori POS agar hanya menampilkan produk kategori terpilih.
+- [ ] Uji fisik kamera, audio beep, scan nyata, dan koneksi HP pada LAN.
+
 ## Tambahan Lama - WhatsApp Invoice Otomatis (historis, dinonaktifkan)
 
 - [x] Migration dan tabel konfigurasi/log lama dipertahankan untuk kompatibilitas data.

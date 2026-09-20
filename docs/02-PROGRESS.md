@@ -404,6 +404,19 @@
 - [ ] Uji browser authenticated, tampilan POS, dan izin kamera fisik masih BLOCKED karena credential vault localhost belum tersedia.
 - [ ] Handoff PC konsumen belum dijalankan; sertifikat lokal perlu di-trust pada setiap perangkat client.
 
+### Fitur Barcode POS dan Gambar Produk (2026-09-20)
+
+- [x] Form `/products/create` menyediakan pilihan `Kamera langsung` dan `Browse dari galeri`; kamera menghasilkan file gambar JPEG ke input upload existing. Tidak ada perubahan database.
+- [x] Scan barcode kamera memakai asset MP3 `public/assets/audio/store-scanner-beep-90395.mp3` dari halaman Pixabay yang diminta, menampilkan status berhasil, dan tetap membuka kamera saat `keepOpenOnDetected=true`.
+- [x] POS menampilkan tombol `HP Scanner`; PC membuat signed scanner channel berbasis cache, HP mengirim barcode, PC polling event lalu menjalankan quick-add ke cart.
+- [x] Scanner HP tetap standby setelah scan; item berikutnya otomatis masuk cart transaksi aktif tanpa membuat order/riwayat baru.
+- [x] Filter kategori POS diperbaiki dengan filter `category_id` langsung pada query produk; produk kategori lain tidak ikut tampil.
+- [x] Regression test scanner memastikan event masuk tanpa menambah order/product/database rows.
+- [x] Audio scanner lama berbasis `AudioContext`/oscillator dihapus; POS, scanner HP, dan product barcode camera memakai asset MP3 lokal yang sama.
+- [x] Validasi audio: source test menolak `AudioContext`/`createOscillator`, memeriksa asset MP3; full suite 115 passed, 2 skipped, 412 assertions; `npm run build`, Blade cache, PHP/JS lint, route list, migration status, dan `git diff --check` lulus.
+- [x] Scanner HP melakukan lookup nama/harga sebelum tombol `Konfirmasi Harga`; setelah konfirmasi event dikirim ke PC dan kamera resume untuk scan berikutnya.
+- [ ] Uji full browser login/checkout, kamera fisik, izin microphone/audio, scan barcode nyata, dan koneksi HP melalui jaringan LAN masih pending.
+
 ### Langkah Selanjutnya
 
 Phase 7 sudah selesai. Phase 8 di `03-TODO.md` sudah tercatat selesai dari pekerjaan sebelumnya. Fitur invoice WhatsApp manual melalui `api.whatsapp.com/send` tersedia dari detail order.

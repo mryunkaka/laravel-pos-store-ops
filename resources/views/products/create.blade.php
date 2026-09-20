@@ -26,27 +26,36 @@
                                     <div class="profile-img-edit">
                                         <div class="crm-profile-img-edit">
                                             <img class="crm-profile-pic rounded-circle avatar-100" id="image-preview"
-                                                src="{{ asset('assets/images/product/default.webp') }}" alt="profile-pic">
+                                                src="{{ asset('assets/images/product/default.webp') }}" alt="preview gambar produk">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row">
-                                <div class="input-group mb-4 col-lg-6">
+                                <div class="input-group mb-2 col-lg-6">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input @error('image') is-invalid @enderror" id="image" name="image"
                                             accept="image/*" onchange="previewImage();">
-                                        <label class="custom-file-label" for="image">Choose file</label>
-                                        </div>
+                                        <label class="custom-file-label" for="image">Browse dari galeri</label>
+                                    </div>
                                     @error('image')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>
                                     @enderror
-                                    </div>
-                                    </div>
-                                    <!-- end: Input Image -->
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <button type="button" id="start_product_image_camera" class="btn btn-success">Kamera langsung</button>
+                                    <button type="button" id="capture_product_image" class="btn btn-primary d-none">Ambil Foto</button>
+                                    <button type="button" id="close_product_image_camera" class="btn btn-outline-secondary d-none">Tutup kamera</button>
+                                </div>
+                                <div class="col-12">
+                                    <video id="product_image_camera_video" class="d-none mb-2" style="width: 100%; max-height: 320px; object-fit: cover;" playsinline muted></video>
+                                    <small id="product_image_camera_status" class="form-text text-muted">Pilih gambar dari galeri atau ambil gambar memakai kamera.</small>
+                                </div>
+                            </div>
+                            <!-- end: Input Image -->
 
                             <!-- begin: Input Data -->
                             <div class="row align-items-center">
@@ -255,13 +264,25 @@
                                 </div>
 
     <script src="{{ asset('assets/js/barcode-camera.js') }}"></script>
+    <script src="{{ asset('assets/js/product-image-camera.js') }}"></script>
     <script>
+        createProductImageCamera({
+            buttonId: 'start_product_image_camera',
+            videoId: 'product_image_camera_video',
+            captureId: 'capture_product_image',
+            closeId: 'close_product_image_camera',
+            inputId: 'image',
+            previewId: 'image-preview',
+            statusId: 'product_image_camera_status'
+        });
+
         createBarcodeCameraScanner({
             buttonId: 'start_barcode_camera',
             videoId: 'product_barcode_camera_video',
             statusId: 'product_barcode_camera_status',
             inputId: 'code',
-            closeId: 'close_barcode_camera'
+            closeId: 'close_barcode_camera',
+            soundUrl: '{{ asset('assets/audio/store-scanner-beep-90395.mp3') }}',
         });
 
         $('#buying_date').datepicker({

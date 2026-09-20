@@ -16,6 +16,18 @@
 - Test POS/layout/branding/invoice, Blade cache, dan frontend build lulus. Full suite terakhir: 110 passed, 2 skipped, 381 assertions. `php artisan migrate:status` dan `git diff --check` lulus.
 - Uji browser authenticated, kamera fisik, dan checkout nyata tetap pending karena credential vault belum tersedia.
 
+### Barcode HP, Beep, Filter Kategori, dan Gambar Produk
+
+- `/products/create` sekarang punya dua pilihan gambar: `Kamera langsung` dan `Browse dari galeri`; hasil kamera masuk ke input upload existing sebagai JPEG. Tidak ada migration atau perubahan database.
+- `barcode-camera.js` memakai asset MP3 lokal `store-scanner-beep-90395.mp3` dari sound Pixabay yang diminta setelah barcode terbaca; `AudioContext`/oscillator sintetis dihapus. Status berhasil, debounce duplikasi, dan opsi kamera tetap aktif dipertahankan.
+- POS menambah `HP Scanner`. PC membuat signed channel sementara berbasis cache; HP membuka signed scanner page, scan barcode, kirim event; PC polling event dan quick-add ke cart transaksi aktif.
+- Scanner HP tetap standby setelah scan. Event hanya barcode sementara; tidak membuat order baru dan tidak mengubah database sampai kasir melakukan checkout normal.
+- Filter kategori POS diperbaiki dengan `where('category_id', ...)`, karena `category_id` sebelumnya dikirim sebagai query biasa tetapi hanya diproses oleh scope pencarian nama/kode.
+- Regression test scanner membuktikan event diterima tanpa menambah `orders` atau `products`; test kategori membuktikan produk kategori lain tidak tampil.
+- Validasi: focused scanner/kategori tests 3 lulus dengan 17 assertions; full suite 115 passed, 2 skipped, 412 assertions; route list scanner, PHP lint, Blade cache, frontend build, `node --check`, migration status, dan `git diff --check` lulus.
+- Scanner HP melakukan lookup nama/harga sebelum `Konfirmasi Harga`; setelah konfirmasi event masuk ke PC dan kamera resume untuk scan berikutnya.
+- Uji browser login/checkout, kamera fisik, audio, barcode nyata, dan koneksi HP LAN masih pending.
+
 ## 2026-09-19
 
 ### QA Full Aplikasi dan Perlindungan Data

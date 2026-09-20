@@ -125,6 +125,16 @@ Route::middleware(['permission:category.menu'])->group(function () {
 });
 
 // ====== POS ======
+Route::get('/pos/scanner/remote/{channel}', [PosController::class, 'scannerPage'])
+    ->middleware('signed:relative')
+    ->name('pos.scanner.remote');
+Route::post('/pos/scanner/remote/{channel}/lookup', [PosController::class, 'lookupScannerCode'])
+    ->middleware('signed:relative')
+    ->name('pos.scanner.lookup');
+Route::post('/pos/scanner/remote/{channel}/scan', [PosController::class, 'receiveScannerCode'])
+    ->middleware('signed:relative')
+    ->name('pos.scanner.scan');
+
 Route::middleware(['permission:pos.menu'])->group(function () {
     Route::get('/pos', [PosController::class,'index'])->name('pos.index');
     Route::post('/pos/add', [PosController::class, 'addCart'])->name('pos.addCart');
@@ -133,6 +143,8 @@ Route::middleware(['permission:pos.menu'])->group(function () {
     Route::post('/pos/customer', [PosController::class, 'storeCustomer'])->name('pos.storeCustomer');
     Route::post('/pos/voucher-preview', [PosController::class, 'voucherPreview'])->name('pos.voucher.preview');
     Route::get('/pos/customers-ajax', [PosController::class, 'searchCustomers'])->name('pos.customers.search');
+    Route::post('/pos/scanner/channel', [PosController::class, 'createScannerChannel'])->name('pos.scanner.channel');
+    Route::get('/pos/scanner/events', [PosController::class, 'scannerEvents'])->name('pos.scanner.events');
 
     Route::post('/pos/invoice/print', [PosController::class, 'printInvoice'])->name('pos.printInvoice');
 

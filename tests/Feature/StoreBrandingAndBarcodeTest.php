@@ -91,6 +91,18 @@ class StoreBrandingAndBarcodeTest extends TestCase
         self::assertStringContainsString('id="product_barcode_camera_video"', file_get_contents(resource_path('views/products/create.blade.php')));
     }
 
+    public function test_product_create_exposes_camera_and_gallery_image_choices(): void
+    {
+        $source = file_get_contents(resource_path('views/products/create.blade.php'));
+
+        self::assertStringContainsString('id="start_product_image_camera"', $source);
+        self::assertStringContainsString('id="product_image_camera_video"', $source);
+        self::assertStringContainsString('id="capture_product_image"', $source);
+        self::assertStringContainsString('id="image"', $source);
+        self::assertStringContainsString('accept="image/*"', $source);
+        self::assertStringContainsString('product-image-camera.js', $source);
+    }
+
     public function test_invoice_pdf_uses_dynamic_store_link_and_full_payment_breakdown(): void
     {
         [$order] = $this->sampleOrder();

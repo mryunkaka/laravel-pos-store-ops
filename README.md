@@ -357,6 +357,18 @@ netstat.exe -ano | findstr ":8443"
 
 Browser membutuhkan secure context untuk `navigator.mediaDevices.getUserMedia`. Kamera fisik tetap perlu izin Camera pada browser/Windows. Jika izin ditolak, buka pengaturan site browser lalu izinkan Camera; aplikasi menampilkan status/error kamera.
 
+#### Scanner barcode HP ke PC kasir
+
+1. Buka POS pada PC kasir melalui `https://localhost:8443/pos`.
+2. Klik `HP Scanner`. Aplikasi membuat link scanner sementara dan menyalinnya ke clipboard.
+3. Buka link itu pada HP yang berada di jaringan LAN yang sama. Link memakai IP LAN PC agar HP tidak diarahkan ke `localhost`.
+4. Trust sertifikat lokal pada HP sebelum memberi izin kamera. Jangan salin private key `*-key.pem`.
+5. Klik `Mulai Kamera` satu kali. Setelah barcode terbaca, HP menampilkan status berhasil dan bunyi beep, lalu tetap standby untuk scan berikutnya.
+6. PC polling event sementara dan otomatis menambah produk ke cart transaksi aktif. Scanner tidak membuat order atau mengubah database; order tersimpan hanya saat kasir checkout.
+7. Cache scanner berlaku 8 jam. Jika link kedaluwarsa, klik `HP Scanner` lagi untuk membuat sesi baru.
+
+Jika HP tidak dapat membuka kamera, gunakan `https://10.77.147.173:8443/pos` pada PC agar link pairing langsung memakai IP LAN, lalu trust sertifikat `pos3-local.crt.pem` pada HP. Tes kamera fisik, audio, barcode nyata, dan koneksi LAN tetap perlu dilakukan pada perangkat target.
+
 ### 8.2 Sertifikat publik dengan win-acme
 
 win-acme tidak dapat menerbitkan sertifikat publik untuk `localhost`. Gunakan domain sungguhan, misalnya `pos.example.com`, dengan DNS mengarah ke IP publik server dan TCP `80` dapat dijangkau Let's Encrypt. Untuk domain publik, gunakan port `443` atau pertahankan `8443` dengan URL port eksplisit.

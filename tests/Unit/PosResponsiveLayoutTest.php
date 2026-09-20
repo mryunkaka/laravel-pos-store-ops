@@ -29,6 +29,28 @@ class PosResponsiveLayoutTest extends TestCase
         self::assertStringNotContainsString("if (!button || !video || !input || !navigator.mediaDevices?.getUserMedia)", $source);
     }
 
+    public function test_barcode_scanner_beeps_and_can_remain_open_after_detection(): void
+    {
+        $source = (string) file_get_contents(public_path('assets/js/barcode-camera.js'));
+
+        self::assertStringContainsString("new Audio(options.soundUrl || '/assets/audio/store-scanner-beep-90395.mp3')", $source);
+        self::assertFileExists(public_path('assets/audio/store-scanner-beep-90395.mp3'));
+        self::assertStringNotContainsString('AudioContext', $source);
+        self::assertStringNotContainsString('createOscillator', $source);
+        self::assertStringContainsString('keepOpenOnDetected', $source);
+        self::assertStringContainsString('Barcode berhasil', $source);
+    }
+
+    public function test_pos_has_mobile_scanner_pairing_controls(): void
+    {
+        $source = (string) file_get_contents(resource_path('views/pos/index.blade.php'));
+
+        self::assertStringContainsString('connect_pos_scanner', $source);
+        self::assertStringContainsString("route('pos.scanner.channel')", $source);
+        self::assertStringContainsString("route('pos.scanner.events')", $source);
+        self::assertStringContainsString('keepOpenOnDetected: true', $source);
+    }
+
     public function test_authenticated_layout_is_not_indexable(): void
     {
         $source = (string) file_get_contents(resource_path('views/dashboard/body/main.blade.php'));

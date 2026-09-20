@@ -11,12 +11,174 @@ use App\Models\StoreSetting;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PosController extends Controller
 {
+    private const SCANNER_TTL_MINUTES = 480;
+
+    public function createScannerChannel()
+    {
+        $channel = Str::random(48);
+        $expiresAt = now()->addMinutes(self::SCANNER_TTL_MINUTES);
+        $ttl = $expiresAt->diffInSeconds(now());
+
+        $cache = $this->scannerCache();
+        $cache->put($this->scannerChannelKey($channel), [
+            'user_id' => auth()->id(),
+            'expires_at' => $expiresAt->toIso8601String(),
+        ], $ttl);
+        $cache->put($this->scannerEventsKey($channel), [], $ttl);
+        $cache->put($this->scannerSequenceKey($channel), 0, $ttl);
+
+        $scannerPath = URL::temporarySignedRoute('pos.scanner.remote', $expiresAt, ['channel' => $channel], false);
+
+        return response()->json([
+            'success' => true,
+            'channel' => $channel,
+            'scanner_url' => $this->scannerUrl($scannerPath),
+            'expires_at' => $expiresAt->toIso8601String(),
+        ]);
+    }
+
+    public function scannerEvents(Request $request)
+    {
+        $validated = $request->validate([
+            'channel' => 'required|string|size:48',
+            'after' => 'nullable|integer|min:0',
+        ]);
+        $channel = $this->scannerChannel($validated['channel']);
+
+        abort_unless((int) ($channel['user_id'] ?? 0) === (int) auth()->id(), 403);
+
+        $after = (int) ($validated['after'] ?? 0);
+        $events = collect($this->scannerCache()->get($this->scannerEventsKey($validated['channel']), []))
+            ->filter(fn (array $event) => (int) ($event['id'] ?? 0) > $after)
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'events' => $events,
+        ]);
+    }
+
+    public function scannerPage(string $channel)
+    {
+        $channelData = $this->scannerChannel($channel);
+        $expiresAt = Carbon::parse($channelData['expires_at']);
+
+        $lookupPath = URL::temporarySignedRoute('pos.scanner.lookup', $expiresAt, ['channel' => $channel], false);
+        $scanPath = URL::temporarySignedRoute('pos.scanner.scan', $expiresAt, ['channel' => $channel], false);
+
+        return view('pos.scanner', [
+            'lookupUrl' => $this->scannerUrl($lookupPath),
+            'scanUrl' => $this->scannerUrl($scanPath),
+        ]);
+    }
+
+    public function lookupScannerCode(Request $request, string $channel)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:50',
+        ]);
+        $this->scannerChannel($channel);
+
+        $product = Product::where('code', trim($validated['code']))->first();
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan.',
+            ], 404);
+        }
+
+        if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk sudah kadaluarsa.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'product' => [
+                'name' => $product->name,
+                'code' => $product->code,
+                'price' => (float) $product->selling_price,
+                'stock' => (int) $product->stock,
+            ],
+        ]);
+    }
+
+    public function receiveScannerCode(Request $request, string $channel)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:50',
+        ]);
+        $this->scannerChannel($channel);
+        $cache = $this->scannerCache();
+        $events = $cache->get($this->scannerEventsKey($channel), []);
+        $eventId = (int) $cache->increment($this->scannerSequenceKey($channel));
+
+        $events[] = [
+            'id' => $eventId,
+            'code' => trim($validated['code']),
+            'created_at' => now()->toIso8601String(),
+        ];
+        $cache->put($this->scannerEventsKey($channel), array_slice($events, -50), self::SCANNER_TTL_MINUTES * 60);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Barcode diterima kasir.',
+        ]);
+    }
+
+    private function scannerChannel(string $channel): array
+    {
+        $data = $this->scannerCache()->get($this->scannerChannelKey($channel));
+
+        abort_unless(is_array($data), 404, 'Sesi scanner sudah berakhir.');
+        abort_if(Carbon::parse($data['expires_at'])->isPast(), 404, 'Sesi scanner sudah berakhir.');
+
+        return $data;
+    }
+
+    private function scannerCache()
+    {
+        return Cache::store('file');
+    }
+
+    private function scannerChannelKey(string $channel): string
+    {
+        return 'pos_scanner_channel:'.$channel;
+    }
+
+    private function scannerEventsKey(string $channel): string
+    {
+        return 'pos_scanner_events:'.$channel;
+    }
+
+    private function scannerSequenceKey(string $channel): string
+    {
+        return 'pos_scanner_sequence:'.$channel;
+    }
+
+    private function scannerUrl(string $path): string
+    {
+        $host = request()->getHost();
+
+        if ($host === 'localhost' || $host === '127.0.0.1') {
+            $host = gethostbyname(gethostname());
+        }
+
+        return request()->getScheme().'://'.$host.':'.request()->getPort().$path;
+    }
+
     /**
      * Display the POS interface.
      */
@@ -34,6 +196,7 @@ class PosController extends Controller
 
         $todayDate = Carbon::now();
         $row = (int) request('row', 10);
+        $categoryId = request()->integer('category_id');
 
         if ($row < 1 || $row > 100) {
             abort(400, 'The per-page parameter must be an integer between 1 and 100.');
@@ -54,6 +217,7 @@ class PosController extends Controller
             'productItem' => Cart::content(),
             'products' => QueryBuilder::for(Product::class)
                 ->where('expire_date', '>', $todayDate)
+                ->when($categoryId > 0, fn ($query) => $query->where('category_id', $categoryId))
                 ->allowedSorts(['name', 'selling_price'])
                 ->allowedFilters(['name', 'category_id'])
                 ->filter(request(['search', 'category_id']))

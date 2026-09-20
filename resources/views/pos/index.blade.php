@@ -45,6 +45,7 @@
                                                             <x-heroicon-o-magnifying-glass class="w-5 h-5" />
                                                         </button>
                                                         <button type="button" id="start_pos_barcode_camera" class="btn btn-success" title="Scan barcode dengan kamera">Kamera</button>
+                                                        <button type="button" id="connect_pos_scanner" class="btn btn-outline-primary" title="Hubungkan kamera HP ke kasir">HP Scanner</button>
                                                         @if (request('search') || request('category_id'))
                                                             <a href="{{ route('pos.index') }}" class="input-group-text bg-danger text-white">
                                                                 <x-heroicon-o-x-mark class="w-5 h-5" />
@@ -55,6 +56,7 @@
                                                 <video id="pos_barcode_camera_video" class="d-none mt-2" style="width: 100%; max-height: 220px; object-fit: cover;" playsinline muted></video>
                                                 <button type="button" id="close_pos_barcode_camera" class="btn btn-sm btn-outline-secondary d-none mt-1">Tutup kamera</button>
                                                 <small id="pos_barcode_camera_status" class="form-text"></small>
+                                                <div id="pos_scanner_pairing" class="small mt-2" aria-live="polite"></div>
                                             </div>
                                         </div>
 
@@ -303,8 +305,86 @@
             statusId: 'pos_barcode_camera_status',
             inputId: 'pos_search',
             closeId: 'close_pos_barcode_camera',
-            onDetected: quickAddBarcode
+            soundUrl: '{{ asset('assets/audio/store-scanner-beep-90395.mp3') }}',
+            keepOpenOnDetected: true,
+            onDetected: function (code) {
+                quickAddBarcode(code, { beep: false });
+            }
         });
+
+        let scannerChannel = null;
+        let scannerEventId = 0;
+        let scannerPollTimer = null;
+        let scannerPollInFlight = false;
+
+        function setScannerStatus(message, isError) {
+            const status = document.getElementById('pos_barcode_camera_status');
+            if (!status) return;
+            status.textContent = message;
+            status.classList.toggle('text-danger', Boolean(isError));
+            status.classList.toggle('text-success', !isError);
+        }
+
+        async function pollScannerEvents() {
+            if (!scannerChannel || scannerPollInFlight) return;
+            scannerPollInFlight = true;
+            try {
+                const params = new URLSearchParams({ channel: scannerChannel, after: String(scannerEventId) });
+                const response = await fetch("{{ route('pos.scanner.events') }}?" + params.toString(), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Sesi scanner berakhir.');
+                const data = await response.json();
+                for (const event of (data.events || [])) {
+                    scannerEventId = Math.max(scannerEventId, Number(event.id || 0));
+                    window.playBarcodeBeep?.();
+                    setScannerStatus('Scan berhasil: ' + event.code, false);
+                    await quickAddBarcode(event.code);
+                }
+            } catch (error) {
+                setScannerStatus(error.message || 'Gagal menerima scan dari HP.', true);
+                window.clearInterval(scannerPollTimer);
+                scannerPollTimer = null;
+            } finally {
+                scannerPollInFlight = false;
+            }
+        }
+
+        async function connectPosScanner() {
+            window.prepareBarcodeAudio?.();
+            const pairing = document.getElementById('pos_scanner_pairing');
+            try {
+                const response = await fetch("{{ route('pos.scanner.channel') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) throw new Error(data.message || 'Gagal membuat sesi scanner.');
+
+                scannerChannel = data.channel;
+                scannerEventId = 0;
+                window.clearInterval(scannerPollTimer);
+                scannerPollTimer = window.setInterval(pollScannerEvents, 900);
+                pairing.textContent = '';
+                const label = document.createElement('span');
+                label.textContent = 'Buka link ini di HP scanner: ';
+                const link = document.createElement('a');
+                link.href = data.scanner_url;
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.textContent = data.scanner_url;
+                pairing.append(label, link);
+                setScannerStatus('HP scanner terhubung. Menunggu barcode.', false);
+                if (navigator.clipboard?.writeText) navigator.clipboard.writeText(data.scanner_url);
+            } catch (error) {
+                setScannerStatus(error.message || 'Gagal menghubungkan HP scanner.', true);
+            }
+        }
+
+        document.getElementById('connect_pos_scanner')?.addEventListener('click', connectPosScanner);
 
         // Initialize Select2 on Load
             window.addEventListener('load', function () {
@@ -770,7 +850,7 @@
             }
         }
 
-        async function quickAddBarcode(code) {
+        async function quickAddBarcode(code, options = {}) {
             try {
                 const response = await fetch("{{ route('pos.barcode.quickAdd') }}", {
                     method: 'POST',
@@ -802,6 +882,7 @@
                 });
                 const addData = await addResponse.json();
                 if (addData.success) {
+                    if (options.beep !== false) window.playBarcodeBeep?.();
                     document.getElementById('cart-sidebar-container').innerHTML = addData.cart_html;
                     document.getElementById('cart-count-badge').innerText = addData.cart_count + ' item';
                 } else {
